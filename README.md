@@ -1,5 +1,9 @@
 # PyPixoo
 
+[![CI](https://github.com/endymion/PyPixoo/actions/workflows/ci.yml/badge.svg)](https://github.com/endymion/PyPixoo/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/endymion/PyPixoo/graph/badge.svg)](https://codecov.io/gh/endymion/PyPixoo)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 > The Pixoo library you can trust — BDD-first, well-tested.
 
 A Python library for the [Divoom Pixoo 64](https://www.divoom.com/products/pixoo-64) display. This is a **true behavior-driven design** project: **behaviors come first**. We work **outside-in** and **backward** from observable behavior — write Gherkin scenarios first, run them (expect failures), implement until they pass. Specs mock the device and assert library behavior; we test the library, not the device.

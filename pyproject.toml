@@ -15,7 +15,15 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "behave~=1.2.6",
+    "coverage[toml]>=7.0",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.coverage.run]
+source = ["src"]
+command_line = "-m behave"
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover"]
