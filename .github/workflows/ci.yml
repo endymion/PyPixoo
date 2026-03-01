@@ -37,7 +37,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          coverage run -m behave
+          coverage run -m behave --tags '~real_device'
           coverage report --fail-under=100
           coverage xml
 

@@ -2,7 +2,10 @@
 
 import base64
 import json
+from pathlib import Path
+
 import requests
+from PIL import Image
 
 from pypixoo.buffer import Buffer
 
@@ -31,6 +34,15 @@ class Pixoo:
         b = max(0, min(255, b))
         for _ in range(self.SIZE * self.SIZE):
             self._buffer.extend([r, g, b])
+
+    def load_image(self, path: str | Path) -> None:
+        """Load an image file into the display buffer. Resizes to 64×64 if needed."""
+        img = Image.open(path).convert("RGB")
+        if img.size != (self.SIZE, self.SIZE):
+            img = img.resize((self.SIZE, self.SIZE), Image.Resampling.NEAREST)
+        self._buffer = list(img.getdata())
+        # Flatten to R,G,B,R,G,B...
+        self._buffer = [c for pixel in self._buffer for c in pixel]
 
     def push(self) -> None:
         """Send the buffer to the display."""

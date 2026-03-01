@@ -31,6 +31,15 @@ def step_fill(context, r, g, b):
         context.fill_error = e
 
 
+@when('I load image "{path}"')
+def step_load_image(context, path):
+    context.load_error = None
+    try:
+        context.pixoo.load_image(path)
+    except Exception as e:
+        context.load_error = e
+
+
 @when('I push')
 def step_push(context):
     context.push_error = None
@@ -44,8 +53,14 @@ def step_push(context):
 def step_no_error(context):
     assert context.connect_error is None, f"Connect failed: {context.connect_error}"
     assert context.connected, "Connection was not successful"
-    assert context.fill_error is None, f"Fill failed: {context.fill_error}"
+    assert getattr(context, "fill_error", None) is None, f"Fill failed: {context.fill_error}"
+    assert getattr(context, "load_error", None) is None, f"Load failed: {context.load_error}"
     assert context.push_error is None, f"Push failed: {context.push_error}"
+
+
+@then('no load error should occur')
+def step_no_load_error(context):
+    assert getattr(context, "load_error", None) is None, f"Load failed: {context.load_error}"
 
 
 @then('the buffer should be {width} by {height}')

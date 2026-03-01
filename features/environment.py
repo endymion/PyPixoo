@@ -1,5 +1,7 @@
 """Behave hooks for PyPixoo specs."""
 
+import os
+
 import requests
 from unittest.mock import MagicMock, patch
 
@@ -11,7 +13,12 @@ def _mock_response(json_data):
 
 
 def before_all(context):
-    """Mock device HTTP so specs run without a real Pixoo on the network."""
+    """Mock device HTTP so specs run without a real Pixoo on the network.
+    Set PIXOO_REAL_DEVICE=1 to disable mocking for @real_device scenarios."""
+    context._real_device = os.environ.get("PIXOO_REAL_DEVICE") == "1"
+    if context._real_device:
+        context._post_patcher = None
+        return
 
     def fake_post(url, data=None, **kwargs):
         mode = getattr(context, "mock_mode", "success")
@@ -39,4 +46,5 @@ def before_scenario(context, scenario):
 
 
 def after_all(context):
-    context._post_patcher.stop()
+    if context._post_patcher is not None:
+        context._post_patcher.stop()

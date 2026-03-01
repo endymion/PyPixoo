@@ -52,8 +52,9 @@ Outside-in, behavior-first:
 
 ## Commands
 
-- **Run specs:** `behave`
-- **Run specs with coverage (must be 100%):** `coverage run -m behave && coverage report --fail-under=100`
+- **Run specs:** `behave --tags '~real_device'` (CI excludes @real_device)
+- **Run specs with coverage (must be 100%):** `coverage run -m behave --tags '~real_device' && coverage report --fail-under=100`
+- **Run against real device:** `PIXOO_REAL_DEVICE=1 behave --tags real_device` (device plugged in, edit IP in feature file if needed)
 - **Install:** `pip install -e ".[dev]"`
 - **Device IP:** Specs use hardcoded IP in feature file (e.g. `192.168.0.37`). The device is mocked; no real Pixoo required for CI.
 
@@ -65,5 +66,6 @@ from pypixoo import Pixoo
 pixoo = Pixoo("192.168.0.37")
 pixoo.connect()          # Returns bool, loads GIF counter
 pixoo.fill(r, g, b)      # Fill buffer with RGB
+pixoo.load_image(path)   # Load image file into buffer (resizes to 64×64 if needed)
 pixoo.push()             # Send buffer to device
 ```
