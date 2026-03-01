@@ -3,7 +3,7 @@
   "title": "Load image into buffer",
   "description": "",
   "type": "epic",
-  "status": "open",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
@@ -19,7 +19,7 @@
     }
   ],
   "created_at": "2026-03-01T05:42:11.916483Z",
-  "updated_at": "2026-03-01T05:42:19.908083Z",
-  "closed_at": null,
+  "updated_at": "2026-03-01T16:27:59.848525Z",
+  "closed_at": "2026-03-01T16:27:59.848525Z",
   "custom": {}
 }
