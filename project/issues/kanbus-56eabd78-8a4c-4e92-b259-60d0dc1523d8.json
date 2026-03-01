@@ -1,0 +1,25 @@
+{
+  "id": "kanbus-56eabd78-8a4c-4e92-b259-60d0dc1523d8",
+  "title": "Load image into buffer",
+  "description": "",
+  "type": "epic",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "3f842acd-298f-4f23-9951-64a3e8f72e77",
+      "author": "ryan.porter",
+      "text": "Command to load an image (PNG, JPEG, etc.) into the buffer and send to the device. Options: scaling vs cropping (fit/letterbox, fill/crop, no scaling), positioning (center, align, offset), scaling mode (stretch, maintain aspect).",
+      "created_at": "2026-03-01T05:42:19.908083Z"
+    }
+  ],
+  "created_at": "2026-03-01T05:42:11.916483Z",
+  "updated_at": "2026-03-01T05:42:19.908083Z",
+  "closed_at": null,
+  "custom": {}
+}

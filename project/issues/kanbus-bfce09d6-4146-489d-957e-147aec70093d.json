@@ -1,0 +1,25 @@
+{
+  "id": "kanbus-bfce09d6-4146-489d-957e-147aec70093d",
+  "title": "Image construction",
+  "description": "",
+  "type": "epic",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "6d21435b-5c17-4cfe-8f32-b893a6f68592",
+      "author": "ryan.porter",
+      "text": "Primitives and helpers for constructing images to send (drawing primitives, regions, etc.).",
+      "created_at": "2026-03-01T05:42:20.822729Z"
+    }
+  ],
+  "created_at": "2026-03-01T05:42:12.614079Z",
+  "updated_at": "2026-03-01T05:42:20.822729Z",
+  "closed_at": null,
+  "custom": {}
+}

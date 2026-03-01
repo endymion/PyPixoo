@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "52546a6a-d285-4264-bad6-b5324ddfcb92",
+  "issue_id": "kanbus-bcb636b5-d73d-4421-a0aa-7665e75e3e03",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-01T06:00:40.216Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-4eafb863-8dec-43a4-b3e6-f5936f94feb1",
+    "priority": 2,
+    "status": "open",
+    "title": "Implement Pydantic buffer and buffer accessor"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "2b6e85a5-fd3c-4d32-879d-7c82bba42b59",
+  "issue_id": "kanbus-498246cc-8700-4349-8f6f-96444d2b4f3a",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-01T06:00:39.971Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "kanbus-4eafb863-8dec-43a4-b3e6-f5936f94feb1",
+    "priority": 2,
+    "status": "open",
+    "title": "Buffer visible for assertions"
+  }
+}

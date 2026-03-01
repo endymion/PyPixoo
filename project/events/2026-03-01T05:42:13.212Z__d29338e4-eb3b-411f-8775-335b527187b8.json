@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "d29338e4-eb3b-411f-8775-335b527187b8",
+  "issue_id": "kanbus-7060c4dd-577a-4329-9147-1e17b442f5cf",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-01T05:42:13.212Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+    "priority": 2,
+    "status": "open",
+    "title": "Animation sequences with timing"
+  }
+}

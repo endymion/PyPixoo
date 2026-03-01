@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "5e8c9489-ee0e-489c-928c-102e0347ee1d",
+  "issue_id": "kanbus-56eabd78-8a4c-4e92-b259-60d0dc1523d8",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-01T05:42:11.916Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+    "priority": 2,
+    "status": "open",
+    "title": "Load image into buffer"
+  }
+}

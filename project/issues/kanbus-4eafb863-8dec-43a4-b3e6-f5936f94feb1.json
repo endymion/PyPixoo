@@ -1,0 +1,25 @@
+{
+  "id": "kanbus-4eafb863-8dec-43a4-b3e6-f5936f94feb1",
+  "title": "Buffer model and assertions",
+  "description": "",
+  "type": "epic",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "b0c2585c-75d1-4f51-9fa8-5a1b1d62bc24",
+      "author": "ryan.porter",
+      "text": "Pydantic class representing the 64×64 display buffer with enough introspection (e.g. region checks, pixel equality) to write effective Gherkin assertions. Add buffer accessor to Pixoo and extend step definitions for buffer assertions.",
+      "created_at": "2026-03-01T05:42:18.397783Z"
+    }
+  ],
+  "created_at": "2026-03-01T05:42:11.310961Z",
+  "updated_at": "2026-03-01T06:02:48.423303Z",
+  "closed_at": "2026-03-01T06:02:48.423303Z",
+  "custom": {}
+}

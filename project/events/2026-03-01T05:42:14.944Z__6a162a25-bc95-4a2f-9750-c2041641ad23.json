@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "6a162a25-bc95-4a2f-9750-c2041641ad23",
+  "issue_id": "kanbus-50a118a1-9669-4a4a-b37e-21b34ac53285",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-01T05:42:14.944Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+    "priority": 2,
+    "status": "open",
+    "title": "React + Storybook on Pixoo"
+  }
+}

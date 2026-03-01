@@ -1,0 +1,25 @@
+{
+  "id": "kanbus-6b214353-799a-4c0a-b681-33358aa6dfba",
+  "title": "Get basic CI testing working",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-87c9498f-ddcd-4f0c-8b96-befa7d30c363",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "3dfb4a77-0940-4675-8084-92fcff51f0d3",
+      "author": "ryan.porter",
+      "text": "Completed: CI green with GitHub Actions workflow, Python 3.9-3.14 matrix, mocked device in behave environment.",
+      "created_at": "2026-03-01T05:42:37.688718Z"
+    }
+  ],
+  "created_at": "2026-03-01T05:42:32.412223Z",
+  "updated_at": "2026-03-01T05:42:37.688718Z",
+  "closed_at": "2026-03-01T05:42:36.825142Z",
+  "custom": {}
+}

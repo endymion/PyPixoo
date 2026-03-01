@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "02b4117a-4f3b-43eb-8c25-42523a5a4152",
+  "issue_id": "kanbus-2d91b379-2c44-4fef-977c-ab56ad1af993",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-01T05:42:14.887Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+    "priority": 2,
+    "status": "open",
+    "title": "Headless browser rendering"
+  }
+}

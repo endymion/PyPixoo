@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-bcb636b5-d73d-4421-a0aa-7665e75e3e03",
+  "title": "Implement Pydantic buffer and buffer accessor",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-4eafb863-8dec-43a4-b3e6-f5936f94feb1",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-01T06:00:40.215951Z",
+  "updated_at": "2026-03-01T06:01:39.884958Z",
+  "closed_at": "2026-03-01T06:01:39.884958Z",
+  "custom": {}
+}
