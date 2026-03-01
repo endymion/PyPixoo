@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/pypixoo.svg)](https://pypi.org/project/pypixoo/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/endymion/PyPixoo/actions/workflows/ci.yml/badge.svg)](https://github.com/endymion/PyPixoo/actions/workflows/ci.yml)
-[![codecov](https://img.shields.io/codecov/c/github/endymion/PyPixoo?branch=main)](https://codecov.io/gh/endymion/PyPixoo)
+[![codecov](https://codecov.io/gh/endymion/PyPixoo/branch/main/graph/badge.svg)](https://codecov.io/gh/endymion/PyPixoo)
 
 > The Pixoo library you can trust — BDD-first, well-tested.
 
