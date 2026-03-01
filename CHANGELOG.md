@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.3.0 (2026-03-01)
+
+### Chores
+
+- Close Animation sequences with timing epic
+  ([`7e4f138`](https://github.com/endymion/PyPixoo/commit/7e4f138ea408a3043aa37f1419ef3f7be0ba0267))
+
+### Features
+
+- Add animation sequences with callbacks and chained demo
+  ([`48d7861`](https://github.com/endymion/PyPixoo/commit/48d78617a6265289acabeba1309c78cecad8b3ce))
+
+
 ## v1.2.0 (2026-03-01)
 
 ### Bug Fixes
