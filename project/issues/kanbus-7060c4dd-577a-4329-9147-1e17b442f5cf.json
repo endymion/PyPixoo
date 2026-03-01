@@ -3,7 +3,7 @@
   "title": "Animation sequences with timing",
   "description": "",
   "type": "epic",
-  "status": "open",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
@@ -19,7 +19,7 @@
     }
   ],
   "created_at": "2026-03-01T05:42:13.212429Z",
-  "updated_at": "2026-03-01T05:42:21.795896Z",
-  "closed_at": null,
+  "updated_at": "2026-03-01T18:07:47.467821Z",
+  "closed_at": "2026-03-01T18:07:47.467821Z",
   "custom": {}
 }
