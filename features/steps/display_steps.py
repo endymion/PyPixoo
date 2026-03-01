@@ -1,0 +1,46 @@
+"""Step definitions for display.feature."""
+
+from behave import given, when, then
+
+from pypixoo import Pixoo
+
+
+@given('a Pixoo at IP "{ip}"')
+def step_pixoo_at_ip(context, ip):
+    context.pixoo = Pixoo(ip)
+
+
+@when('I connect')
+def step_connect(context):
+    context.connect_error = None
+    try:
+        context.connected = context.pixoo.connect()
+    except Exception as e:
+        context.connect_error = e
+        context.connected = False
+
+
+@when('I fill with RGB {r} {g} {b}')
+def step_fill(context, r, g, b):
+    context.fill_error = None
+    try:
+        context.pixoo.fill(int(r), int(g), int(b))
+    except Exception as e:
+        context.fill_error = e
+
+
+@when('I push')
+def step_push(context):
+    context.push_error = None
+    try:
+        context.pixoo.push()
+    except Exception as e:
+        context.push_error = e
+
+
+@then('no error should occur')
+def step_no_error(context):
+    assert context.connect_error is None, f"Connect failed: {context.connect_error}"
+    assert context.connected, "Connection was not successful"
+    assert context.fill_error is None, f"Fill failed: {context.fill_error}"
+    assert context.push_error is None, f"Push failed: {context.push_error}"
