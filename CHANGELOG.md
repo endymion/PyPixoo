@@ -2,6 +2,25 @@
 
 <!-- version list -->
 
+## v1.0.3 (2026-03-01)
+
+### Bug Fixes
+
+- Paths-ignore coverage.json to prevent workflow loop from badge pushes
+  ([`f963d94`](https://github.com/endymion/PyPixoo/commit/f963d94c4bbd5da011815729736aaaf0f3652845))
+
+- **ci**: Run coverage-badge after release to avoid push race
+  ([`89ee185`](https://github.com/endymion/PyPixoo/commit/89ee185cbcbd8b52b6f3ef3723a0c7f0ecf21083))
+
+### Chores
+
+- Self-hosted coverage badge, no third-party service
+  ([`0a69639`](https://github.com/endymion/PyPixoo/commit/0a69639b4816ec09ed52605eafe7e65992399dfc))
+
+- Update coverage badge [skip ci]
+  ([`0b7b02d`](https://github.com/endymion/PyPixoo/commit/0b7b02da5aaa2625dacbb51f13265613f8c6fa7c))
+
+
 ## v1.0.2 (2026-03-01)
 
 ### Bug Fixes
