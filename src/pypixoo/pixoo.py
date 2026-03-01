@@ -4,6 +4,8 @@ import base64
 import json
 import requests
 
+from pypixoo.buffer import Buffer
+
 
 class Pixoo:
     """Client for Divoom Pixoo 64 display."""
@@ -33,6 +35,11 @@ class Pixoo:
     def push(self) -> None:
         """Send the buffer to the display."""
         self._send_buffer()
+
+    @property
+    def buffer(self) -> Buffer:
+        """Return a snapshot of the display buffer for introspection and assertions."""
+        return Buffer(data=tuple(self._buffer))
 
     def _validate_connection(self) -> bool:
         """Verify connection by calling device API."""

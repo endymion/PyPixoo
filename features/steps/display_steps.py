@@ -44,3 +44,18 @@ def step_no_error(context):
     assert context.connected, "Connection was not successful"
     assert context.fill_error is None, f"Fill failed: {context.fill_error}"
     assert context.push_error is None, f"Push failed: {context.push_error}"
+
+
+@then('the buffer should be {width} by {height}')
+def step_buffer_dimensions(context, width, height):
+    buf = context.pixoo.buffer
+    assert buf.width == int(width), f"Expected width {width}, got {buf.width}"
+    assert buf.height == int(height), f"Expected height {height}, got {buf.height}"
+
+
+@then('the buffer at {x} {y} should be RGB {r} {g} {b}')
+def step_buffer_pixel(context, x, y, r, g, b):
+    buf = context.pixoo.buffer
+    actual = buf.get_pixel(int(x), int(y))
+    expected = (int(r), int(g), int(b))
+    assert actual == expected, f"At ({x},{y}) expected RGB {expected}, got {actual}"

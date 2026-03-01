@@ -9,3 +9,5 @@ Feature: Display control
     And I fill with RGB 255 0 68
     And I push
     Then no error should occur
+    And the buffer should be 64 by 64
+    And the buffer at 0 0 should be RGB 255 0 68
