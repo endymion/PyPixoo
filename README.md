@@ -35,6 +35,25 @@ behave
 
 Specs mock the device HTTP layer, so no Pixoo is required. The first scenario uses a hardcoded IP (`192.168.0.37`) in the step text; the mock fakes all API calls. Edit `features/display.feature` if you change the IP in your assertions.
 
+### CLI
+
+A `pypixoo` command is installed with the package. Set `PIXOO_REAL_DEVICE=1` to send to a real device.
+
+```bash
+# Fill the display with a color (hex or name)
+PIXOO_REAL_DEVICE=1 pypixoo fill FF00FF
+PIXOO_REAL_DEVICE=1 pypixoo fill f0f
+PIXOO_REAL_DEVICE=1 pypixoo fill fuchsia
+
+# Load an image (resized to 64×64) and push
+PIXOO_REAL_DEVICE=1 pypixoo load-image path/to/image.png
+
+# Optional: device IP (default 192.168.0.37)
+PIXOO_REAL_DEVICE=1 pypixoo --ip 192.168.0.38 fill black
+```
+
+If the `pypixoo` script is not on your PATH, run `python -m pypixoo.cli` instead.
+
 ## Usage
 
 ### Basic display
