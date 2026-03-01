@@ -22,6 +22,7 @@ PyPixoo is a **true behavior-driven design (BDD)** project: **behaviors come fir
 2. **Outside-in, working backward:** Start from observable outcomes (what the user sees, what the API returns). Work backward into the implementation. Do not design internals first.
 3. **Specs mock the device:** We test the library, not the device. Specs mock HTTP and assert library behavior.
 4. **Minimal API:** Connect, draw primitives (fill, text, shapes), push to screen.
+5. **100% test coverage:** CI fails if coverage is below 100%. Add scenarios (and mocks as needed) so every line in `src/pypixoo/` is covered.
 
 ## Project Structure
 
@@ -52,6 +53,7 @@ Outside-in, behavior-first:
 ## Commands
 
 - **Run specs:** `behave`
+- **Run specs with coverage (must be 100%):** `coverage run -m behave && coverage report --fail-under=100`
 - **Install:** `pip install -e ".[dev]"`
 - **Device IP:** Specs use hardcoded IP in feature file (e.g. `192.168.0.37`). The device is mocked; no real Pixoo required for CI.
 

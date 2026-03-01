@@ -11,3 +11,30 @@ Feature: Display control
     Then no error should occur
     And the buffer should be 64 by 64
     And the buffer at 0 0 should be RGB 255 0 68
+
+  Scenario: Buffer get_pixel raises IndexError for out-of-range coordinates
+    Given a Pixoo at IP "192.168.0.37"
+    And I connect
+    And I fill with RGB 0 0 0
+    When I get the buffer pixel at 64 0
+    Then an IndexError should occur
+
+  @mock_validate_fail
+  Scenario: Connect returns False when device validation request raises RequestException
+    Given a Pixoo at IP "192.168.0.37"
+    When I connect
+    Then connection should be unsuccessful
+
+  @mock_load_counter_fail
+  Scenario: Connect raises when device load counter returns error
+    Given a Pixoo at IP "192.168.0.37"
+    When I connect
+    Then a RuntimeError should occur on connect
+
+  @mock_push_fail
+  Scenario: Push raises when device returns error
+    Given a Pixoo at IP "192.168.0.37"
+    And I connect
+    And I fill with RGB 255 0 0
+    When I push
+    Then a RuntimeError should occur on push

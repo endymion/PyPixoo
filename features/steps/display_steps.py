@@ -10,6 +10,7 @@ def step_pixoo_at_ip(context, ip):
     context.pixoo = Pixoo(ip)
 
 
+@given('I connect')
 @when('I connect')
 def step_connect(context):
     context.connect_error = None
@@ -20,6 +21,7 @@ def step_connect(context):
         context.connected = False
 
 
+@given('I fill with RGB {r} {g} {b}')
 @when('I fill with RGB {r} {g} {b}')
 def step_fill(context, r, g, b):
     context.fill_error = None
@@ -59,3 +61,42 @@ def step_buffer_pixel(context, x, y, r, g, b):
     actual = buf.get_pixel(int(x), int(y))
     expected = (int(r), int(g), int(b))
     assert actual == expected, f"At ({x},{y}) expected RGB {expected}, got {actual}"
+
+
+@when('I get the buffer pixel at {x} {y}')
+def step_get_buffer_pixel(context, x, y):
+    context.pixel_error = None
+    try:
+        buf = context.pixoo.buffer
+        buf.get_pixel(int(x), int(y))
+    except Exception as e:
+        context.pixel_error = e
+
+
+@then('an IndexError should occur')
+def step_index_error(context):
+    assert context.pixel_error is not None, "Expected IndexError but no exception occurred"
+    assert isinstance(context.pixel_error, IndexError), (
+        f"Expected IndexError, got {type(context.pixel_error).__name__}: {context.pixel_error}"
+    )
+
+
+@then('connection should be unsuccessful')
+def step_connection_unsuccessful(context):
+    assert context.connected is False, "Expected connection to fail"
+
+
+@then('a RuntimeError should occur on connect')
+def step_runtime_error_connect(context):
+    assert context.connect_error is not None, "Expected RuntimeError on connect"
+    assert isinstance(context.connect_error, RuntimeError), (
+        f"Expected RuntimeError, got {type(context.connect_error).__name__}: {context.connect_error}"
+    )
+
+
+@then('a RuntimeError should occur on push')
+def step_runtime_error_push(context):
+    assert context.push_error is not None, "Expected RuntimeError on push"
+    assert isinstance(context.push_error, RuntimeError), (
+        f"Expected RuntimeError, got {type(context.push_error).__name__}: {context.push_error}"
+    )
