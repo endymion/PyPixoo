@@ -8,11 +8,15 @@ callbacks, then plays the sequence on the device in a loop until Ctrl+C.
 Requires: pip install -e ".[browser]" (Playwright)
 Requires a Pixoo 64 at 192.168.0.37. Run from project root:
 
-  PIXOO_REAL_DEVICE=1 python demos/browser_mixed.py
+  python demos/browser_mixed.py
 """
 
+import os
 from pathlib import Path
 import time
+
+# Demos always use the real device
+os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
 
 from pypixoo import Pixoo, FrameRenderer, StaticFrameSource, WebFrameSource, AnimationPlayer
 from pypixoo.buffer import Buffer

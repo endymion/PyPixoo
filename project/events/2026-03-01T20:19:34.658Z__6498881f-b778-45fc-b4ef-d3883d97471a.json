@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "event_id": "6498881f-b778-45fc-b4ef-d3883d97471a",
+  "issue_id": "kanbus-50a118a1-9669-4a4a-b37e-21b34ac53285",
+  "event_type": "state_transition",
+  "occurred_at": "2026-03-01T20:19:34.658Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "from_status": "open",
+    "to_status": "closed"
+  }
+}

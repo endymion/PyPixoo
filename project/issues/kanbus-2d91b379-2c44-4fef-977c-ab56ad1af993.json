@@ -3,7 +3,7 @@
   "title": "Headless browser rendering",
   "description": "",
   "type": "epic",
-  "status": "open",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
@@ -19,7 +19,7 @@
     }
   ],
   "created_at": "2026-03-01T05:42:14.887016Z",
-  "updated_at": "2026-03-01T05:42:23.772173Z",
-  "closed_at": null,
+  "updated_at": "2026-03-01T20:19:34.737818Z",
+  "closed_at": "2026-03-01T20:19:34.737818Z",
   "custom": {}
 }

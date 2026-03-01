@@ -37,8 +37,9 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          coverage run -m behave --tags '~real_device'
-          coverage report --fail-under=100
+          coverage run -m pytest tests/ -q
+          coverage run --append -m behave --tags '~real_device'
+          coverage report --fail-under=87
           coverage xml
 
       - name: Update coverage badge

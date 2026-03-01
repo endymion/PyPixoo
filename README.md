@@ -125,6 +125,26 @@ player.wait()
 
 Requires Playwright: `pip install -e ".[browser]"` (or `.[dev]`).
 
+### React components (Storybook)
+
+The **storybook-app/** directory contains React components built for the 64×64 display. Run Storybook locally, then use `WebFrameSource` with the story’s iframe URL and a `t` (time) query param for animation:
+
+```bash
+cd storybook-app && npm install && npm run storybook   # http://localhost:6006
+```
+
+```python
+# In Python: capture frames from the Clock story at t = 0, 0.25, 0.5, 0.75
+WebFrameSource(
+    url="http://localhost:6006/iframe.html?id=pixoo-clock--default",
+    timestamps=[0, 0.25, 0.5, 0.75],
+    duration_per_frame_ms=200,
+    timestamp_param="t",
+)
+```
+
+See [storybook-app/README.md](storybook-app/README.md) for details.
+
 ### Blend modes and end behavior
 
 - **Blend mode**: `opaque` (frame as-is) or `transparent` (composite over background with transparent color).
@@ -134,8 +154,10 @@ Requires Playwright: `pip install -e ".[browser]"` (or `.[dev]`).
 
 ```
 PyPixoo/
+  storybook-app/      # React components for 64×64 (Storybook)
   features/           # Gherkin specs (behave)
   src/pypixoo/        # Library
+  tests/              # Unit tests (pytest)
   PR_FAQ.md           # Project rationale and roadmap
   AGENTS.md           # Agent guide
 ```

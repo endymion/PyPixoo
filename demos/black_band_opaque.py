@@ -3,10 +3,14 @@
 
 Each frame is pre-composited (gradient + black band). Requires a Pixoo 64 at 192.168.0.37.
 Run from project root:
-  PIXOO_REAL_DEVICE=1 python demos/black_band_opaque.py
+  python demos/black_band_opaque.py
 """
 
+import os
 from pathlib import Path
+
+# Demos always use the real device
+os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
 
 from PIL import Image
 

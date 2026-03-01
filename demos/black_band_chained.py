@@ -3,13 +3,17 @@
 sequence 2 (band right-to-left), then back to sequence 1, in a loop.
 
 Requires a Pixoo 64 at 192.168.0.37. Run from project root:
-  PIXOO_REAL_DEVICE=1 python demos/black_band_chained.py
+  python demos/black_band_chained.py
 
 Press Ctrl+C to stop.
 """
 
+import os
 import time
 from pathlib import Path
+
+# Demos always use the real device
+os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
 
 from pypixoo import Pixoo
 from pypixoo.animation import AnimationPlayer, AnimationSequence, Frame
