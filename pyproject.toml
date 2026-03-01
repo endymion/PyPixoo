@@ -7,11 +7,16 @@ name = "pypixoo"
 version = "0.1.0"
 description = "BDD-first Python library for Divoom Pixoo 64"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.9"
 dependencies = [
     "requests~=2.32.0",
     "pydantic>=2.0",
 ]
+[project.urls]
+Homepage = "https://github.com/endymion/PyPixoo"
+Repository = "https://github.com/endymion/PyPixoo"
+
 [project.optional-dependencies]
 dev = [
     "behave~=1.2.6",
@@ -27,3 +32,8 @@ command_line = "-m behave"
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover"]
+
+[tool.semantic_release]
+branch = "main"
+version_toml = ["pyproject.toml:project.version"]
+build_command = "python -m build"
