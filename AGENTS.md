@@ -28,16 +28,23 @@ PyPixoo is a **true behavior-driven design (BDD)** project: **behaviors come fir
 
 ```
 PyPixoo/
+  demos/                 # Demo scripts (require real device)
+    black_band_transparent.py
+    black_band_opaque.py
   features/              # Gherkin specs
     display.feature
+    animation.feature
     steps/
-      display_steps.py   # Behave step implementations
+      display_steps.py
+      animation_steps.py
     environment.py       # Behave hooks
   src/pypixoo/           # Library
     __init__.py
     pixoo.py             # Pixoo client (connect, fill, push)
+    animation.py         # AnimationSequence, AnimationPlayer
+    buffer.py            # Buffer model
   pyproject.toml
-  PR_FAQ.md              # RFC-style project rationale
+  PR_FAQ.md
   README.md
 ```
 
@@ -61,11 +68,24 @@ Outside-in, behavior-first:
 ## API Reference (Current)
 
 ```python
-from pypixoo import Pixoo
+from pypixoo import Pixoo, AnimationPlayer, AnimationSequence, Frame
+from pypixoo.buffer import Buffer
 
 pixoo = Pixoo("192.168.0.37")
 pixoo.connect()          # Returns bool, loads GIF counter
 pixoo.fill(r, g, b)      # Fill buffer with RGB
 pixoo.load_image(path)   # Load image file into buffer (resizes to 64×64 if needed)
 pixoo.push()             # Send buffer to device
+
+# Animation
+seq = AnimationSequence(frames=[Frame(image=buf, duration_ms=100)], background=buf)
+player = AnimationPlayer(
+    seq,
+    loop=1,
+    blend_mode="transparent",
+    on_finished=lambda: print("done"),
+    on_loop=lambda n: print(f"loop {n}"),
+)
+player.play_async(pixoo)  # Returns immediately
+player.wait()             # Block until done
 ```

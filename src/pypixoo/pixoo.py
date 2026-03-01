@@ -49,6 +49,10 @@ class Pixoo:
         """Send the buffer to the display."""
         self._send_buffer()
 
+    def push_buffer(self, data: list) -> None:
+        """Send the given buffer data to the display without modifying internal buffer."""
+        self._send_buffer_data(data)
+
     @property
     def buffer(self) -> Buffer:
         """Return a snapshot of the display buffer for introspection and assertions."""
@@ -81,8 +85,12 @@ class Pixoo:
 
     def _send_buffer(self) -> None:
         """Send the buffer to the device."""
+        self._send_buffer_data(self._buffer)
+
+    def _send_buffer_data(self, data: list) -> None:
+        """Send the given buffer data to the device."""
         self._counter += 1
-        pic_data = base64.b64encode(bytearray(self._buffer)).decode()
+        pic_data = base64.b64encode(bytearray(data)).decode()
         payload = json.dumps({
             "Command": "Draw/SendHttpGif",
             "PicNum": 1,
@@ -93,6 +101,6 @@ class Pixoo:
             "PicData": pic_data,
         })
         response = requests.post(self._url, payload, timeout=5)
-        data = response.json()
-        if data.get("error_code", -1) != 0:
-            raise RuntimeError(f"Failed to push: {data}")
+        response_data = response.json()
+        if response_data.get("error_code", -1) != 0:
+            raise RuntimeError(f"Failed to push: {response_data}")

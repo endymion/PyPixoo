@@ -1,5 +1,7 @@
 """Behave hooks for PyPixoo specs."""
 
+import base64
+import json
 import os
 
 import requests
@@ -28,8 +30,19 @@ def before_all(context):
             return _mock_response({"error_code": 1})
         if mode == "push_fail" and data and "SendHttpGif" in str(data):
             return _mock_response({"error_code": 1})
+        if "SendHttpGif" in str(data):
+            try:
+                payload = json.loads(data) if isinstance(data, str) else data
+                pic_data = payload.get("PicData", "")
+                raw = base64.b64decode(pic_data)
+                history = getattr(context, "_push_history", None)
+                if history is not None:
+                    history.append(list(raw))
+            except (json.JSONDecodeError, TypeError, KeyError):
+                pass
         return _mock_response({"error_code": 0, "PicId": 1})
 
+    context._push_history: list = []
     context._post_patcher = patch("pypixoo.pixoo.requests.post", side_effect=fake_post)
     context._post_patcher.start()
 
@@ -37,6 +50,8 @@ def before_all(context):
 def before_scenario(context, scenario):
     """Set mock mode from scenario tags for failure-path coverage."""
     context.mock_mode = "success"
+    if hasattr(context, "_push_history"):
+        context._push_history.clear()
     if "mock_validate_fail" in scenario.tags:
         context.mock_mode = "validate_fail"
     elif "mock_load_counter_fail" in scenario.tags:
