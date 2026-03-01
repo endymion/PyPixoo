@@ -2,6 +2,25 @@
 
 <!-- version list -->
 
+## v1.1.0 (2026-03-01)
+
+### Chores
+
+- Close Basic testing foundation epic
+  ([`b9740b8`](https://github.com/endymion/PyPixoo/commit/b9740b876d60bf4d2f1470b02f538519f2d81651))
+
+- Close Load image into buffer epic
+  ([`7ff4ef1`](https://github.com/endymion/PyPixoo/commit/7ff4ef14f621129cd03c5e46e8fb2a45d72e32ea))
+
+- Update coverage badge [skip ci]
+  ([`e7eff11`](https://github.com/endymion/PyPixoo/commit/e7eff112c1d270bdec56cbe2506f429d11aa8bb4))
+
+### Features
+
+- **tests**: Add 100% coverage scenarios and gate
+  ([`784984b`](https://github.com/endymion/PyPixoo/commit/784984bb355a98fa2ed38a2a0503754887dc2da9))
+
+
 ## v1.0.3 (2026-03-01)
 
 ### Bug Fixes
