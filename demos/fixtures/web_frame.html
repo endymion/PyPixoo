@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Frame</title>
+  <style>
+    * { margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var t = parseFloat(params.get('t') || '0');
+      // Map t in [0, 1] to RGB gradients for distinct frames
+      var r = Math.round(255 * Math.min(1, t * 2));
+      var g = Math.round(255 * Math.max(0, Math.min(1, t * 2 - 0.5)));
+      var b = Math.round(255 * (1 - t));
+      document.body.style.backgroundColor = 'rgb(' + r + ',' + g + ',' + b + ')';
+    })();
+  </script>
+</body>
+</html>

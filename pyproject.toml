@@ -22,6 +22,10 @@ Repository = "https://github.com/endymion/PyPixoo"
 dev = [
     "behave~=1.2.6",
     "coverage[toml]>=7.0",
+    "playwright>=1.40",
+]
+browser = [
+    "playwright>=1.40",
 ]
 
 [tool.setuptools.packages.find]

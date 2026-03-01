@@ -64,37 +64,39 @@ def main():
     )
 
     pixoo = Pixoo(IP)
-    if not pixoo.connect():
-        raise RuntimeError("Failed to connect to Pixoo")
-
-    def make_player(seq: AnimationSequence, next_player_getter):
-        def on_finished():
-            next_player_getter().play_async(pixoo)
-
-        return AnimationPlayer(
-            seq,
-            loop=1,
-            end_on="last_frame",
-            blend_mode="transparent",
-            transparent_color=transparent_color,
-            on_finished=on_finished,
-        )
-
-    # Use a list to break circular reference: player1 -> on_finished -> player2 -> on_finished -> player1
-    players = []
-    player1 = make_player(seq1, lambda: players[1])
-    player2 = make_player(seq2, lambda: players[0])
-    players.extend([player1, player2])
-
-    print("Chained demo running (Ctrl+C to stop)...")
-    player1.play_async(pixoo)
-
-    # Keep main thread alive; animation threads chain indefinitely
     try:
+        if not pixoo.connect():
+            raise RuntimeError("Failed to connect to Pixoo")
+
+        def make_player(seq: AnimationSequence, next_player_getter):
+            def on_finished():
+                next_player_getter().play_async(pixoo)
+
+            return AnimationPlayer(
+                seq,
+                loop=1,
+                end_on="last_frame",
+                blend_mode="transparent",
+                transparent_color=transparent_color,
+                on_finished=on_finished,
+            )
+
+        # Use a list to break circular reference: player1 -> on_finished -> player2 -> on_finished -> player1
+        players = []
+        player1 = make_player(seq1, lambda: players[1])
+        player2 = make_player(seq2, lambda: players[0])
+        players.extend([player1, player2])
+
+        print("Chained demo running (Ctrl+C to stop)...")
+        player1.play_async(pixoo)
+
+        # Keep main thread alive; animation threads chain indefinitely
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
         print("\nStopped")
+    finally:
+        pixoo.close()
 
 
 if __name__ == "__main__":

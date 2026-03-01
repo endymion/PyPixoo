@@ -49,11 +49,14 @@ def main():
         blend_mode="opaque",
     )
     pixoo = Pixoo(IP)
-    if not pixoo.connect():
-        raise RuntimeError("Failed to connect to Pixoo")
-    player.play_async(pixoo)
-    player.wait()
-    print("Done (opaque)")
+    try:
+        if not pixoo.connect():
+            raise RuntimeError("Failed to connect to Pixoo")
+        player.play_async(pixoo)
+        player.wait()
+        print("Done (opaque)")
+    finally:
+        pixoo.close()
 
 
 if __name__ == "__main__":

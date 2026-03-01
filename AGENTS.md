@@ -42,6 +42,7 @@ PyPixoo/
     __init__.py
     pixoo.py             # Pixoo client (connect, fill, push)
     animation.py         # AnimationSequence, AnimationPlayer
+    browser.py           # StaticFrameSource, WebFrameSource, FrameRenderer (Playwright)
     buffer.py            # Buffer model
   pyproject.toml
   PR_FAQ.md
@@ -62,13 +63,13 @@ Outside-in, behavior-first:
 - **Run specs:** `behave --tags '~real_device'` (CI excludes @real_device)
 - **Run specs with coverage (must be 100%):** `coverage run -m behave --tags '~real_device' && coverage report --fail-under=100`
 - **Run against real device:** `PIXOO_REAL_DEVICE=1 behave --tags real_device` (device plugged in, edit IP in feature file if needed)
-- **Install:** `pip install -e ".[dev]"`
+- **Install:** `pip install -e ".[dev]"` (includes Playwright for browser feature)
 - **Device IP:** Specs use hardcoded IP in feature file (e.g. `192.168.0.37`). The device is mocked; no real Pixoo required for CI.
 
 ## API Reference (Current)
 
 ```python
-from pypixoo import Pixoo, AnimationPlayer, AnimationSequence, Frame
+from pypixoo import Pixoo, AnimationPlayer, AnimationSequence, Frame, FrameRenderer, StaticFrameSource, WebFrameSource
 from pypixoo.buffer import Buffer
 
 pixoo = Pixoo("192.168.0.37")
@@ -88,4 +89,15 @@ player = AnimationPlayer(
 )
 player.play_async(pixoo)  # Returns immediately
 player.wait()             # Block until done
+
+# Headless browser rendering (pip install -e ".[browser]" or ".[dev]")
+sources = [
+    StaticFrameSource(buffer=buf, duration_ms=100),
+    WebFrameSource(url="http://localhost:6006/?t=0.1", timestamps=[0.0], duration_per_frame_ms=200, browser_mode="persistent"),
+]
+renderer = FrameRenderer(sources)
+seq = renderer.precompute(on_first_frame=lambda: print("first ready"), on_all_frames=lambda: print("all done"))
+player = AnimationPlayer(seq)
+player.play_async(pixoo)
+player.wait()
 ```

@@ -54,11 +54,14 @@ def main():
         transparent_color=transparent_color,
     )
     pixoo = Pixoo(IP)
-    if not pixoo.connect():
-        raise RuntimeError("Failed to connect to Pixoo")
-    player.play_async(pixoo)
-    player.wait()
-    print("Done (transparent blend)")
+    try:
+        if not pixoo.connect():
+            raise RuntimeError("Failed to connect to Pixoo")
+        player.play_async(pixoo)
+        player.wait()
+        print("Done (transparent blend)")
+    finally:
+        pixoo.close()
 
 
 if __name__ == "__main__":
