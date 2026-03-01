@@ -36,4 +36,4 @@ exclude_lines = ["pragma: no cover"]
 [tool.semantic_release]
 branch = "main"
 version_toml = ["pyproject.toml:project.version"]
-build_command = "python -m build"
+build_command = "pip install build && python -m build"
