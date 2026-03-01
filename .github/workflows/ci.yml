@@ -2,7 +2,11 @@ name: CI
 
 on:
   push:
+    paths-ignore:
+      - 'coverage.json'
   pull_request:
+    paths-ignore:
+      - 'coverage.json'
 
 permissions:
   contents: read
