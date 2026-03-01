@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.2.0 (2026-03-01)
+
+### Bug Fixes
+
+- Use Union[str, Path] for Python 3.9 compatibility
+  ([`44756bd`](https://github.com/endymion/PyPixoo/commit/44756bd3b858e6a58ef6eec827b20f4eea9b53dc))
+
+### Features
+
+- Add load_image to load images into buffer
+  ([`c202e5c`](https://github.com/endymion/PyPixoo/commit/c202e5c9a49d0518bc6574436bb46c71eebe3ddf))
+
+
 ## v1.1.0 (2026-03-01)
 
 ### Chores
