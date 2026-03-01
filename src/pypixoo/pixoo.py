@@ -3,6 +3,7 @@
 import base64
 import json
 from pathlib import Path
+from typing import Union
 
 import requests
 from PIL import Image
@@ -35,7 +36,7 @@ class Pixoo:
         for _ in range(self.SIZE * self.SIZE):
             self._buffer.extend([r, g, b])
 
-    def load_image(self, path: str | Path) -> None:
+    def load_image(self, path: Union[str, Path]) -> None:
         """Load an image file into the display buffer. Resizes to 64×64 if needed."""
         img = Image.open(path).convert("RGB")
         if img.size != (self.SIZE, self.SIZE):
