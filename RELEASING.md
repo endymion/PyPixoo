@@ -10,3 +10,13 @@ Releases are automated with [python-semantic-release](https://python-semantic-re
 ## Trusted publisher
 
 PyPI is configured to trust the GitHub Actions workflow: repository **endymion/PyPixoo**, workflow **ci.yml**. No `PYPI_API_TOKEN` secret is required.
+
+## Coverage badge
+
+The coverage badge (Codecov) only updates after the repo is connected and uploads succeed. Add your **Codecov upload token** as a GitHub Actions secret:
+
+1. Open [codecov.io](https://codecov.io), sign in with GitHub, and add the **endymion/PyPixoo** repository.
+2. In the repo’s Codecov settings, copy the **Upload token**.
+3. In GitHub → repo **Settings** → **Secrets and variables** → **Actions**, add a secret **`CODECOV_TOKEN`** with that value.
+
+After the next CI run, the badge should show coverage.
