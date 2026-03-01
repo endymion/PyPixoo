@@ -9,22 +9,31 @@ The existing [pixoo](https://github.com/SomethingWithComputers/pixoo) project wo
 ## Goals
 
 - **BDD-first:** Gherkin specs drive implementation. Write scenarios first, see them fail, implement until they pass.
-- **Real-device integration tests:** Specs run against an actual Divoom Pixoo 64 on the network.
+- **Test the library, not the device:** Specs mock the device and assert library behavior. The device is known to work.
 - **Minimal v1:** Connect to device, draw one primitive (fill), push to screen.
 - **Approachable:** Works for hobbyists and developers — simple API, clear docs.
+- **Buffer-centric evolution:** A clean Pydantic buffer model with introspection for effective assertions; features focus on constructing images and running animation sequences with timing.
 
 ## Non-goals
 
 - Feature parity with pixoo in v1
-- Simulator or mock in the first slice (real device required)
-- Text drawing, images, or advanced primitives in v1
+- Requiring a real device for CI (we mock for automated tests)
 
 ## Proposed approach
 
 1. Reimplement from scratch, using pixoo as a reference for the HTTP API.
 2. Use Gherkin (Behave) specs as the single source of truth.
-3. Require a real Pixoo 64 on the network for integration tests.
-4. Start with connect → fill → push. Add more primitives incrementally.
+3. Mock device HTTP in specs so CI runs without a Pixoo; assert library behavior only.
+4. Start with connect → fill → push. Add buffer introspection, image construction, and animation incrementally.
+
+## Roadmap (epics in Kanbus)
+
+- **Buffer model and assertions:** Pydantic class representing the 64×64 display buffer with enough introspection (e.g. region checks, pixel equality) to write effective Gherkin assertions.
+- **Image construction:** Primitives and helpers for constructing images to send.
+- **Animation sequences:** Frame sequences with timing between frame updates.
+- **Async fire-and-forget animation:** Asynchronous constructs that push frames at the right times without blocking.
+- **Headless browser rendering:** Load a headless browser and render the buffer for preview/debugging.
+- **React + Storybook on Pixoo:** Use Storybook to construct and preview React components on the computer; run the same components on the Pixoo. Components support a `time` parameter for frame rendering (timestamp), enabling animation libraries (gsap, Framer Motion) with easing. Variable frame rate is acceptable: the device may not sustain a high frame rate, but animation timing remains correct when driven by `time` rather than frame count.
 
 ---
 
@@ -32,15 +41,15 @@ The existing [pixoo](https://github.com/SomethingWithComputers/pixoo) project wo
 
 ### Why reimplement instead of wrapping or extending pixoo?
 
-To own the design and test surface from the start. A wrapper would inherit pixoo’s untested behavior. A reimplementation lets us define behavior in Gherkin first and implement only what the specs require.
+To own the design and test surface from the start. A wrapper would inherit pixoo's untested behavior. A reimplementation lets us define behavior in Gherkin first and implement only what the specs require.
 
-### Why require a real device for v1 specs (vs mock)?
+### Why mock the device in specs?
 
-We want integration confidence: “it works on a real Pixoo.” A mock would prove logic, not connectivity or device API. Device-based specs are the differentiator for v1.
+We test the library, not the device. The device is known to work. Specs mock `requests.post` and assert that our buffer handling, API payloads, and control flow behave correctly. CI runs without a Pixoo on the network.
 
-### What happens if no device is available when running specs?
+### What happens if I want to run against a real device?
 
-Specs will fail with a connection error. Document that `PIXOO_IP` must point to a reachable Pixoo. Future work could add `@skip_if_no_device` or env-gated skip logic.
+Use the same specs with a live Pixoo: remove or disable the mock in the environment. The specs exercise the real API when a device is reachable.
 
 ### What is the minimal "one thing" to draw in v1?
 

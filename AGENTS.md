@@ -14,13 +14,14 @@ This document helps AI agents (and humans) work effectively on PyPixoo.
 
 ## Project Overview
 
-PyPixoo is a BDD-first Python library for the Divoom Pixoo 64 display. It is a reimplementation inspired by the [pixoo](https://github.com/SomethingWithComputers/pixoo) project, with Gherkin specs driving implementation and real-device integration tests.
+PyPixoo is a **true behavior-driven design (BDD)** project: **behaviors come first**. It is a Python library for the Divoom Pixoo 64 display, a reimplementation inspired by [pixoo](https://github.com/SomethingWithComputers/pixoo), with Gherkin specs driving implementation. We work **outside-in** and **backward** from observable behavior — never from implementation details.
 
 ## Key Principles
 
-1. **BDD-first:** Write Gherkin specs before implementation. Run `behave`, see failures, implement until green.
-2. **Real device required:** Specs run against an actual Pixoo 64 on the network. No mock in v1.
-3. **Minimal API:** Connect, draw primitives (fill, text, shapes), push to screen.
+1. **Behaviors come first:** This is BDD. Describe the desired behavior in Gherkin *before* writing production code. Run `behave`, see failures, implement until green.
+2. **Outside-in, working backward:** Start from observable outcomes (what the user sees, what the API returns). Work backward into the implementation. Do not design internals first.
+3. **Specs mock the device:** We test the library, not the device. Specs mock HTTP and assert library behavior.
+4. **Minimal API:** Connect, draw primitives (fill, text, shapes), push to screen.
 
 ## Project Structure
 
@@ -41,16 +42,18 @@ PyPixoo/
 
 ## Workflow
 
-1. Add or edit scenarios in `features/*.feature`
+Outside-in, behavior-first:
+
+1. Add or edit scenarios in `features/*.feature` — define the behavior *first*
 2. Run `behave` — expect undefined or failing steps
-3. Implement steps in `features/steps/` and library code in `src/pypixoo/`
+3. Implement steps in `features/steps/` and library code in `src/pypixoo/` — only what the specs require
 4. Reference the original pixoo project for HTTP API semantics (e.g. `Draw/SendHttpGif`, `Channel/GetAllConf`)
 
 ## Commands
 
 - **Run specs:** `behave`
 - **Install:** `pip install -e ".[dev]"`
-- **Device IP:** Specs use hardcoded IP in feature file (e.g. `192.168.0.37`). Edit the feature if the device IP differs.
+- **Device IP:** Specs use hardcoded IP in feature file (e.g. `192.168.0.37`). The device is mocked; no real Pixoo required for CI.
 
 ## API Reference (Current)
 
