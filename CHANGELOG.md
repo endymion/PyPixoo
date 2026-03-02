@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v2.3.0 (2026-03-02)
+
+### Features
+
+- Add clock face fade and per-element color controls
+  ([`92ca6ff`](https://github.com/endymion/PyPixoo/commit/92ca6ff357b8d6074be27ceaaa380b05a23496dc))
+
+
 ## v2.2.4 (2026-03-02)
 
 ### Bug Fixes
