@@ -35,7 +35,7 @@ const TAU = 2 * Math.PI;
 const CX = PIXOO_SIZE / 2;
 const CY = PIXOO_SIZE / 2;
 const MARKER_ANGLES = Array.from({ length: 12 }, (_, i) => (i / 12) * TAU);
-const MARKER_OUTWARD_OFFSET = 1.0;
+const MARKER_OUTWARD_OFFSET = 1.8;
 
 /** Angle 0 = 12 o'clock, clockwise in radians. */
 function angleToXY(angleRad: number, length: number) {

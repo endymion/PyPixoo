@@ -70,10 +70,22 @@
       "author": "ryan.porter",
       "text": "Applied marker outward shift so the clock uses more of the available edge pixels.\n\nChange:\n- In `storybook-app/src/components/Clock.tsx`, added `MARKER_OUTWARD_OFFSET = 1.0` and applied it to marker radii (`markerOuter`, `markerInner`, `markerDot`) with bounds clamped to the drawable half-size.\n- This shifts dots and tick geometry outward together by ~1 pixel.\n\nValidation:\n- `cd storybook-app && npm run build-storybook` (success)\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- Live realtime demo restarted successfully with updated rendering.\n",
       "created_at": "2026-03-02T13:26:03.873876Z"
+    },
+    {
+      "id": "05e301af-cac5-4060-ac35-94c29b75a1b5",
+      "author": "ryan.porter",
+      "text": "Follow-up calibration requested: markers are still too conservative at the outer ring.\n\nPlanned update:\n- Increase outward marker offset beyond current +1.0 so dots/ticks use more of the outer pixel ring.\n- Keep bounds clamp to avoid clipping artifacts.\n- Restart live demo and validate visually.\n",
+      "created_at": "2026-03-02T13:45:23.440764Z"
+    },
+    {
+      "id": "e3c5a5a7-cc41-4045-af73-a8a15656bf34",
+      "author": "ryan.porter",
+      "text": "Increased marker outward shift further to use more of the outer pixel ring.\n\nChange:\n- `storybook-app/src/components/Clock.tsx`: increased `MARKER_OUTWARD_OFFSET` from `1.0` to `1.8`.\n- Dots and tick radii both use this offset; clamp remains in place to avoid excessive clipping.\n\nValidation:\n- `cd storybook-app && npm run build-storybook` (success)\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- Live demo restarted successfully with updated geometry.\n",
+      "created_at": "2026-03-02T13:46:15.184322Z"
     }
   ],
   "created_at": "2026-03-02T05:31:05.543299Z",
-  "updated_at": "2026-03-02T13:26:03.873876Z",
+  "updated_at": "2026-03-02T13:46:15.184322Z",
   "closed_at": null,
   "custom": {}
 }
