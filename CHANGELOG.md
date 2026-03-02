@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v2.2.0 (2026-03-02)
+
+### Features
+
+- Add clock marker color option for realtime demo
+  ([`a4b444a`](https://github.com/endymion/PyPixoo/commit/a4b444acdbf0ebb4278b16ad55eb5e7a12c0630b))
+
+
 ## v2.1.0 (2026-03-02)
 
 ### Features
