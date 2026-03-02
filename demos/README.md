@@ -28,6 +28,7 @@ python demos/storybook_clock.py --delivery upload --upload-mode command_list
 
 # Smooth real-time clock (default push mode avoids repeated "Loading..." indicator)
 # Default demo mode cycles clockface marker style every minute.
+# Automatically reconnects after device/network interruptions (default retry every 3s).
 # Optional: --fps, --render-lead-ms, --dial-color, --hands-color
 python demos/clock_realtime.py
 python demos/clock_realtime.py --fps 3 --render-lead-ms 1500 --dial-color "#111" --hands-color cyan

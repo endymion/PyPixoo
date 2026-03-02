@@ -40,10 +40,16 @@
       "author": "ryan.porter",
       "text": "Implemented clock marker color control and set live demo to magenta.\n\nChanges:\n- Added `--marker-color` option to `demos/clock_realtime.py`.\n- Passed marker color through Storybook URL args as `markerColor`.\n- Updated demo usage examples in `demos/clock_realtime.py` and `demos/README.md`.\n\nValidation:\n- `python demos/clock_realtime.py --help` shows `--marker-color`.\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` -> 29 passed.\n- Live run started with magenta markers:\n  - `python demos/clock_realtime.py --fps 1 --render-lead-ms 2200 --delivery push --no-second-hand --marker-color \"#ff00ff\"`\n",
       "created_at": "2026-03-02T06:25:56.721357Z"
+    },
+    {
+      "id": "9b51d026-af30-4105-bc5d-98bee79a9938",
+      "author": "ryan.porter",
+      "text": "Implemented resilience for `demos/clock_realtime.py` so unplug/replug no longer terminates the demo.\n\nWhat changed:\n- Added auto-reconnect loop around demo execution.\n- On startup and after disconnect, the script retries `pixoo.connect()` until successful.\n- Added handling for `requests` connection errors and command/runtime errors during playback.\n- Added CLI option: `--reconnect-delay-seconds` (default `3.0`).\n- Added timestamped logging and reconnect status messages.\n- README demo section updated to document automatic reconnect behavior.\n\nValidation:\n- `python demos/clock_realtime.py --help`\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- Fault simulation: `--ip 192.0.2.1 --reconnect-delay-seconds 1` now keeps retrying instead of exiting.\n- Live device run restarted successfully in magenta mode with no second hand.\n",
+      "created_at": "2026-03-02T12:54:26.621853Z"
     }
   ],
   "created_at": "2026-03-02T05:31:05.543299Z",
-  "updated_at": "2026-03-02T06:25:56.721357Z",
+  "updated_at": "2026-03-02T12:54:26.621853Z",
   "closed_at": null,
   "custom": {}
 }

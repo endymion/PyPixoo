@@ -28,6 +28,8 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlencode
 
+import requests
+
 # Demos always use the real device; set env so the library acquires the device lock.
 os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
 
@@ -45,6 +47,10 @@ CLOCKFACE_MODES = [
     "dots_quarters_ticks_others",
     "ticks_all_thick_quarters",
 ]
+
+
+def _log(msg: str) -> None:
+    print(f"{datetime.now().strftime('%H:%M:%S')} {msg}", flush=True)
 
 
 def _format_story_arg(value) -> str:
@@ -142,7 +148,7 @@ def _run_push_mode(pixoo: Pixoo, args, fps: int) -> None:
         marker_mode = resolve_clockface_mode(next_target, args.clockface)
         if marker_mode != last_mode:
             mode_source = "fixed --clockface" if args.clockface else "minute cycle"
-            print(f"clockface mode -> {marker_mode} ({mode_source})", flush=True)
+            _log(f"clockface mode -> {marker_mode} ({mode_source})")
             last_mode = marker_mode
         frame = _render_single_frame(
             display_time=next_target,
@@ -161,10 +167,9 @@ def _run_push_mode(pixoo: Pixoo, args, fps: int) -> None:
             time.sleep(next_target - now)
 
         pixoo.push_buffer(list(frame.image.data))
-        print(
-            f"{datetime.now().strftime('%H:%M:%S')} pushed frame "
-            f"(render {render_dur:.2f}s, lead {max(lead_sec, avg_render_sec + 0.05):.2f}s)",
-            flush=True,
+        _log(
+            f"pushed frame (render {render_dur:.2f}s, "
+            f"lead {max(lead_sec, avg_render_sec + 0.05):.2f}s)"
         )
 
         next_target += interval
@@ -219,7 +224,7 @@ def _run_upload_mode(pixoo: Pixoo, args, fps: int) -> None:
         first_mode = cycle_modes[0]
         if first_mode != last_mode:
             mode_source = "fixed --clockface" if args.clockface else "minute cycle"
-            print(f"clockface mode -> {first_mode} ({mode_source})", flush=True)
+            _log(f"clockface mode -> {first_mode} ({mode_source})")
             last_mode = first_mode
 
         pixoo.upload_sequence(
@@ -227,11 +232,21 @@ def _run_upload_mode(pixoo: Pixoo, args, fps: int) -> None:
             mode=UploadMode(args.upload_mode),
             chunk_size=args.chunk_size,
         )
-        print(
-            f"{datetime.now().strftime('%H:%M:%S')} uploaded {frame_count} frames "
-            f"(render {render_dur:.2f}s)",
-            flush=True,
-        )
+        _log(f"uploaded {frame_count} frames (render {render_dur:.2f}s)")
+
+
+def _wait_for_connection(pixoo: Pixoo, reconnect_delay_seconds: float) -> None:
+    while True:
+        try:
+            if pixoo.connect():
+                _log("connected to device")
+                return
+            _log("connect check failed; retrying")
+        except requests.exceptions.RequestException as exc:
+            _log(f"connect error ({type(exc).__name__}): {exc}")
+        except RuntimeError as exc:
+            _log(f"connect runtime error: {exc}")
+        time.sleep(reconnect_delay_seconds)
 
 
 def main() -> None:
@@ -293,6 +308,12 @@ def main() -> None:
         help="Clockface marker color (default: rgba(255,255,255,0.75))",
     )
     parser.add_argument(
+        "--reconnect-delay-seconds",
+        type=float,
+        default=3.0,
+        help="Reconnect delay after connection failure (default: 3.0)",
+    )
+    parser.add_argument(
         "--upload-mode",
         choices=[UploadMode.FRAME_BY_FRAME.value, UploadMode.COMMAND_LIST.value],
         default=UploadMode.COMMAND_LIST.value,
@@ -302,19 +323,27 @@ def main() -> None:
     args = parser.parse_args()
 
     fps = max(1, args.fps)
-
+    reconnect_delay_seconds = max(0.5, args.reconnect_delay_seconds)
     pixoo = Pixoo(args.ip)
-    if not pixoo.connect():
-        print(f"error: Failed to connect to {args.ip}", file=sys.stderr)
-        sys.exit(1)
-
     print("Press Ctrl+C to stop.")
+    _log(
+        f"resilient mode enabled (auto-reconnect every {reconnect_delay_seconds:.1f}s on disconnect)"
+    )
 
     try:
-        if args.delivery == "push":
-            _run_push_mode(pixoo, args, fps)
-        else:
-            _run_upload_mode(pixoo, args, fps)
+        while True:
+            _wait_for_connection(pixoo, reconnect_delay_seconds)
+            try:
+                if args.delivery == "push":
+                    _run_push_mode(pixoo, args, fps)
+                else:
+                    _run_upload_mode(pixoo, args, fps)
+            except requests.exceptions.RequestException as exc:
+                _log(f"device connection lost ({type(exc).__name__}): {exc}")
+                time.sleep(reconnect_delay_seconds)
+            except RuntimeError as exc:
+                _log(f"device command failure: {exc}")
+                time.sleep(reconnect_delay_seconds)
     except KeyboardInterrupt:
         print("\nStopped")
     finally:
