@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v2.2.3 (2026-03-02)
+
+### Bug Fixes
+
+- Shift clock markers outward to use edge pixels
+  ([`cf30449`](https://github.com/endymion/PyPixoo/commit/cf30449d6507086cfe64bd03f607ba81bf6f22d4))
+
+
 ## v2.2.2 (2026-03-02)
 
 ### Bug Fixes
