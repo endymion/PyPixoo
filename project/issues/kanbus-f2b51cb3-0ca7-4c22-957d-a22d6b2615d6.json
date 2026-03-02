@@ -460,10 +460,22 @@
       "author": "ryan.porter",
       "text": "Committed and pushed new Row feature: c093f2e on main. Includes React Row component (top-origin y + height + bottom border params), 7px alphabet header row with 1px half-bright border, and showcase pipeline update to preserve border color plus startup precompute retry.",
       "created_at": "2026-03-02T05:25:57.929780Z"
+    },
+    {
+      "id": "0ace4f8e-45c5-4696-a53e-d29f5fe9a76f",
+      "author": "ryan.porter",
+      "text": "Starting follow-up per user request: make the font showcase demo work after V2 breaking API migration. Will reproduce current demo failure, patch demos/font_showcase.py for V2 native upload/cycle semantics, then validate with save-only output and runtime checks.",
+      "created_at": "2026-03-02T05:47:00.238094Z"
+    },
+    {
+      "id": "43accdf3-23ae-4d32-a4a5-8b26304bfa21",
+      "author": "ryan.porter",
+      "text": "Font demo is fixed for V2 API. Removed legacy AnimationPlayer/AnimationSequence usage in demos/font_showcase.py, switched playback to native upload_sequence (UploadMode.COMMAND_LIST), and verified: (1) save-only export path works, (2) live run starts, connects, and cycles, (3) existing background font_showcase process was terminated to avoid lock contention.",
+      "created_at": "2026-03-02T05:48:30.812024Z"
     }
   ],
   "created_at": "2026-03-01T22:06:40.289727Z",
-  "updated_at": "2026-03-02T05:25:57.929780Z",
+  "updated_at": "2026-03-02T05:48:30.812024Z",
   "closed_at": null,
   "custom": {}
 }

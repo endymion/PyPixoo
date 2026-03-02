@@ -15,13 +15,14 @@ Press Ctrl+C to stop.
 import argparse
 import os
 import sys
+import time
 from pathlib import Path
 from urllib.parse import urlencode
 
 os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pypixoo import Pixoo, FrameRenderer, WebFrameSource, AnimationPlayer, AnimationSequence, Frame
+from pypixoo import GifFrame, GifSequence, Pixoo, FrameRenderer, UploadMode, WebFrameSource
 from pypixoo.buffer import Buffer
 from PIL import Image
 
@@ -190,9 +191,9 @@ def main():
             if not _has_foreground(f.image, bg_rgb):
                 blank_name = str(screen["name"])
                 break
-            frames.append(Frame(image=f.image, duration_ms=f.duration_ms))
+            frames.append(GifFrame(image=f.image, duration_ms=f.duration_ms))
         if blank_name is None:
-            seq = AnimationSequence(frames=frames)
+            seq = GifSequence(frames=frames, speed_ms=duration_ms)
             break
         print(f"Retrying precompute due to blank frame: {blank_name} (attempt {attempt}/{max_precompute_attempts})")
     if seq is None:
@@ -218,16 +219,11 @@ def main():
     try:
         if not pixoo.connect():
             raise RuntimeError(f"Failed to connect to {args.ip}")
-        player = AnimationPlayer(
-            seq,
-            loop=1,
-            end_on="last_frame",
-            blend_mode="opaque",
-        )
         print(f"Showing font showcase ({args.duration}s per screen). Ctrl+C to stop.")
+        cycle_seconds = max((seq.speed_ms * len(seq.frames)) / 1000.0, 0.2)
         while True:
-            player.play_async(pixoo)
-            player.wait()
+            pixoo.upload_sequence(seq, mode=UploadMode.COMMAND_LIST, chunk_size=40)
+            time.sleep(cycle_seconds)
     except KeyboardInterrupt:
         print("\nStopped")
     finally:
