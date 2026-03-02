@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pypixoo"
-version = "2.0.0"
+version = "2.0.1"
 description = "BDD-first Python library for Divoom Pixoo 64"
 readme = "README.md"
 license = "MIT"

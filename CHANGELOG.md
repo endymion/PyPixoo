@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v2.0.1 (2026-03-02)
+
+### Bug Fixes
+
+- Modernize clock demos for V2 native smooth playback
+  ([`8dd8ee4`](https://github.com/endymion/PyPixoo/commit/8dd8ee44cc402ba8cd0cae36a1b81a84f8100bdd))
+
+
 ## v2.0.0 (2026-03-02)
 
 ### Bug Fixes
