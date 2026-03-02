@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-6d12d072-335f-45db-ac9a-d51b7a663eff",
+  "title": "Cycle configured sequence items in order",
+  "description": "Feature: Cycle configured sequence items in order\nScenario: Cycle engine runs items deterministically\nGiven a cycle with multiple item types\nWhen start_cycle is called\nThen items are executed in the configured order for each loop",
+  "type": "story",
+  "status": "open",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-a135cef2-44f4-43c4-ba00-c692a0b08a5a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-02T05:31:05.642084Z",
+  "updated_at": "2026-03-02T05:31:05.642084Z",
+  "closed_at": null,
+  "custom": {}
+}

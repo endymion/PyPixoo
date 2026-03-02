@@ -102,6 +102,49 @@ def _screenshot_to_buffer(
     return Buffer.from_flat_list(data)
 
 
+def _wait_for_page_fonts(page, timeout_ms: int = 8000) -> None:
+    """Wait for the page's active font family/size instead of a fixed spec."""
+    try:
+        page.evaluate("() => document.fonts?.ready")
+    except Exception:
+        return
+    try:
+        page.wait_for_function(
+            """() => {
+                if (!document.fonts || !document.fonts.check) return true;
+                const target = document.querySelector('.char') || document.body;
+                const style = getComputedStyle(target);
+                const size = style.fontSize || '16px';
+                const familyRaw = style.fontFamily || '';
+                const family = familyRaw.split(',')[0].trim().replace(/^['"]|['"]$/g, '');
+                if (!family) return true;
+                return (
+                    document.fonts.check(`${size} "${family}"`) ||
+                    document.fonts.check(`${size} ${family}`) ||
+                    document.fonts.check(`16px "${family}"`) ||
+                    document.fonts.check(`16px ${family}`)
+                );
+            }""",
+            timeout=timeout_ms,
+        )
+    except Exception:
+        pass
+
+
+def _wait_for_page_render_ready(page, timeout_ms: int = 20000) -> None:
+    """Wait for optional page-side render-complete marker."""
+    try:
+        has_ready_flag = bool(page.evaluate("() => ('__pixooReady' in window)"))
+    except Exception:
+        return
+    if not has_ready_flag:
+        return
+    try:
+        page.wait_for_function("() => window.__pixooReady === true", timeout=timeout_ms)
+    except Exception:
+        pass
+
+
 def _render_web_frame(
     url: str,
     timestamp: float,
@@ -127,14 +170,8 @@ def _render_web_frame(
         page = context.new_page()
         page.goto(full_url, wait_until="networkidle")
         page.wait_for_timeout(600)
-        try:
-            page.evaluate("() => document.fonts.ready")
-        except Exception:
-            pass
-        try:
-            page.wait_for_function("document.fonts.check('18px Tiny5')", timeout=8000)
-        except Exception:
-            pass
+        _wait_for_page_fonts(page)
+        _wait_for_page_render_ready(page)
         page.wait_for_timeout(300)
         screenshot_bytes = page.screenshot()
         if save_raw_path:
@@ -173,14 +210,8 @@ def _render_web_frames_persistent(
             full_url = _url_with_timestamp(url, ts, param)
             page.goto(full_url, wait_until="networkidle")
             page.wait_for_timeout(600)
-            try:
-                page.evaluate("() => document.fonts.ready")
-            except Exception:
-                pass
-            try:
-                page.wait_for_function("document.fonts.check('18px Tiny5')", timeout=8000)
-            except Exception:
-                pass
+            _wait_for_page_fonts(page)
+            _wait_for_page_render_ready(page)
             page.wait_for_timeout(300)
             screenshot_bytes = page.screenshot()
             if save_raw_path and idx == 0:

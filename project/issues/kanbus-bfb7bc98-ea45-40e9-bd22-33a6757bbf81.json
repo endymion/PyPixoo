@@ -1,0 +1,25 @@
+{
+  "id": "kanbus-bfb7bc98-ea45-40e9-bd22-33a6757bbf81",
+  "title": "Implement Pixoo V2 upload and ID methods",
+  "description": "Implement get_http_gif_id, reset_http_gif_id, upload_sequence(mode=frame_by_frame|command_list, chunk_size=40) and refactor push/push_buffer through V2 transport.",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-52f2ab71-e717-4b50-92d8-d2afe39c79f6",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "eb7f3b27-ac2f-4169-a1f1-ce8e82b40d9a",
+      "author": "ryan.porter",
+      "text": "Implementing Pixoo V2 protocol methods now: HTTP GIF ID lifecycle + sequence upload modes (frame_by_frame and command_list).",
+      "created_at": "2026-03-02T05:31:21.787427Z"
+    }
+  ],
+  "created_at": "2026-03-02T05:31:04.668124Z",
+  "updated_at": "2026-03-02T05:31:21.787427Z",
+  "closed_at": null,
+  "custom": {}
+}

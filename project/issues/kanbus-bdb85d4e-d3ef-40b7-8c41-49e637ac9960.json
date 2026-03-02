@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-bdb85d4e-d3ef-40b7-8c41-49e637ac9960",
+  "title": "Add command payload models and serializer helpers",
+  "description": "Implement payload models/helpers for Draw/SendHttpGif, Draw/CommandList, Device/PlayTFGif, Draw/SendHttpText, Draw/ClearHttpText.",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-52f2ab71-e717-4b50-92d8-d2afe39c79f6",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-02T05:31:04.570052Z",
+  "updated_at": "2026-03-02T05:31:15.619530Z",
+  "closed_at": null,
+  "custom": {}
+}

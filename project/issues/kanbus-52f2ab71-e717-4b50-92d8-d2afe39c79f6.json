@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-52f2ab71-e717-4b50-92d8-d2afe39c79f6",
+  "title": "V2 native HttpGif upload protocol",
+  "description": "Draw/SendHttpGif + Draw/CommandList + PicID lifecycle",
+  "type": "epic",
+  "status": "in_progress",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-02T05:30:28.899675Z",
+  "updated_at": "2026-03-02T05:31:15.043402Z",
+  "closed_at": null,
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-a7e8cad3-db05-49e8-a49d-a2fdf63fdf2e",
+  "title": "Play GIF from URL/TF file/TF directory",
+  "description": "Feature: Play GIF from URL/TF file/TF directory\nScenario: PlayTFGif maps source type to file type correctly\nGiven a valid GifSource of type url, tf_file, or tf_directory\nWhen play_gif is called\nThen Device/PlayTFGif is sent with FileType 2, 0, or 1 respectively",
+  "type": "story",
+  "status": "open",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-36c97aa4-14de-4d27-acdc-38e8046c6d9f",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-02T05:31:04.958875Z",
+  "updated_at": "2026-03-02T05:31:04.958875Z",
+  "closed_at": null,
+  "custom": {}
+}

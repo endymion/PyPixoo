@@ -28,4 +28,9 @@ python demos/storybook_clock.py
 # Optional: --dial-color, --hands-color (defaults black/white), --interval 1
 python demos/clock_realtime.py
 python demos/clock_realtime.py --dial-color "#111" --hands-color cyan
+
+# Font showcase: cycle Tiny5 text screens (alphabet, numbers, alert, warning, success, info) — 5s per screen
+# Uses local 192x192 fixture + 3x downsample (no Storybook required)
+python demos/font_showcase.py
+python demos/font_showcase.py --duration 3
 ```

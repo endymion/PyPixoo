@@ -1,0 +1,25 @@
+{
+  "id": "kanbus-0c9e0cb2-60e8-4340-ac21-bf69fee7bba3",
+  "title": "Remove v1 animation API + update internals",
+  "description": "Remove AnimationPlayer/AnimationSequence/Frame from public API and route internals through V2 native methods.",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-199c65b3-dacc-4284-bbca-512fa8397d28",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "ca65aeba-4e37-4cf5-b816-34b95514ee2f",
+      "author": "ryan.porter",
+      "text": "Starting implementation for V2 breaking redesign. Scope in this task: remove legacy top-level animation API, add V2-native models/methods, and wire internals to native transport commands.",
+      "created_at": "2026-03-02T05:31:21.687991Z"
+    }
+  ],
+  "created_at": "2026-03-02T05:31:06.418799Z",
+  "updated_at": "2026-03-02T05:31:21.687991Z",
+  "closed_at": null,
+  "custom": {}
+}

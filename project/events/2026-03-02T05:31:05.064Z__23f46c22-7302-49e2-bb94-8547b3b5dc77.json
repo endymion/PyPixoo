@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "23f46c22-7302-49e2-bb94-8547b3b5dc77",
+  "issue_id": "kanbus-afcb7f1d-855f-4f0b-9ef7-98579b660310",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T05:31:05.064Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Feature: Send and clear text overlays on HttpGif playback\nScenario: Overlay text commands are available for HttpGif flows\nGiven an uploaded HttpGif playback context\nWhen send_text_overlay and clear_text_overlay are called\nThen Draw/SendHttpText and Draw/ClearHttpText are sent with expected fields",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "kanbus-36c97aa4-14de-4d27-acdc-38e8046c6d9f",
+    "priority": 2,
+    "status": "open",
+    "title": "Send and clear text overlays on HttpGif playback"
+  }
+}

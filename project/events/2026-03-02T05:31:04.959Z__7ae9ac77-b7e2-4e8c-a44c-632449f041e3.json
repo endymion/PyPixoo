@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "7ae9ac77-b7e2-4e8c-a44c-632449f041e3",
+  "issue_id": "kanbus-a7e8cad3-db05-49e8-a49d-a2fdf63fdf2e",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T05:31:04.959Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Feature: Play GIF from URL/TF file/TF directory\nScenario: PlayTFGif maps source type to file type correctly\nGiven a valid GifSource of type url, tf_file, or tf_directory\nWhen play_gif is called\nThen Device/PlayTFGif is sent with FileType 2, 0, or 1 respectively",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "kanbus-36c97aa4-14de-4d27-acdc-38e8046c6d9f",
+    "priority": 1,
+    "status": "open",
+    "title": "Play GIF from URL/TF file/TF directory"
+  }
+}

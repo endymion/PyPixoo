@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-30d82b4c-6594-408a-b7ec-1f02a9c0c93b",
+  "title": "Add BDD specs for cycle engine",
+  "description": "Add feature scenarios and steps for cycle ordering, loop count, and stop behavior.",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-a135cef2-44f4-43c4-ba00-c692a0b08a5a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-02T05:31:05.928735Z",
+  "updated_at": "2026-03-02T05:31:16.572432Z",
+  "closed_at": null,
+  "custom": {}
+}

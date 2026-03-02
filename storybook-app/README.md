@@ -43,6 +43,11 @@ The library appends `&t=<timestamp>` to the URL for each frame, so the Clock (or
 ## Stories
 
 - **Pixoo/Clock** – Simple clock with a hand; `t` (0–1) sets the hand angle (one full rotation per cycle).
+- **Pixoo/TinyText** – Pixel-accurate tiny font (Tiny5, ~5px) for labels and messages: alphabet, numbers, alert, warning, success, info. Each story is a full-screen 64×64 frame. Use `demos/font_showcase.py` to cycle them on the device (5s per screen).
+
+## Pixel-accurate rendering
+
+Preview head injects Tiny5 from Google Fonts and disables font smoothing (`image-rendering: pixelated`, `-webkit-font-smoothing: none`) so screenshots stay crisp on the Pixoo. Use integer font sizes (e.g. 5px) and avoid scaling the 64×64 canvas.
 
 ## Adding components
 

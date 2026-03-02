@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-c42fccfe-a3a9-4d79-aac3-5796cb47087e",
+  "title": "Migration guidance from v1.x to v2.0",
+  "description": "Feature: Migration guidance from v1.x to v2.0\nScenario: Breaking changes are documented with replacement paths\nGiven a user upgrading from v1.x\nWhen they read README and PR_FAQ migration sections\nThen they can map removed APIs to V2 alternatives",
+  "type": "story",
+  "status": "open",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-199c65b3-dacc-4284-bbca-512fa8397d28",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-02T05:31:06.320023Z",
+  "updated_at": "2026-03-02T05:31:06.320023Z",
+  "closed_at": null,
+  "custom": {}
+}

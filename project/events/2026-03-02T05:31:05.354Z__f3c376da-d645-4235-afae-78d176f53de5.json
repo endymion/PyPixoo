@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "f3c376da-d645-4235-afae-78d176f53de5",
+  "issue_id": "kanbus-50aec989-6abb-4f16-a12a-a15e6a9c3657",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T05:31:05.354Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Implement send_text_overlay, clear_text_overlay, and guard against incompatible PlayTFGif overlay usage.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-36c97aa4-14de-4d27-acdc-38e8046c6d9f",
+    "priority": 1,
+    "status": "open",
+    "title": "Implement overlay APIs and compatibility guard"
+  }
+}

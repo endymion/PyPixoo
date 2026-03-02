@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "7c35cb35-c2ee-4322-a96f-32cad3bed5b6",
+  "issue_id": "kanbus-f5df77ac-e297-42b9-acfe-058d4ed82dd0",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T05:31:04.373Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Feature: Batch upload via CommandList with safe chunking\nScenario: Large frame sets are chunked safely\nGiven a GifSequence with 90 frames\nWhen upload_sequence is called in command_list mode with chunk_size 40\nThen three Draw/CommandList requests are sent with chunk sizes 40, 40, and 10",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "kanbus-52f2ab71-e717-4b50-92d8-d2afe39c79f6",
+    "priority": 1,
+    "status": "open",
+    "title": "Batch upload via CommandList with safe chunking"
+  }
+}

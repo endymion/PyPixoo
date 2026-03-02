@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Letter A</title>
+  <style>
+    @font-face {
+      font-family: 'Tiny5';
+      src: url('./fonts/Tiny5-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 64px;
+      height: 64px;
+      overflow: hidden;
+      background: #000;
+      color: #fff;
+      font-family: 'Tiny5', monospace;
+      font-size: 5px;
+      line-height: 1;
+      padding: 0;
+      margin: 0;
+      -webkit-font-smoothing: none;
+      -moz-osx-font-smoothing: unset;
+      font-smooth: never;
+      text-rendering: geometricPrecision;
+    }
+    .char {
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: block;
+    }
+  </style>
+</head>
+<body><span class="char" aria-hidden="true">A</span></body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "80c35138-372c-4c87-bcf1-a58f2aacceb2",
+  "issue_id": "kanbus-a135cef2-44f4-43c4-ba00-c692a0b08a5a",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T05:30:33.101Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Cycle multiple sequence types with async control",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+    "priority": 1,
+    "status": "open",
+    "title": "V2 sequence cycling orchestration"
+  }
+}

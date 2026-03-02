@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-65776ca5-57d6-456e-97ae-6857b8064475",
+  "title": "Block invalid overlay combinations with PlayTFGif",
+  "description": "Feature: Block invalid overlay combinations with PlayTFGif\nScenario: Overlay is rejected after native GIF playback\nGiven a PlayTFGif playback context\nWhen send_text_overlay is called\nThen a clear ValueError is raised and no Draw/SendHttpText command is sent",
+  "type": "story",
+  "status": "open",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-36c97aa4-14de-4d27-acdc-38e8046c6d9f",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-02T05:31:05.160424Z",
+  "updated_at": "2026-03-02T05:31:05.160424Z",
+  "closed_at": null,
+  "custom": {}
+}

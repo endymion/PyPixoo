@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "ca536c7c-e34b-4d4f-8619-a455d47262bc",
+  "issue_id": "kanbus-7195da93-30c1-4aac-a66d-dad5379d4b8e",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T05:31:05.738Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Feature: Async cycle control with callbacks and stop\nScenario: Cycle handle controls background execution\nGiven a running cycle\nWhen stop and wait are called with callbacks configured\nThen the cycle stops cleanly and callbacks report loop/item progress",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "kanbus-a135cef2-44f4-43c4-ba00-c692a0b08a5a",
+    "priority": 1,
+    "status": "open",
+    "title": "Async cycle control with callbacks and stop"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "6d78b8b5-17d6-4f6e-98fb-fe1448141190",
+  "issue_id": "kanbus-6d12d072-335f-45db-ac9a-d51b7a663eff",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T05:31:05.642Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Feature: Cycle configured sequence items in order\nScenario: Cycle engine runs items deterministically\nGiven a cycle with multiple item types\nWhen start_cycle is called\nThen items are executed in the configured order for each loop",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "kanbus-a135cef2-44f4-43c4-ba00-c692a0b08a5a",
+    "priority": 1,
+    "status": "open",
+    "title": "Cycle configured sequence items in order"
+  }
+}

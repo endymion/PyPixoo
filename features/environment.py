@@ -70,7 +70,13 @@ class _FakePlaywrightContextManager:
             def goto(self, url, wait_until=None): pass
             def screenshot(self): return _fake_png_bytes()
 
+        class FakeContext:
+            def new_page(self): return FakePage()
+            def close(self): pass
+
         class FakeBrowser:
+            def new_context(self, viewport=None, device_scale_factor=1):
+                return FakeContext()
             def new_page(self): return FakePage()
             def close(self): pass
 

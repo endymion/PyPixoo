@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-a135cef2-44f4-43c4-ba00-c692a0b08a5a",
+  "title": "V2 sequence cycling orchestration",
+  "description": "Cycle multiple sequence types with async control",
+  "type": "epic",
+  "status": "in_progress",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-02T05:30:33.100951Z",
+  "updated_at": "2026-03-02T05:31:15.336288Z",
+  "closed_at": null,
+  "custom": {}
+}

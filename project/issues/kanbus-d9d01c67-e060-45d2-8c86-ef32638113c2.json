@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-d9d01c67-e060-45d2-8c86-ef32638113c2",
+  "title": "Release execution for breaking version",
+  "description": "Prepare breaking-release commit semantics, migration docs completion, and semantic-release major version path.",
+  "type": "task",
+  "status": "open",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-199c65b3-dacc-4284-bbca-512fa8397d28",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-02T05:31:06.603342Z",
+  "updated_at": "2026-03-02T05:31:06.603342Z",
+  "closed_at": null,
+  "custom": {}
+}

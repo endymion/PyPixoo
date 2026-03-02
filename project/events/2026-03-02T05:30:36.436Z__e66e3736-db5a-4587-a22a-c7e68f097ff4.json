@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "e66e3736-db5a-4587-a22a-c7e68f097ff4",
+  "issue_id": "kanbus-199c65b3-dacc-4284-bbca-512fa8397d28",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T05:30:36.436Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Breaking API rollout, docs, versioning",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+    "priority": 1,
+    "status": "open",
+    "title": "V2 API/CLI migration and release"
+  }
+}

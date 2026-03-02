@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "4574d735-1a54-4b5f-9986-8e0967622286",
+  "issue_id": "kanbus-de9a6578-6827-4f76-b469-c9d0d2c1cf1a",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T05:31:05.834Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Implement CycleItem/CycleHandle and Pixoo.start_cycle(loop, on_loop, on_item) orchestration.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-a135cef2-44f4-43c4-ba00-c692a0b08a5a",
+    "priority": 1,
+    "status": "open",
+    "title": "Implement cycle engine and handle"
+  }
+}

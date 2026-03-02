@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-36302345-3377-46af-9441-4d5d61218914",
+  "title": "Update demos/docs for native GIF paths",
+  "description": "Update README and demos to reflect V2 native GIF upload/playback usage patterns.",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-36c97aa4-14de-4d27-acdc-38e8046c6d9f",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-02T05:31:05.543299Z",
+  "updated_at": "2026-03-02T05:31:16.692823Z",
+  "closed_at": null,
+  "custom": {}
+}
