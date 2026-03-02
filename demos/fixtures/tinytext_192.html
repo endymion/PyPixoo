@@ -11,6 +11,34 @@
       font-style: normal;
       font-display: block;
     }
+    @font-face {
+      font-family: 'Micro5';
+      src: url('./fonts/Micro5-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'Jersey10';
+      src: url('./fonts/Jersey10-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'Bytesized';
+      src: url('./fonts/Bytesized-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'Jersey15';
+      src: url('./fonts/Jersey15-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -20,7 +48,7 @@
       overflow: hidden;
       background: #000;
       color: #fff;
-      font-family: 'Tiny5', monospace;
+      font-family: monospace;
       font-size: 23px;
       line-height: 1;
       -webkit-font-smoothing: none;
@@ -43,6 +71,24 @@
   <script>
     const PRESETS = {
       alphabet: [
+        "ABCDEFGHIJKLM",
+        "NOPQRSTUVWXYZ",
+        "abcdefghijklm",
+        "nopqrstuvwxyz",
+      ],
+      alphabet10: [
+        "ABCDEFGH",
+        "IJKLMNOP",
+        "QRSTUVWX",
+        "YZ",
+      ],
+      alphabet15: [
+        "ABCDEFGHI",
+        "JKLMNOPQR",
+        "STUVWXYZ",
+        "",
+      ],
+      alphabet4: [
         "ABCDEFGHIJKLM",
         "NOPQRSTUVWXYZ",
         "abcdefghijklm",
@@ -83,6 +129,18 @@
         "Pixoo 64",
         "64x64 px",
       ],
+      single_a: [
+        "A",
+        "",
+        "",
+        "",
+      ],
+      font_list: [
+        "FONTS",
+        "Tiny5:5",
+        "Micro5:5",
+        "Bytesized:4",
+      ],
     };
 
     const COLORS = {
@@ -95,18 +153,81 @@
       custom: { bg: "#111", fg: "#0f0" },
     };
 
+    const FONT_PROFILES = {
+      tiny5: { family: "Tiny5", sizePx: 23, yOffsetHi: -3, heightPx: 5, sampleHeightPx: 8, maskAlphaThreshold: 64 },
+      micro5: { family: "Micro5", sizePx: 34, yOffsetHi: 0, heightPx: 5, sampleHeightPx: 8, maskAlphaThreshold: 64 },
+      bytesized: { family: "Bytesized", sizePx: 23, yOffsetHi: -2, heightPx: 4, sampleHeightPx: 8, maskAlphaThreshold: 64 },
+      jersey10: { family: "Jersey10", sizePx: 56, yOffsetHi: -9, heightPx: 10, sampleHeightPx: 16, maskAlphaThreshold: 128 },
+      jersey15: { family: "Jersey15", sizePx: 83, yOffsetHi: -20, heightPx: 15, sampleHeightPx: 24, maskAlphaThreshold: 128 },
+    };
+
     const LINE_YS_64 = [8, 22, 36, 50];
+    const LINE_YS_BY_VARIANT = {
+      alphabet15: [8, 26, 44, 62],
+    };
+    const MASK_ALPHA_THRESHOLD = 64;
     const BASE_GAP_PX_64 = 1;
     const WORD_SPACE_PX_64 = 2;
     const START_X_64 = 2;
-    const FONT_SPEC = "23px Tiny5";
 
     const params = new URLSearchParams(window.location.search);
     const variant = params.get("variant") || "alphabet";
+    const requestedFont = (params.get("font") || "tiny5").toLowerCase();
+    const baseFontProfile = FONT_PROFILES[requestedFont] || FONT_PROFILES.tiny5;
+    const sizeOverride = Number.parseInt(params.get("font_size") || "", 10);
+    const yOffsetOverride = Number.parseInt(params.get("font_y") || "", 10);
+    const sampleHeightOverride = Number.parseInt(params.get("font_sample_h") || "", 10);
+    const fontProfile = {
+      ...baseFontProfile,
+      sizePx: Number.isFinite(sizeOverride) ? sizeOverride : baseFontProfile.sizePx,
+      yOffsetHi: Number.isFinite(yOffsetOverride) ? yOffsetOverride : baseFontProfile.yOffsetHi,
+      sampleHeightPx: Number.isFinite(sampleHeightOverride)
+        ? Math.max(8, sampleHeightOverride)
+        : baseFontProfile.sampleHeightPx,
+    };
     const tracking = Number.parseInt(params.get("tracking") || "0", 10);
     const trackingPx64 = Number.isFinite(tracking) ? Math.max(0, tracking) : 0;
-    const lines = PRESETS[variant] || PRESETS.alphabet;
-    const colors = COLORS[variant] || COLORS.alphabet;
+    const fontListParam = params.get("font_list") || "";
+    const fontListPage = Number.parseInt(params.get("font_list_page") || "0", 10);
+    const baseColors = COLORS[variant] || COLORS.alphabet;
+    const colors = {
+      bg: null,
+      fg: null,
+    };
+
+    function buildFontListEntries(raw) {
+      const page = Number.isFinite(fontListPage) ? Math.max(0, fontListPage) : 0;
+      const pageSize = 4;
+      const parsed = raw
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map((entry) => {
+          const [k, name, height] = entry.split(":");
+          const key = (height ? k : name || k || "").toLowerCase();
+          const display = (height ? name : k || "font").trim();
+          const h = (height ? height : name || "5").trim();
+          return { key, text: `${display.toUpperCase()} ${h}px` };
+        });
+      const start = page * pageSize;
+      const rows = parsed.slice(start, start + pageSize);
+      while (rows.length < pageSize) {
+        rows.push({ key: requestedFont, text: "" });
+      }
+      return rows;
+    }
+
+    const lineDefs = (variant === "font_list" && fontListParam)
+      ? buildFontListEntries(fontListParam)
+      : (PRESETS[variant] || PRESETS.alphabet).map((text) => ({ key: requestedFont, text }));
+
+    function resolveProfile(key) {
+      const profileKey = (key || requestedFont).toLowerCase();
+      if (profileKey === requestedFont) {
+        return fontProfile;
+      }
+      return FONT_PROFILES[profileKey] || fontProfile;
+    }
 
     function hexToRgb(hex) {
       const v = hex.replace("#", "");
@@ -118,7 +239,18 @@
       ];
     }
 
-    function toBinaryMask(ctx, width, height) {
+    function normalizeHexColor(value) {
+      if (!value) return null;
+      const trimmed = value.trim();
+      const match = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.exec(trimmed);
+      if (!match) return null;
+      return `#${match[1]}`;
+    }
+
+    colors.bg = normalizeHexColor(params.get("bg")) || baseColors.bg;
+    colors.fg = normalizeHexColor(params.get("fg")) || baseColors.fg;
+
+    function toBinaryMask(ctx, width, height, alphaThreshold = MASK_ALPHA_THRESHOLD) {
       const data = ctx.getImageData(0, 0, width, height).data;
       let minX = width;
       let minY = height;
@@ -128,7 +260,7 @@
       for (let y = 0; y < height; y += 1) {
         for (let x = 0; x < width; x += 1) {
           const i = (y * width + x) * 4;
-          if (data[i + 3] > 0) {
+          if (data[i + 3] >= alphaThreshold) {
             if (x < minX) minX = x;
             if (y < minY) minY = y;
             if (x > maxX) maxX = x;
@@ -138,7 +270,13 @@
       }
 
       if (maxX < minX || maxY < minY) {
-        return { width: 0, height: 0, offsetY: 0, mask: new Uint8Array(0) };
+        return {
+          width: 0,
+          height: 0,
+          offsetX: 0,
+          offsetY: 0,
+          mask: new Uint8Array(0),
+        };
       }
 
       const outW = maxX - minX + 1;
@@ -149,13 +287,13 @@
           const sx = minX + x;
           const sy = minY + y;
           const i = (sy * width + sx) * 4;
-          mask[y * outW + x] = data[i + 3] > 0 ? 1 : 0;
+          mask[y * outW + x] = data[i + 3] >= alphaThreshold ? 1 : 0;
         }
       }
-      return { width: outW, height: outH, offsetY: minY, mask };
+      return { width: outW, height: outH, offsetX: minX, offsetY: minY, mask };
     }
 
-    function buildGlyphAtlas(linesToRender) {
+    function buildGlyphAtlas(linesToRender, profile) {
       const charset = new Set();
       for (const line of linesToRender) {
         for (const ch of line) {
@@ -165,31 +303,49 @@
 
       const hi = document.createElement("canvas");
       hi.width = 192;
-      hi.height = 24;
+      hi.height = profile.sampleHeightPx * 3;
       const hctx = hi.getContext("2d");
-      hctx.font = FONT_SPEC;
+      hctx.font = `${profile.sizePx}px "${profile.family}"`;
       hctx.textBaseline = "top";
       hctx.fontKerning = "none";
       hctx.fillStyle = "#fff";
 
       const lo = document.createElement("canvas");
       lo.width = 64;
-      lo.height = 8;
+      lo.height = profile.sampleHeightPx;
       const lctx = lo.getContext("2d");
       lctx.imageSmoothingEnabled = false;
 
-      const atlas = new Map();
+      const glyphs = new Map();
+      const spaceAdvancePx = Math.max(1, Math.round(hctx.measureText(" ").width / 3));
       for (const ch of charset) {
         hctx.clearRect(0, 0, hi.width, hi.height);
-        hctx.fillText(ch, 0, -3);
+        hctx.fillText(ch, 0, profile.yOffsetHi);
         lctx.clearRect(0, 0, lo.width, lo.height);
         lctx.drawImage(hi, 0, 0, hi.width, hi.height, 0, 0, lo.width, lo.height);
-        atlas.set(ch, toBinaryMask(lctx, lo.width, lo.height));
+        const mask = toBinaryMask(
+          lctx,
+          lo.width,
+          lo.height,
+          profile.maskAlphaThreshold || MASK_ALPHA_THRESHOLD,
+        );
+        glyphs.set(
+          ch,
+          {
+            ...mask,
+            // Use visible ink width for deterministic per-glyph packing.
+            // This keeps inter-letter spacing consistent without per-character tuning.
+            drawWidthPx: Math.max(1, mask.width),
+          },
+        );
       }
-      return atlas;
+      return {
+        glyphs,
+        spaceAdvancePx,
+      };
     }
 
-    function renderLowRes(linesToRender, bgRgb, fgRgb) {
+    function renderLowRes(rowsToRender, bgRgb, fgRgb) {
       const low = document.createElement("canvas");
       low.width = 64;
       low.height = 64;
@@ -198,7 +354,27 @@
       lctx.fillStyle = `rgb(${bgRgb[0]},${bgRgb[1]},${bgRgb[2]})`;
       lctx.fillRect(0, 0, 64, 64);
 
-      const atlas = buildGlyphAtlas(linesToRender);
+      const atlases = new Map();
+      const textsByFont = new Map();
+      for (const row of rowsToRender) {
+        const k = (row.key || requestedFont).toLowerCase();
+        if (!textsByFont.has(k)) {
+          textsByFont.set(k, []);
+        }
+        textsByFont.get(k).push(row.text || "");
+      }
+      // Ensure alphabet-frame label glyphs are available in the active font atlas.
+      if (variant.startsWith("alphabet")) {
+        if (!textsByFont.has(requestedFont)) {
+          textsByFont.set(requestedFont, []);
+        }
+        textsByFont.get(requestedFont).push((fontProfile.family || "").toUpperCase());
+      }
+      for (const [k, texts] of textsByFont.entries()) {
+        const p = resolveProfile(k);
+        atlases.set(k, buildGlyphAtlas(texts, p));
+      }
+
       const img = lctx.getImageData(0, 0, 64, 64);
       const px = img.data;
 
@@ -211,16 +387,147 @@
         px[i + 3] = 255;
       }
 
-      for (let li = 0; li < linesToRender.length && li < LINE_YS_64.length; li += 1) {
-        const text = linesToRender[li] || " ";
-        const baseY = LINE_YS_64[li];
+      const LABEL_FONT_4PX = {
+        A: [".##.", "#..#", "####", "#..#"],
+        B: ["###.", "#..#", "###.", "###."],
+        C: [".##.", "#...", "#...", ".##."],
+        D: ["###.", "#..#", "#..#", "###."],
+        E: ["####", "###.", "#...", "####"],
+        F: ["####", "###.", "#...", "#..."],
+        G: [".##.", "#...", "#.##", ".###"],
+        H: ["#..#", "####", "#..#", "#..#"],
+        I: ["####", ".##.", ".##.", "####"],
+        J: ["####", "..#.", "#.#.", ".#.."],
+        K: ["#..#", "###.", "###.", "#..#"],
+        L: ["#...", "#...", "#...", "####"],
+        M: ["#..#", "####", "#..#", "#..#"],
+        N: ["#..#", "##.#", "#.##", "#..#"],
+        O: [".##.", "#..#", "#..#", ".##."],
+        P: ["###.", "#..#", "###.", "#..."],
+        Q: [".##.", "#..#", "#.##", ".###"],
+        R: ["###.", "#..#", "###.", "#..#"],
+        S: [".###", "#...", ".##.", "###."],
+        T: ["####", ".##.", ".##.", ".##."],
+        U: ["#..#", "#..#", "#..#", ".##."],
+        V: ["#..#", "#..#", ".##.", ".##."],
+        W: ["#..#", "#..#", "####", "#..#"],
+        X: ["#..#", ".##.", ".##.", "#..#"],
+        Y: ["#..#", ".##.", "..#.", "..#."],
+        Z: ["####", "..##", ".##.", "####"],
+        0: [".##.", "#.##", "##.#", ".##."],
+        1: [".##.", "..#.", "..#.", ".###"],
+        2: ["###.", "..##", ".##.", "####"],
+        3: ["###.", "..##", "..##", "###."],
+        4: ["#..#", "####", "...#", "...#"],
+        5: ["####", "###.", "...#", "###."],
+        6: [".##.", "###.", "#..#", ".##."],
+        7: ["####", "..##", ".##.", ".##."],
+        8: [".##.", "#..#", ".##.", "#..#"],
+        9: [".##.", "#..#", ".###", "..#."],
+        ".": ["....", "....", "....", ".##."],
+        "-": ["....", ".##.", ".##.", "...."],
+        "_": ["....", "....", "....", "####"],
+      };
+
+      function drawLabelTopCentered(labelText) {
+        const text = (labelText || "").toUpperCase();
+        const glyphGap = 1;
+        let width = 0;
+        for (let i = 0; i < text.length; i += 1) {
+          const ch = text[i];
+          const glyph = LABEL_FONT_4PX[ch];
+          width += glyph ? glyph[0].length : 4;
+          if (i < text.length - 1) {
+            width += glyphGap;
+          }
+        }
+        const startX = Math.max(0, Math.floor((64 - width) / 2));
+        const startY = 0;
+        let cx = startX;
+
+        for (const ch of text) {
+          const glyph = LABEL_FONT_4PX[ch];
+          const rows = glyph || ["....", ".##.", ".##.", "...."];
+          const gw = rows[0].length;
+          for (let gy = 0; gy < rows.length; gy += 1) {
+            for (let gx = 0; gx < gw; gx += 1) {
+              if (rows[gy][gx] === "#") {
+                setFg(cx + gx, startY + gy);
+              }
+            }
+          }
+          cx += gw + glyphGap;
+        }
+      }
+
+      function drawLabelFromActiveFontTopCentered(labelText, atlas) {
+        const text = (labelText || "").toUpperCase();
+        if (!text || !atlas || !atlas.glyphs) return false;
+        const glyphGap = 1;
+        const glyphs = [];
+        let width = 0;
+        for (let i = 0; i < text.length; i += 1) {
+          const ch = text[i];
+          if (ch === " ") {
+            glyphs.push({ ch, glyph: null });
+            width += atlas.spaceAdvancePx;
+          } else {
+            const glyph = atlas.glyphs.get(ch);
+            if (!glyph || glyph.width === 0 || glyph.height === 0 || glyph.height > 5) {
+              return false;
+            }
+            glyphs.push({ ch, glyph });
+            width += glyph.drawWidthPx;
+          }
+          if (i < text.length - 1) {
+            width += glyphGap;
+          }
+        }
+        let cx = Math.max(0, Math.floor((64 - width) / 2));
+        for (const item of glyphs) {
+          if (!item.glyph) {
+            cx += atlas.spaceAdvancePx + glyphGap;
+            continue;
+          }
+          const glyph = item.glyph;
+          for (let gy = 0; gy < glyph.height; gy += 1) {
+            for (let gx = 0; gx < glyph.width; gx += 1) {
+              if (glyph.mask[gy * glyph.width + gx]) {
+                setFg(cx + gx, gy);
+              }
+            }
+          }
+          cx += glyph.drawWidthPx + glyphGap;
+        }
+        return true;
+      }
+
+      if (variant.startsWith("alphabet")) {
+        const labelAtlas = atlases.get(requestedFont);
+        const drewWithActiveFont = fontProfile.heightPx <= 5
+          ? drawLabelFromActiveFontTopCentered(fontProfile.family, labelAtlas)
+          : false;
+        if (!drewWithActiveFont) {
+          drawLabelTopCentered(fontProfile.family);
+        }
+      }
+
+      const lineYs = LINE_YS_BY_VARIANT[variant] || LINE_YS_64;
+      for (let li = 0; li < rowsToRender.length && li < lineYs.length; li += 1) {
+        const row = rowsToRender[li] || { key: requestedFont, text: " " };
+        const text = row.text || " ";
+        const lineFontKey = (row.key || requestedFont).toLowerCase();
+        const atlas = atlases.get(lineFontKey) || atlases.get(requestedFont);
+        const glyphs = atlas ? atlas.glyphs : null;
+        const spaceAdvancePx = atlas ? atlas.spaceAdvancePx : WORD_SPACE_PX_64;
+        const baseY = lineYs[li];
         let x = START_X_64;
         for (const ch of text) {
           if (ch === " ") {
-            x += WORD_SPACE_PX_64 + BASE_GAP_PX_64 + trackingPx64;
+            x += spaceAdvancePx + BASE_GAP_PX_64 + trackingPx64;
             continue;
           }
-          const glyph = atlas.get(ch);
+          const glyph = glyphs ? glyphs.get(ch) : null;
           if (!glyph || glyph.width === 0 || glyph.height === 0) {
             x += BASE_GAP_PX_64 + trackingPx64;
             continue;
@@ -232,7 +539,7 @@
               }
             }
           }
-          x += glyph.width + BASE_GAP_PX_64 + trackingPx64;
+          x += glyph.drawWidthPx + BASE_GAP_PX_64 + trackingPx64;
         }
       }
 
@@ -240,25 +547,41 @@
       return low;
     }
 
-    async function ensureTiny5Loaded() {
+    async function ensureFontLoaded(fontKeys) {
       if (!document.fonts || !document.fonts.load) {
         return;
       }
-      await document.fonts.load(FONT_SPEC);
+      const specs = [];
+      for (const k of fontKeys) {
+        const p = resolveProfile(k);
+        specs.push(`${p.sizePx}px "${p.family}"`);
+      }
+      for (const spec of specs) {
+        await document.fonts.load(spec);
+      }
       await document.fonts.ready;
       for (let i = 0; i < 20; i += 1) {
-        if (document.fonts.check(FONT_SPEC)) {
+        if (specs.every((spec) => document.fonts.check(spec))) {
           return;
         }
         await new Promise((resolve) => setTimeout(resolve, 50));
       }
     }
 
+    window.__pixooReady = false;
+    window.__pixooError = null;
+
     async function render() {
-      await ensureTiny5Loaded();
+      document.body.style.fontFamily = `"${fontProfile.family}", monospace`;
+      document.body.style.fontSize = `${fontProfile.sizePx}px`;
+      const requiredFontKeys = new Set([requestedFont]);
+      for (const row of lineDefs) {
+        requiredFontKeys.add((row.key || requestedFont).toLowerCase());
+      }
+      await ensureFontLoaded(requiredFontKeys);
       const bgRgb = hexToRgb(colors.bg);
       const fgRgb = hexToRgb(colors.fg);
-      const low = renderLowRes(lines, bgRgb, fgRgb);
+      const low = renderLowRes(lineDefs, bgRgb, fgRgb);
 
       document.body.style.background = colors.bg;
       const screen = document.getElementById("screen");
@@ -267,9 +590,14 @@
       sctx.fillStyle = colors.bg;
       sctx.fillRect(0, 0, 192, 192);
       sctx.drawImage(low, 0, 0, 64, 64, 0, 0, 192, 192);
+      window.__pixooReady = true;
     }
 
-    render();
+    render().catch((err) => {
+      window.__pixooError = String(err);
+      window.__pixooReady = true;
+      throw err;
+    });
   </script>
 </body>
 </html>
