@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v2.2.2 (2026-03-02)
+
+### Bug Fixes
+
+- Replace mixed marker mode with two-dot-size clockface
+  ([`27115e0`](https://github.com/endymion/PyPixoo/commit/27115e00809dbc49050cefc3ec20d3df7fa54733))
+
+
 ## v2.2.1 (2026-03-02)
 
 ### Bug Fixes
