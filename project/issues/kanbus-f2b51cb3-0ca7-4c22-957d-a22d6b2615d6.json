@@ -472,10 +472,28 @@
       "author": "ryan.porter",
       "text": "Font demo is fixed for V2 API. Removed legacy AnimationPlayer/AnimationSequence usage in demos/font_showcase.py, switched playback to native upload_sequence (UploadMode.COMMAND_LIST), and verified: (1) save-only export path works, (2) live run starts, connects, and cycles, (3) existing background font_showcase process was terminated to avoid lock contention.",
       "created_at": "2026-03-02T05:48:30.812024Z"
+    },
+    {
+      "id": "aef61d1b-b00c-4da7-bcef-43b1925ba956",
+      "author": "ryan.porter",
+      "text": "Starting clock demo modernization for V2. Goal: replace unreliable just-in-time single-frame pushes with smoother native sequence upload/cycle behavior and validate runtime reliability.",
+      "created_at": "2026-03-02T05:51:05.506615Z"
+    },
+    {
+      "id": "5e18dfd4-c452-4ed3-a2cc-37bc4f682132",
+      "author": "ryan.porter",
+      "text": "Clock demos updated for V2 and smoother playback.  now uses native  loop (no legacy AnimationPlayer).  now pre-renders multi-frame windows and uploads as native HttpGif sequences (command_list by default), avoiding one-frame-per-second just-in-time pushes. Validation: both scripts run on device (192.168.0.37); storybook_clock precomputed+looped, clock_realtime repeatedly uploaded 8-frame windows at fps=4 with stable cycles.",
+      "created_at": "2026-03-02T05:56:12.303071Z"
+    },
+    {
+      "id": "4dbf2ba7-3caf-4467-b740-77ede3f07ddd",
+      "author": "ryan.porter",
+      "text": "Clock demos updated for V2 and smoother playback.\n\n- `demos/storybook_clock.py` now uses native `upload_sequence` looping (no legacy `AnimationPlayer`).\n- `demos/clock_realtime.py` now pre-renders multi-frame windows and uploads native HttpGif sequences (`command_list` by default), avoiding one-frame-per-second just-in-time pushes.\n\nValidation:\n- Both scripts run on device (`192.168.0.37`).\n- `storybook_clock.py` precomputed and looped successfully.\n- `clock_realtime.py` repeatedly uploaded 8-frame windows at `fps=4` with stable cycles.\n",
+      "created_at": "2026-03-02T05:56:17.384647Z"
     }
   ],
   "created_at": "2026-03-01T22:06:40.289727Z",
-  "updated_at": "2026-03-02T05:48:30.812024Z",
+  "updated_at": "2026-03-02T05:56:17.384647Z",
   "closed_at": null,
   "custom": {}
 }

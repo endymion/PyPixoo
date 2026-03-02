@@ -1,26 +1,27 @@
 #!/usr/bin/env python3
-"""Show current time on the Pixoo using the Storybook Clock (hour + minute + second).
+"""Show a smoother real-time Storybook Clock on Pixoo using V2 native uploads.
 
-Updates every second. Pre-renders the frame before each tick (default 800 ms before)
-so the push happens on the second boundary for better accuracy.
+Instead of rendering and pushing one frame just-in-time every second,
+this demo pre-renders a short multi-frame time window and uploads it as a
+native HttpGif sequence for smoother motion.
 
 Requires Storybook: cd storybook-app && npm run storybook
 Requires: pip install -e ".[browser]"
 
   python demos/clock_realtime.py
-  python demos/clock_realtime.py --preload-ms 500 --dial-color black --hands-color white
-  python demos/clock_realtime.py --interval 1 --preload-ms 800
-  python demos/clock_realtime.py --no-second-hand
-  python demos/clock_realtime.py --second-hand-color cyan
+  python demos/clock_realtime.py --fps 10 --window-seconds 3 --preload-ms 900
+  python demos/clock_realtime.py --dial-color "#111" --hands-color cyan
 
 Press Ctrl+C to stop.
 """
+
+from __future__ import annotations
 
 import argparse
 import os
 import sys
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -29,53 +30,93 @@ os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pypixoo import Pixoo, FrameRenderer, WebFrameSource
+from pypixoo import FrameRenderer, Pixoo, UploadMode, WebFrameSource
 
 IP_DEFAULT = "192.168.0.37"
 STORYBOOK_IFRAME = "http://localhost:6006/iframe.html"
 CLOCK_STORY_ID = "pixoo-clock--time-with-seconds"
 
 
+def _format_story_arg(value) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, float):
+        rendered = f"{value:.3f}".rstrip("0").rstrip(".")
+        return rendered if rendered else "0"
+    return str(value)
+
+
 def build_clock_url(
-    hour: int,
-    minute: int,
-    second: int,
+    frame_time_epoch: float,
     face_color: str,
     hand_color: str,
     show_second_hand: bool,
     second_hand_color: str,
 ) -> str:
-    """Build Storybook iframe URL. Preview decorator reads hour/minute/second from URL."""
-    query = {
-        "id": CLOCK_STORY_ID,
-        "viewMode": "story",
-        "hour": str(hour % 12),
-        "minute": str(minute),
-        "second": str(second),
+    """Build Storybook iframe URL using args=... semantics for deterministic frame rendering."""
+    dt = datetime.fromtimestamp(frame_time_epoch)
+    second_value = dt.second + (dt.microsecond / 1_000_000.0)
+    args_map = {
+        "hour": dt.hour % 12,
+        "minute": dt.minute,
+        "second": second_value,
+        "showSecondHand": show_second_hand,
         "faceColor": face_color,
         "handColor": hand_color,
-        "showSecondHand": "true" if show_second_hand else "false",
         "secondHandColor": second_hand_color,
     }
-    return f"{STORYBOOK_IFRAME}?{urlencode(query)}"
+    args_str = ";".join(f"{key}:{_format_story_arg(value)}" for key, value in args_map.items())
+    return f"{STORYBOOK_IFRAME}?{urlencode({'id': CLOCK_STORY_ID, 'viewMode': 'story', 'args': args_str})}"
 
 
-def main():
+def build_sources(
+    start_epoch: float,
+    frame_count: int,
+    fps: int,
+    duration_ms: int,
+    dial_color: str,
+    hands_color: str,
+    show_second_hand: bool,
+    second_hand_color: str,
+) -> list[WebFrameSource]:
+    sources: list[WebFrameSource] = []
+    for i in range(frame_count):
+        frame_time = start_epoch + (i / fps)
+        sources.append(
+            WebFrameSource(
+                url=build_clock_url(
+                    frame_time,
+                    dial_color,
+                    hands_color,
+                    show_second_hand,
+                    second_hand_color,
+                ),
+                timestamps=[0],
+                duration_per_frame_ms=duration_ms,
+                browser_mode="per_frame",
+                timestamp_param="t",
+            )
+        )
+    return sources
+
+
+def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Show current time on Pixoo (Storybook Clock). Updates every second with pre-rendering."
+        description="Show smooth real-time Storybook clock using V2 native sequence uploads"
     )
     parser.add_argument("--ip", default=IP_DEFAULT, help=f"Device IP (default: {IP_DEFAULT})")
+    parser.add_argument("--fps", type=int, default=10, help="Target frames per second (default: 10)")
     parser.add_argument(
-        "--interval",
+        "--window-seconds",
         type=float,
-        default=1.0,
-        help="Update interval in seconds (default: 1)",
+        default=3.0,
+        help="Seconds of animation to pre-render and upload per cycle (default: 3)",
     )
     parser.add_argument(
         "--preload-ms",
         type=int,
-        default=800,
-        help="Start rendering this many ms before the second mark (default: 800)",
+        default=900,
+        help="Begin rendering this many ms before cycle boundary (default: 900)",
     )
     parser.add_argument(
         "--dial-color",
@@ -97,61 +138,63 @@ def main():
         default="rgba(255,100,100,0.9)",
         help="Second hand color (default: reddish)",
     )
-    parse_args = parser.parse_args()
+    parser.add_argument(
+        "--upload-mode",
+        choices=[UploadMode.FRAME_BY_FRAME.value, UploadMode.COMMAND_LIST.value],
+        default=UploadMode.COMMAND_LIST.value,
+        help="Native upload transport mode",
+    )
+    parser.add_argument("--chunk-size", type=int, default=40, help="CommandList chunk size")
+    args = parser.parse_args()
 
-    pixoo = Pixoo(parse_args.ip)
+    fps = max(1, args.fps)
+    window_seconds = max(1.0 / fps, args.window_seconds)
+    frame_count = max(1, int(round(fps * window_seconds)))
+    frame_duration_ms = max(20, int(round(1000 / fps)))
+
+    pixoo = Pixoo(args.ip)
     if not pixoo.connect():
-        print(f"error: Failed to connect to {parse_args.ip}", file=sys.stderr)
+        print(f"error: Failed to connect to {args.ip}", file=sys.stderr)
         sys.exit(1)
 
-    interval = parse_args.interval
-
     print(
-        f"Clock realtime: interval={interval}s, preload={parse_args.preload_ms}ms, "
-        f"dial={parse_args.dial_color}, hands={parse_args.hands_color}, "
-        f"second_hand={'off' if parse_args.no_second_hand else 'on'} ({parse_args.second_hand_color})"
+        f"Clock smooth mode: fps={fps}, window={window_seconds:.2f}s ({frame_count} frames), "
+        f"lead={args.preload_ms}ms, upload_mode={args.upload_mode}, chunk={args.chunk_size}"
     )
     print("Press Ctrl+C to stop.")
 
+    render_estimate_sec = window_seconds
+    min_lead_sec = max(0.1, args.preload_ms / 1000.0)
+
     try:
         while True:
-            now = datetime.now()
-            next_display = (now + timedelta(seconds=interval)).replace(microsecond=0)
-            render_at = next_display - timedelta(milliseconds=parse_args.preload_ms)
+            cycle_start = time.time() + max(min_lead_sec, render_estimate_sec)
 
-            now = datetime.now()
-            if render_at > now:
-                sleep_sec = (render_at - now).total_seconds()
-                time.sleep(max(0, sleep_sec))
-
-            url = build_clock_url(
-                next_display.hour,
-                next_display.minute,
-                next_display.second,
-                parse_args.dial_color,
-                parse_args.hands_color,
-                show_second_hand=not parse_args.no_second_hand,
-                second_hand_color=parse_args.second_hand_color,
+            render_started = time.time()
+            sources = build_sources(
+                start_epoch=cycle_start,
+                frame_count=frame_count,
+                fps=fps,
+                duration_ms=frame_duration_ms,
+                dial_color=args.dial_color,
+                hands_color=args.hands_color,
+                show_second_hand=not args.no_second_hand,
+                second_hand_color=args.second_hand_color,
             )
-            source = WebFrameSource(
-                url=url,
-                timestamps=[0],
-                duration_per_frame_ms=0,
-                browser_mode="per_frame",
-                timestamp_param="t",
+            sequence = FrameRenderer(sources).precompute()
+            render_duration_sec = time.time() - render_started
+
+            pixoo.upload_sequence(
+                sequence,
+                mode=UploadMode(args.upload_mode),
+                chunk_size=args.chunk_size,
             )
-            renderer = FrameRenderer([source])
-            sequence = renderer.precompute()
-            frame = sequence.frames[0]
-            buffer_data = list(frame.image.data)
-
-            now = datetime.now()
-            if next_display > now:
-                sleep_sec = (next_display - now).total_seconds()
-                time.sleep(max(0, sleep_sec))
-
-            pixoo.push_buffer(buffer_data)
-            print(next_display.strftime("%H:%M:%S"), flush=True)
+            render_estimate_sec = (render_estimate_sec * 0.7) + (render_duration_sec * 0.3)
+            print(
+                f"{datetime.now().strftime('%H:%M:%S')} uploaded {frame_count} frames "
+                f"(render {render_duration_sec:.2f}s, lead target {max(min_lead_sec, render_estimate_sec):.2f}s)",
+                flush=True,
+            )
     except KeyboardInterrupt:
         print("\nStopped")
     finally:

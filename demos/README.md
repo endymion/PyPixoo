@@ -20,14 +20,15 @@ python demos/black_band_chained.py
 # Requires: pip install -e ".[browser]"
 python demos/browser_mixed.py
 
-# Storybook Clock animation (t 0..1)
+# Storybook Clock animation (t 0..1), precomputed + native sequence upload
 # Requires: Storybook running (cd storybook-app && npm run storybook)
 python demos/storybook_clock.py
+python demos/storybook_clock.py --fps 10 --loop-seconds 2
 
-# Real-time clock: current time, updates every second; pre-renders before each tick (--preload-ms, default 800)
-# Optional: --dial-color, --hands-color (defaults black/white), --interval 1
+# Smooth real-time clock: pre-renders a short window and uploads as native sequence
+# Optional: --fps, --window-seconds, --preload-ms, --dial-color, --hands-color
 python demos/clock_realtime.py
-python demos/clock_realtime.py --dial-color "#111" --hands-color cyan
+python demos/clock_realtime.py --fps 8 --window-seconds 3 --dial-color "#111" --hands-color cyan
 
 # Font showcase: cycle Tiny5 text screens (alphabet, numbers, alert, warning, success, info) — 5s per screen
 # Uses local 192x192 fixture + 3x downsample (no Storybook required)
