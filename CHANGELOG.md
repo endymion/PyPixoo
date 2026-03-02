@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v2.1.0 (2026-03-02)
+
+### Features
+
+- Add clockface marker modes and minute-cycle demo
+  ([`07158e6`](https://github.com/endymion/PyPixoo/commit/07158e670526371bfc5e92901f433792cfd3e9ef))
+
+
 ## v2.0.2 (2026-03-02)
 
 ### Bug Fixes
