@@ -60,24 +60,6 @@ def _hex_to_rgb(value: str) -> tuple[int, int, int]:
     return (int(value[0:2], 16), int(value[2:4], 16), int(value[4:6], 16))
 
 
-def _quantize_to_two_colors(
-    buf: Buffer,
-    bg_rgb: tuple[int, int, int],
-    fg_rgb: tuple[int, int, int],
-) -> Buffer:
-    """Map each pixel to nearest of background/foreground colors for crisp text."""
-    data = list(buf.data)
-    for i in range(0, len(data), 3):
-        r, g, b = data[i], data[i + 1], data[i + 2]
-        d_bg = (r - bg_rgb[0]) ** 2 + (g - bg_rgb[1]) ** 2 + (b - bg_rgb[2]) ** 2
-        d_fg = (r - fg_rgb[0]) ** 2 + (g - fg_rgb[1]) ** 2 + (b - fg_rgb[2]) ** 2
-        pr, pg, pb = fg_rgb if d_fg <= d_bg else bg_rgb
-        data[i] = pr
-        data[i + 1] = pg
-        data[i + 2] = pb
-    return Buffer.from_flat_list(data)
-
-
 def _has_foreground(buf: Buffer, bg_rgb: tuple[int, int, int]) -> bool:
     data = buf.data
     br, bg, bb = bg_rgb
@@ -177,7 +159,6 @@ def main():
 
     duration_ms = int(args.duration * 1000)
     bg_rgb = _hex_to_rgb(args.bg_color)
-    text_rgb = _hex_to_rgb(args.text_color)
     if not TINYTEXT_FIXTURE.exists():
         print(f"error: Fixture not found: {TINYTEXT_FIXTURE}", file=sys.stderr)
         sys.exit(1)
@@ -198,19 +179,24 @@ def main():
     ]
 
     print("Precomputing deterministic font showcase frames from local fixture...")
-    renderer = FrameRenderer(sources)
-    seq = renderer.precompute()
-    frames = []
-    for screen, f in zip(showcase_screens, seq.frames):
-        q = _quantize_to_two_colors(
-            f.image,
-            bg_rgb,
-            text_rgb,
-        )
-        if not _has_foreground(q, bg_rgb):
-            raise RuntimeError(f"Blank frame generated for {screen['name']}")
-        frames.append(Frame(image=q, duration_ms=f.duration_ms))
-    seq = AnimationSequence(frames=frames)
+    max_precompute_attempts = 3
+    seq = None
+    for attempt in range(1, max_precompute_attempts + 1):
+        renderer = FrameRenderer(sources)
+        candidate = renderer.precompute()
+        frames = []
+        blank_name: str | None = None
+        for screen, f in zip(showcase_screens, candidate.frames):
+            if not _has_foreground(f.image, bg_rgb):
+                blank_name = str(screen["name"])
+                break
+            frames.append(Frame(image=f.image, duration_ms=f.duration_ms))
+        if blank_name is None:
+            seq = AnimationSequence(frames=frames)
+            break
+        print(f"Retrying precompute due to blank frame: {blank_name} (attempt {attempt}/{max_precompute_attempts})")
+    if seq is None:
+        raise RuntimeError("Failed to precompute showcase frames without blanks after retries")
 
     if args.save_frames is not None:
         out_dir = Path(args.save_frames) if args.save_frames else FIXTURES_DIR / "font_showcase_frames"

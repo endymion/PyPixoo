@@ -169,6 +169,9 @@
     const BASE_GAP_PX_64 = 1;
     const WORD_SPACE_PX_64 = 2;
     const START_X_64 = 2;
+    const HEADER_ROW_Y_64 = 0;
+    const HEADER_ROW_HEIGHT_64 = 7;
+    const HEADER_BORDER_BOTTOM_PX_64 = 1;
 
     const params = new URLSearchParams(window.location.search);
     const variant = params.get("variant") || "alphabet";
@@ -378,13 +381,17 @@
       const img = lctx.getImageData(0, 0, 64, 64);
       const px = img.data;
 
-      function setFg(x, y) {
+      function setRgb(x, y, rgb) {
         if (x < 0 || x >= 64 || y < 0 || y >= 64) return;
         const i = (y * 64 + x) * 4;
-        px[i] = fgRgb[0];
-        px[i + 1] = fgRgb[1];
-        px[i + 2] = fgRgb[2];
+        px[i] = rgb[0];
+        px[i + 1] = rgb[1];
+        px[i + 2] = rgb[2];
         px[i + 3] = 255;
+      }
+
+      function setFg(x, y) {
+        setRgb(x, y, fgRgb);
       }
 
       const LABEL_FONT_4PX = {
@@ -429,9 +436,10 @@
         "_": ["....", "....", "....", "####"],
       };
 
-      function drawLabelTopCentered(labelText) {
+      function drawLabelTopCentered(labelText, rowY, rowHeight) {
         const text = (labelText || "").toUpperCase();
         const glyphGap = 1;
+        const glyphHeight = 4;
         let width = 0;
         for (let i = 0; i < text.length; i += 1) {
           const ch = text[i];
@@ -442,7 +450,8 @@
           }
         }
         const startX = Math.max(0, Math.floor((64 - width) / 2));
-        const startY = 0;
+        const rowContentHeight = Math.max(0, rowHeight - HEADER_BORDER_BOTTOM_PX_64);
+        const startY = rowY + Math.max(0, Math.floor((rowContentHeight - glyphHeight) / 2));
         let cx = startX;
 
         for (const ch of text) {
@@ -460,12 +469,13 @@
         }
       }
 
-      function drawLabelFromActiveFontTopCentered(labelText, atlas) {
+      function drawLabelFromActiveFontTopCentered(labelText, atlas, rowY, rowHeight) {
         const text = (labelText || "").toUpperCase();
         if (!text || !atlas || !atlas.glyphs) return false;
         const glyphGap = 1;
         const glyphs = [];
         let width = 0;
+        let maxGlyphHeight = 0;
         for (let i = 0; i < text.length; i += 1) {
           const ch = text[i];
           if (ch === " ") {
@@ -478,11 +488,16 @@
             }
             glyphs.push({ ch, glyph });
             width += glyph.drawWidthPx;
+            if (glyph.height > maxGlyphHeight) {
+              maxGlyphHeight = glyph.height;
+            }
           }
           if (i < text.length - 1) {
             width += glyphGap;
           }
         }
+        const rowContentHeight = Math.max(0, rowHeight - HEADER_BORDER_BOTTOM_PX_64);
+        const startY = rowY + Math.max(0, Math.floor((rowContentHeight - maxGlyphHeight) / 2));
         let cx = Math.max(0, Math.floor((64 - width) / 2));
         for (const item of glyphs) {
           if (!item.glyph) {
@@ -493,7 +508,7 @@
           for (let gy = 0; gy < glyph.height; gy += 1) {
             for (let gx = 0; gx < glyph.width; gx += 1) {
               if (glyph.mask[gy * glyph.width + gx]) {
-                setFg(cx + gx, gy);
+                setFg(cx + gx, startY + gy);
               }
             }
           }
@@ -503,12 +518,28 @@
       }
 
       if (variant.startsWith("alphabet")) {
+        const borderColor = [
+          Math.floor(fgRgb[0] / 2),
+          Math.floor(fgRgb[1] / 2),
+          Math.floor(fgRgb[2] / 2),
+        ];
+        const borderY = HEADER_ROW_Y_64 + HEADER_ROW_HEIGHT_64 - HEADER_BORDER_BOTTOM_PX_64;
+        for (let y = borderY; y < HEADER_ROW_Y_64 + HEADER_ROW_HEIGHT_64; y += 1) {
+          for (let x = 0; x < 64; x += 1) {
+            setRgb(x, y, borderColor);
+          }
+        }
         const labelAtlas = atlases.get(requestedFont);
         const drewWithActiveFont = fontProfile.heightPx <= 5
-          ? drawLabelFromActiveFontTopCentered(fontProfile.family, labelAtlas)
+          ? drawLabelFromActiveFontTopCentered(
+            fontProfile.family,
+            labelAtlas,
+            HEADER_ROW_Y_64,
+            HEADER_ROW_HEIGHT_64,
+          )
           : false;
         if (!drewWithActiveFont) {
-          drawLabelTopCentered(fontProfile.family);
+          drawLabelTopCentered(fontProfile.family, HEADER_ROW_Y_64, HEADER_ROW_HEIGHT_64);
         }
       }
 
