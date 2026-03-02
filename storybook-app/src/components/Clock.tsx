@@ -21,14 +21,22 @@ export interface ClockProps {
   showSecondHand?: boolean;
   /** Hand color (CSS color) for hour and minute hands. */
   handColor?: string;
+  /** Hour hand color (CSS color). Falls back to handColor. */
+  hourHandColor?: string;
+  /** Minute hand color (CSS color). Falls back to handColor. */
+  minuteHandColor?: string;
   /** Second hand color (CSS color). */
   secondHandColor?: string;
   /** Marker color (CSS color). */
   markerColor?: string;
+  /** Optional override for the top-center marker (12 o'clock). */
+  topMarkerColor?: string;
   /** Face background (CSS color) */
   faceColor?: string;
   /** Clock face marker style. */
   markerMode?: ClockMarkerMode;
+  /** Intensity multiplier for markers + hands (0.0 to 1.0). */
+  faceFade?: number;
 }
 
 const TAU = 2 * Math.PI;
@@ -59,12 +67,19 @@ export function Clock({
   second,
   showSecondHand = true,
   handColor = "white",
+  hourHandColor,
+  minuteHandColor,
   secondHandColor = "rgba(255,100,100,0.9)",
   markerColor = "rgba(255,255,255,0.75)",
+  topMarkerColor,
   faceColor = "black",
   markerMode = "ticks_all_thick_quarters",
+  faceFade = 1.0,
 }: ClockProps) {
   const useTimeMode = typeof hour === "number" && typeof minute === "number";
+  const clampedFaceFade = Math.max(0, Math.min(1, faceFade));
+  const hourStroke = hourHandColor ?? handColor ?? "white";
+  const minuteStroke = minuteHandColor ?? handColor ?? "white";
 
   const radius = (PIXOO_SIZE / 2) * 0.95;
   const hourLength = radius * 0.55;
@@ -108,6 +123,7 @@ export function Clock({
       markerMode === "dot12" ||
       (markerMode === "dots_quarters" && quarter) ||
       markerMode === "dots_all_thick_quarters";
+    const markerStrokeColor = i === 0 ? (topMarkerColor ?? markerColor) : markerColor;
 
     if (shouldDrawDot) {
       const pos = angleToXY(angle, markerDot);
@@ -117,7 +133,7 @@ export function Clock({
             ? 1.25
             : 0.8
           : 1.2;
-      return <circle key={key} cx={pos.x} cy={pos.y} r={dotRadius} fill={markerColor} />;
+      return <circle key={key} cx={pos.x} cy={pos.y} r={dotRadius} fill={markerStrokeColor} />;
     }
 
     const thickTick = markerMode === "ticks_all_thick_quarters" && quarter;
@@ -130,7 +146,7 @@ export function Clock({
         y1={start.y}
         x2={end.x}
         y2={end.y}
-        stroke={markerColor}
+        stroke={markerStrokeColor}
         strokeWidth={thickTick ? 1.9 : 1.2}
         strokeLinecap="round"
       />
@@ -144,50 +160,52 @@ export function Clock({
       viewBox={`0 0 ${PIXOO_SIZE} ${PIXOO_SIZE}`}
       style={{ display: "block", background: faceColor }}
     >
-      {markers}
-      {useTimeMode ? (
-        <>
-          <line
-            x1={CX}
-            y1={CY}
-            x2={hourEnd.x}
-            y2={hourEnd.y}
-            stroke={handColor}
-            strokeWidth={2.5}
-            strokeLinecap="round"
-          />
+      <g opacity={clampedFaceFade}>
+        {markers}
+        {useTimeMode ? (
+          <>
+            <line
+              x1={CX}
+              y1={CY}
+              x2={hourEnd.x}
+              y2={hourEnd.y}
+              stroke={hourStroke}
+              strokeWidth={2.5}
+              strokeLinecap="round"
+            />
+            <line
+              x1={CX}
+              y1={CY}
+              x2={minuteEnd.x}
+              y2={minuteEnd.y}
+              stroke={minuteStroke}
+              strokeWidth={1.5}
+              strokeLinecap="round"
+            />
+            {secondEnd !== null && (
+              <line
+                x1={CX}
+                y1={CY}
+                x2={secondEnd.x}
+                y2={secondEnd.y}
+                stroke={secondHandColor}
+                strokeWidth={1}
+                strokeLinecap="round"
+              />
+            )}
+          </>
+        ) : (
           <line
             x1={CX}
             y1={CY}
             x2={minuteEnd.x}
             y2={minuteEnd.y}
-            stroke={handColor}
-            strokeWidth={1.5}
+            stroke={minuteStroke}
+            strokeWidth={2}
             strokeLinecap="round"
           />
-          {secondEnd !== null && (
-            <line
-              x1={CX}
-              y1={CY}
-              x2={secondEnd.x}
-              y2={secondEnd.y}
-              stroke={secondHandColor}
-              strokeWidth={1}
-              strokeLinecap="round"
-            />
-          )}
-        </>
-      ) : (
-        <line
-          x1={CX}
-          y1={CY}
-          x2={minuteEnd.x}
-          y2={minuteEnd.y}
-          stroke={handColor}
-          strokeWidth={2}
-          strokeLinecap="round"
-        />
-      )}
+        )}
+      </g>
     </svg>
   );
 }

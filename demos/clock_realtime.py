@@ -13,6 +13,7 @@ Requires: pip install -e ".[browser]"
   python demos/clock_realtime.py --fps 3 --render-lead-ms 1500
   python demos/clock_realtime.py --clockface ticks_all_thick_quarters --no-second-hand
   python demos/clock_realtime.py --no-second-hand --marker-color "#ff00ff"
+  python demos/clock_realtime.py --fade 20
   python demos/clock_realtime.py --delivery upload --fps 6 --window-seconds 3
 
 Press Ctrl+C to stop.
@@ -65,11 +66,14 @@ def _format_story_arg(value) -> str:
 def build_clock_url(
     frame_time_epoch: float,
     face_color: str,
-    hand_color: str,
+    hour_hand_color: str,
+    minute_hand_color: str,
     show_second_hand: bool,
     second_hand_color: str,
     marker_mode: str,
     marker_color: str,
+    top_marker_color: str | None,
+    face_fade: float,
 ) -> str:
     """Build Storybook iframe URL using args=... semantics for deterministic frame rendering."""
     dt = datetime.fromtimestamp(frame_time_epoch)
@@ -80,11 +84,15 @@ def build_clock_url(
         "second": second_value,
         "showSecondHand": show_second_hand,
         "faceColor": face_color,
-        "handColor": hand_color,
+        "hourHandColor": hour_hand_color,
+        "minuteHandColor": minute_hand_color,
         "secondHandColor": second_hand_color,
         "markerMode": marker_mode,
         "markerColor": marker_color,
+        "faceFade": face_fade,
     }
+    if top_marker_color:
+        args_map["topMarkerColor"] = top_marker_color
     args_str = ";".join(f"{key}:{_format_story_arg(value)}" for key, value in args_map.items())
     return f"{STORYBOOK_IFRAME}?{urlencode({'id': CLOCK_STORY_ID, 'viewMode': 'story', 'args': args_str})}"
 
@@ -99,21 +107,27 @@ def resolve_clockface_mode(frame_time_epoch: float, fixed_clockface: str | None)
 def _render_single_frame(
     display_time: float,
     dial_color: str,
-    hands_color: str,
+    hour_hand_color: str,
+    minute_hand_color: str,
     show_second_hand: bool,
     second_hand_color: str,
     marker_mode: str,
     marker_color: str,
+    top_marker_color: str | None,
+    face_fade: float,
 ):
     source = WebFrameSource(
         url=build_clock_url(
             display_time,
             dial_color,
-            hands_color,
+            hour_hand_color,
+            minute_hand_color,
             show_second_hand,
             second_hand_color,
             marker_mode,
             marker_color,
+            top_marker_color,
+            face_fade,
         ),
         timestamps=[0],
         duration_per_frame_ms=0,
@@ -129,6 +143,9 @@ def _run_push_mode(pixoo: Pixoo, args, fps: int) -> None:
     lead_sec = max(0.2, args.render_lead_ms / 1000.0)
     avg_render_sec = lead_sec
     show_second_hand = not args.no_second_hand
+    hour_hand_color = args.hour_hand_color or args.hands_color or "white"
+    minute_hand_color = args.minute_hand_color or args.hands_color or "white"
+    face_fade = max(0.0, min(100.0, args.fade)) / 100.0
     last_mode = None
 
     next_target = time.time() + max(lead_sec, interval)
@@ -153,11 +170,14 @@ def _run_push_mode(pixoo: Pixoo, args, fps: int) -> None:
         frame = _render_single_frame(
             display_time=next_target,
             dial_color=args.dial_color,
-            hands_color=args.hands_color,
+            hour_hand_color=hour_hand_color,
+            minute_hand_color=minute_hand_color,
             show_second_hand=show_second_hand,
             second_hand_color=args.second_hand_color,
             marker_mode=marker_mode,
             marker_color=args.marker_color,
+            top_marker_color=args.top_marker_color,
+            face_fade=face_fade,
         )
         render_dur = time.time() - render_started
         avg_render_sec = (avg_render_sec * 0.8) + (render_dur * 0.2)
@@ -182,6 +202,9 @@ def _run_upload_mode(pixoo: Pixoo, args, fps: int) -> None:
     frame_duration_ms = max(20, int(round(1000 / fps)))
     render_estimate_sec = window_seconds
     min_lead_sec = max(0.2, args.render_lead_ms / 1000.0)
+    hour_hand_color = args.hour_hand_color or args.hands_color or "white"
+    minute_hand_color = args.minute_hand_color or args.hands_color or "white"
+    face_fade = max(0.0, min(100.0, args.fade)) / 100.0
     last_mode = None
 
     print(
@@ -203,11 +226,14 @@ def _run_upload_mode(pixoo: Pixoo, args, fps: int) -> None:
                     url=build_clock_url(
                         frame_time,
                         args.dial_color,
-                        args.hands_color,
+                        hour_hand_color,
+                        minute_hand_color,
                         not args.no_second_hand,
                         args.second_hand_color,
                         marker_mode,
                         args.marker_color,
+                        args.top_marker_color,
+                        face_fade,
                     ),
                     timestamps=[0],
                     duration_per_frame_ms=frame_duration_ms,
@@ -280,8 +306,18 @@ def main() -> None:
     )
     parser.add_argument(
         "--hands-color",
-        default="white",
-        help="Hour and minute hands color (default: white)",
+        default=None,
+        help="Legacy fallback for both hour/minute hand colors when dedicated colors are not set",
+    )
+    parser.add_argument(
+        "--hour-hand-color",
+        default="rgba(242,232,255,0.6)",
+        help="Hour hand color (default: rgba(242,232,255,0.6))",
+    )
+    parser.add_argument(
+        "--minute-hand-color",
+        default="rgba(242,232,255,0.5)",
+        help="Minute hand color (default: rgba(242,232,255,0.5))",
     )
     parser.add_argument(
         "--no-second-hand",
@@ -304,8 +340,19 @@ def main() -> None:
     )
     parser.add_argument(
         "--marker-color",
-        default="rgba(255,255,255,0.75)",
-        help="Clockface marker color (default: rgba(255,255,255,0.75))",
+        default="rgba(255,0,255,0.5)",
+        help="Clockface marker color (default: rgba(255,0,255,0.5))",
+    )
+    parser.add_argument(
+        "--top-marker-color",
+        default="rgba(255,0,255,0.3)",
+        help="Top-center marker color override (default: rgba(255,0,255,0.3))",
+    )
+    parser.add_argument(
+        "--fade",
+        type=float,
+        default=100.0,
+        help="Markers+hands intensity percent (0-100, default: 100)",
     )
     parser.add_argument(
         "--reconnect-delay-seconds",

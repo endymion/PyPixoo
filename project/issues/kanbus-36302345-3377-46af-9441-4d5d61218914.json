@@ -82,10 +82,22 @@
       "author": "ryan.porter",
       "text": "Increased marker outward shift further to use more of the outer pixel ring.\n\nChange:\n- `storybook-app/src/components/Clock.tsx`: increased `MARKER_OUTWARD_OFFSET` from `1.0` to `1.8`.\n- Dots and tick radii both use this offset; clamp remains in place to avoid excessive clipping.\n\nValidation:\n- `cd storybook-app && npm run build-storybook` (success)\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- Live demo restarted successfully with updated geometry.\n",
       "created_at": "2026-03-02T13:46:15.184322Z"
+    },
+    {
+      "id": "dfec9418-5ed4-429b-a287-382ad8594732",
+      "author": "ryan.porter",
+      "text": "Starting implementation of fine-grained clock face colors + fade controls.\n\nScope this pass:\n- Clock props: `hourHandColor`, `minuteHandColor`, `topMarkerColor`, `faceFade`.\n- Back-compat hand fallback: hour/minute use `hourHandColor|minuteHandColor` then `handColor`.\n- Top marker override at 12 o'clock for dot/tick modes.\n- Realtime CLI: `--hour-hand-color`, `--minute-hand-color`, `--top-marker-color`, `--fade`.\n- Demo defaults set to requested FF00FF/mauve profile.\n- Build/test + fade=20 runtime check.\n",
+      "created_at": "2026-03-02T13:58:44.389596Z"
+    },
+    {
+      "id": "0b197d8b-86ce-4262-a893-f0796fb4ac82",
+      "author": "ryan.porter",
+      "text": "Implemented fine-grained clock color controls + face fade.\n\nClock component changes (`storybook-app/src/components/Clock.tsx`):\n- Added props: `hourHandColor`, `minuteHandColor`, `topMarkerColor`, `faceFade`.\n- Preserved back-compat `handColor` fallback:\n  - `hourStroke = hourHandColor ?? handColor ?? \"white\"`\n  - `minuteStroke = minuteHandColor ?? handColor ?? \"white\"`\n- Top marker override applies only at marker index 0 (12 o'clock) for both dot and tick modes.\n- Added `<g opacity={faceFade}>` wrapper over markers + hands only (background unchanged).\n- Clamps `faceFade` to `[0,1]`.\n\nRealtime demo changes (`demos/clock_realtime.py`):\n- Added CLI args: `--hour-hand-color`, `--minute-hand-color`, `--top-marker-color`, `--fade`.\n- Extended Storybook arg mapping with `hourHandColor`, `minuteHandColor`, `topMarkerColor`, `faceFade`.\n- Kept `--hands-color` as legacy fallback.\n- Updated defaults to requested profile:\n  - marker ring: `rgba(255,0,255,0.5)`\n  - top marker: `rgba(255,0,255,0.3)`\n  - hour hand: `rgba(242,232,255,0.6)`\n  - minute hand: `rgba(242,232,255,0.5)`\n  - fade default: `100` (maps to `1.0`)\n\nStorybook stories/docs:\n- Added Storybook controls for new props in `Clock.stories.tsx`.\n- Updated `demos/README.md` examples and notes for fade/color controls.\n\nValidation:\n- `python demos/clock_realtime.py --help`\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- `cd storybook-app && npm run build-storybook` (success)\n- Live run check: `python demos/clock_realtime.py --fade 20 --fps 1 --no-second-hand --delivery push` (connected, rendered, pushed frames)\n",
+      "created_at": "2026-03-02T14:01:09.971163Z"
     }
   ],
   "created_at": "2026-03-02T05:31:05.543299Z",
-  "updated_at": "2026-03-02T13:46:15.184322Z",
+  "updated_at": "2026-03-02T14:01:09.971163Z",
   "closed_at": null,
   "custom": {}
 }
