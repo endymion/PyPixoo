@@ -1,6 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Clock } from "./Clock";
 
+const markerModes = [
+  "dot12",
+  "dots_quarters",
+  "ticks_all",
+  "dots_quarters_ticks_others",
+  "ticks_all_thick_quarters",
+] as const;
+
 const meta: Meta<typeof Clock> = {
   component: Clock,
   title: "Pixoo/Clock",
@@ -11,6 +19,8 @@ const meta: Meta<typeof Clock> = {
     second: { control: { type: "range", min: 0, max: 59, step: 1 } },
     showSecondHand: { control: "boolean" },
     secondHandColor: { control: "color" },
+    markerColor: { control: "color" },
+    markerMode: { control: "select", options: markerModes },
   },
 };
 
@@ -53,6 +63,7 @@ export const TimeWithSeconds: Story = {
     showSecondHand: true,
     handColor: "white",
     secondHandColor: "rgba(255,100,100,0.9)",
+    markerMode: "ticks_all_thick_quarters",
     faceColor: "black",
   },
 };
@@ -77,6 +88,7 @@ export const TimeNoSecondHand: Story = {
     minute: 15,
     showSecondHand: false,
     handColor: "white",
+    markerMode: "dots_quarters_ticks_others",
     faceColor: "black",
   },
 };

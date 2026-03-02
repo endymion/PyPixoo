@@ -27,9 +27,11 @@ python demos/storybook_clock.py --fps 10 --loop-seconds 2
 python demos/storybook_clock.py --delivery upload --upload-mode command_list
 
 # Smooth real-time clock (default push mode avoids repeated "Loading..." indicator)
+# Default demo mode cycles clockface marker style every minute.
 # Optional: --fps, --render-lead-ms, --dial-color, --hands-color
 python demos/clock_realtime.py
 python demos/clock_realtime.py --fps 3 --render-lead-ms 1500 --dial-color "#111" --hands-color cyan
+python demos/clock_realtime.py --clockface ticks_all_thick_quarters --no-second-hand
 
 # Optional: native upload windows mode (may show loading indicator while uploading)
 python demos/clock_realtime.py --delivery upload --fps 6 --window-seconds 3

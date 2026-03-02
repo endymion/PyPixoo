@@ -16,10 +16,22 @@
       "author": "ryan.porter",
       "text": "README and PR_FAQ were updated for V2 native workflows. Demo script migration is intentionally deferred per user direction (\"we're going to have to deal with getting those demos working again after this is all changed\").",
       "created_at": "2026-03-02T05:44:16.591623Z"
+    },
+    {
+      "id": "44d3dec4-ffc4-4dae-a796-20a088edba17",
+      "author": "ryan.porter",
+      "text": "Implementing requested clock-face redesign in demos/Storybook clock path:\n- Remove circle outline from the clock face.\n- Add marker-mode variants:\n  - dot12\n  - dots_quarters\n  - ticks_all\n  - dots_quarters_ticks_others\n  - ticks_all_thick_quarters\n- Update realtime clock demo to cycle marker modes by minute (endless loop), while keeping no-loading push delivery default.\n\nWill validate by running the demo on device and checking per-minute mode selection logic.\n",
+      "created_at": "2026-03-02T06:15:02.334131Z"
+    },
+    {
+      "id": "aaac80f3-e57f-43f4-972e-dfccb6bb7293",
+      "author": "ryan.porter",
+      "text": "Implemented clockface marker-mode redesign for clock demos and Storybook Clock component.\n\nWhat changed:\n- Removed the circular outline from `storybook-app/src/components/Clock.tsx`.\n- Added marker modes in Clock component:\n  - `dot12`\n  - `dots_quarters`\n  - `ticks_all`\n  - `dots_quarters_ticks_others`\n  - `ticks_all_thick_quarters`\n- Added Storybook controls for `markerMode` + `markerColor` in `Clock.stories.tsx`.\n- Updated `demos/clock_realtime.py`:\n  - new optional `--clockface` arg for fixed face mode\n  - if `--clockface` is omitted, demo mode cycles marker styles by minute (endless loop)\n  - `--no-second-hand` remains supported\n- Updated `demos/README.md` to document default minute-cycle behavior and fixed mode usage.\n\nValidation:\n- `python demos/clock_realtime.py --help`\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- `cd storybook-app && npm run build-storybook` (success)\n- Live device run confirmed mode switch on minute boundary in push mode:\n  - observed `clockface mode -> ticks_all (minute cycle)` then\n  - `clockface mode -> dots_quarters_ticks_others (minute cycle)` after minute rollover.\n",
+      "created_at": "2026-03-02T06:18:31.230576Z"
     }
   ],
   "created_at": "2026-03-02T05:31:05.543299Z",
-  "updated_at": "2026-03-02T05:44:16.591623Z",
+  "updated_at": "2026-03-02T06:18:31.230576Z",
   "closed_at": null,
   "custom": {}
 }

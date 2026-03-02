@@ -1,6 +1,13 @@
 import React from "react";
 import { PIXOO_SIZE } from "../pixoo";
 
+export type ClockMarkerMode =
+  | "dot12"
+  | "dots_quarters"
+  | "ticks_all"
+  | "dots_quarters_ticks_others"
+  | "ticks_all_thick_quarters";
+
 export interface ClockProps {
   /** Time in [0, 1); 0 = 12:00, 0.25 = 3:00. Used when hour/minute not set (single hand). */
   t?: number;
@@ -16,18 +23,27 @@ export interface ClockProps {
   handColor?: string;
   /** Second hand color (CSS color). */
   secondHandColor?: string;
+  /** Marker color (CSS color). */
+  markerColor?: string;
   /** Face background (CSS color) */
   faceColor?: string;
+  /** Clock face marker style. */
+  markerMode?: ClockMarkerMode;
 }
 
 const TAU = 2 * Math.PI;
 const CX = PIXOO_SIZE / 2;
 const CY = PIXOO_SIZE / 2;
+const MARKER_ANGLES = Array.from({ length: 12 }, (_, i) => (i / 12) * TAU);
 
 /** Angle 0 = 12 o'clock, clockwise in radians. */
 function angleToXY(angleRad: number, length: number) {
   const a = angleRad - Math.PI / 2;
   return { x: CX + length * Math.cos(a), y: CY + length * Math.sin(a) };
+}
+
+function isQuarterHour(index: number) {
+  return index % 3 === 0;
 }
 
 /**
@@ -43,7 +59,9 @@ export function Clock({
   showSecondHand = true,
   handColor = "white",
   secondHandColor = "rgba(255,100,100,0.9)",
+  markerColor = "rgba(255,255,255,0.75)",
   faceColor = "black",
+  markerMode = "ticks_all_thick_quarters",
 }: ClockProps) {
   const useTimeMode = typeof hour === "number" && typeof minute === "number";
 
@@ -70,6 +88,48 @@ export function Clock({
   const secondEnd =
     secondAngle !== null ? angleToXY(secondAngle, secondLength) : null;
 
+  const markerOuter = radius * 0.96;
+  const markerInner = radius * 0.82;
+  const markerDot = radius * 0.90;
+
+  const markers = MARKER_ANGLES.map((angle, i) => {
+    const quarter = isQuarterHour(i);
+    const key = `marker-${i}`;
+
+    if (markerMode === "dot12" && i !== 0) {
+      return null;
+    }
+    if (markerMode === "dots_quarters" && !quarter) {
+      return null;
+    }
+
+    const shouldDrawDot =
+      markerMode === "dot12" ||
+      (markerMode === "dots_quarters" && quarter) ||
+      (markerMode === "dots_quarters_ticks_others" && quarter);
+
+    if (shouldDrawDot) {
+      const pos = angleToXY(angle, markerDot);
+      return <circle key={key} cx={pos.x} cy={pos.y} r={1.2} fill={markerColor} />;
+    }
+
+    const thickTick = markerMode === "ticks_all_thick_quarters" && quarter;
+    const start = angleToXY(angle, markerOuter);
+    const end = angleToXY(angle, markerInner);
+    return (
+      <line
+        key={key}
+        x1={start.x}
+        y1={start.y}
+        x2={end.x}
+        y2={end.y}
+        stroke={markerColor}
+        strokeWidth={thickTick ? 1.9 : 1.2}
+        strokeLinecap="round"
+      />
+    );
+  });
+
   return (
     <svg
       width={PIXOO_SIZE}
@@ -77,14 +137,7 @@ export function Clock({
       viewBox={`0 0 ${PIXOO_SIZE} ${PIXOO_SIZE}`}
       style={{ display: "block", background: faceColor }}
     >
-      <circle
-        cx={CX}
-        cy={CY}
-        r={radius}
-        fill="none"
-        stroke="rgba(255,255,255,0.3)"
-        strokeWidth={1}
-      />
+      {markers}
       {useTimeMode ? (
         <>
           <line

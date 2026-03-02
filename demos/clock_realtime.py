@@ -11,6 +11,7 @@ Requires: pip install -e ".[browser]"
 
   python demos/clock_realtime.py
   python demos/clock_realtime.py --fps 3 --render-lead-ms 1500
+  python demos/clock_realtime.py --clockface ticks_all_thick_quarters --no-second-hand
   python demos/clock_realtime.py --delivery upload --fps 6 --window-seconds 3
 
 Press Ctrl+C to stop.
@@ -36,6 +37,13 @@ from pypixoo import FrameRenderer, Pixoo, UploadMode, WebFrameSource
 IP_DEFAULT = "192.168.0.37"
 STORYBOOK_IFRAME = "http://localhost:6006/iframe.html"
 CLOCK_STORY_ID = "pixoo-clock--time-with-seconds"
+CLOCKFACE_MODES = [
+    "dot12",
+    "dots_quarters",
+    "ticks_all",
+    "dots_quarters_ticks_others",
+    "ticks_all_thick_quarters",
+]
 
 
 def _format_story_arg(value) -> str:
@@ -53,6 +61,7 @@ def build_clock_url(
     hand_color: str,
     show_second_hand: bool,
     second_hand_color: str,
+    marker_mode: str,
 ) -> str:
     """Build Storybook iframe URL using args=... semantics for deterministic frame rendering."""
     dt = datetime.fromtimestamp(frame_time_epoch)
@@ -65,9 +74,17 @@ def build_clock_url(
         "faceColor": face_color,
         "handColor": hand_color,
         "secondHandColor": second_hand_color,
+        "markerMode": marker_mode,
     }
     args_str = ";".join(f"{key}:{_format_story_arg(value)}" for key, value in args_map.items())
     return f"{STORYBOOK_IFRAME}?{urlencode({'id': CLOCK_STORY_ID, 'viewMode': 'story', 'args': args_str})}"
+
+
+def resolve_clockface_mode(frame_time_epoch: float, fixed_clockface: str | None) -> str:
+    if fixed_clockface:
+        return fixed_clockface
+    minute = datetime.fromtimestamp(frame_time_epoch).minute
+    return CLOCKFACE_MODES[minute % len(CLOCKFACE_MODES)]
 
 
 def _render_single_frame(
@@ -76,6 +93,7 @@ def _render_single_frame(
     hands_color: str,
     show_second_hand: bool,
     second_hand_color: str,
+    marker_mode: str,
 ):
     source = WebFrameSource(
         url=build_clock_url(
@@ -84,6 +102,7 @@ def _render_single_frame(
             hands_color,
             show_second_hand,
             second_hand_color,
+            marker_mode,
         ),
         timestamps=[0],
         duration_per_frame_ms=0,
@@ -99,6 +118,7 @@ def _run_push_mode(pixoo: Pixoo, args, fps: int) -> None:
     lead_sec = max(0.2, args.render_lead_ms / 1000.0)
     avg_render_sec = lead_sec
     show_second_hand = not args.no_second_hand
+    last_mode = None
 
     next_target = time.time() + max(lead_sec, interval)
     print(
@@ -114,12 +134,18 @@ def _run_push_mode(pixoo: Pixoo, args, fps: int) -> None:
             next_target = min_target
 
         render_started = time.time()
+        marker_mode = resolve_clockface_mode(next_target, args.clockface)
+        if marker_mode != last_mode:
+            mode_source = "fixed --clockface" if args.clockface else "minute cycle"
+            print(f"clockface mode -> {marker_mode} ({mode_source})", flush=True)
+            last_mode = marker_mode
         frame = _render_single_frame(
             display_time=next_target,
             dial_color=args.dial_color,
             hands_color=args.hands_color,
             show_second_hand=show_second_hand,
             second_hand_color=args.second_hand_color,
+            marker_mode=marker_mode,
         )
         render_dur = time.time() - render_started
         avg_render_sec = (avg_render_sec * 0.8) + (render_dur * 0.2)
@@ -145,6 +171,7 @@ def _run_upload_mode(pixoo: Pixoo, args, fps: int) -> None:
     frame_duration_ms = max(20, int(round(1000 / fps)))
     render_estimate_sec = window_seconds
     min_lead_sec = max(0.2, args.render_lead_ms / 1000.0)
+    last_mode = None
 
     print(
         f"Clock upload mode: fps={fps}, window={window_seconds:.2f}s ({frame_count} frames), "
@@ -155,8 +182,11 @@ def _run_upload_mode(pixoo: Pixoo, args, fps: int) -> None:
     while True:
         cycle_start = time.time() + max(min_lead_sec, render_estimate_sec)
         sources = []
+        cycle_modes = []
         for i in range(frame_count):
             frame_time = cycle_start + (i / fps)
+            marker_mode = resolve_clockface_mode(frame_time, args.clockface)
+            cycle_modes.append(marker_mode)
             sources.append(
                 WebFrameSource(
                     url=build_clock_url(
@@ -165,6 +195,7 @@ def _run_upload_mode(pixoo: Pixoo, args, fps: int) -> None:
                         args.hands_color,
                         not args.no_second_hand,
                         args.second_hand_color,
+                        marker_mode,
                     ),
                     timestamps=[0],
                     duration_per_frame_ms=frame_duration_ms,
@@ -177,6 +208,12 @@ def _run_upload_mode(pixoo: Pixoo, args, fps: int) -> None:
         sequence = FrameRenderer(sources).precompute()
         render_dur = time.time() - render_started
         render_estimate_sec = (render_estimate_sec * 0.7) + (render_dur * 0.3)
+
+        first_mode = cycle_modes[0]
+        if first_mode != last_mode:
+            mode_source = "fixed --clockface" if args.clockface else "minute cycle"
+            print(f"clockface mode -> {first_mode} ({mode_source})", flush=True)
+            last_mode = first_mode
 
         pixoo.upload_sequence(
             sequence,
@@ -233,6 +270,15 @@ def main() -> None:
         "--second-hand-color",
         default="rgba(255,100,100,0.9)",
         help="Second hand color (default: reddish)",
+    )
+    parser.add_argument(
+        "--clockface",
+        choices=CLOCKFACE_MODES,
+        default=None,
+        help=(
+            "Fixed clockface marker mode. If omitted, demo mode cycles marker styles "
+            "every minute in this order: " + ", ".join(CLOCKFACE_MODES)
+        ),
     )
     parser.add_argument(
         "--upload-mode",
