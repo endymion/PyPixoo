@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Play the Storybook Clock story as a smooth native HttpGif sequence.
+"""Play the Storybook Clock story smoothly on Pixoo.
 
 Requires Storybook running: cd storybook-app && npm run storybook
 Requires: pip install -e ".[browser]"
@@ -22,26 +22,80 @@ os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
 # Ensure we can import pypixoo (run from project root)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pypixoo import Pixoo, FrameRenderer, UploadMode, WebFrameSource
+from pypixoo import FrameRenderer, Pixoo, UploadMode, WebFrameSource
 
 IP_DEFAULT = "192.168.0.37"
 # Clock story iframe URL (t is appended per frame)
 CLOCK_URL_DEFAULT = "http://localhost:6006/iframe.html?id=pixoo-clock--default"
 
 
+def _run_push_loop(pixoo: Pixoo, sequence) -> None:
+    frame_payloads = [list(frame.image.data) for frame in sequence.frames]
+    frame_delays = [max(0.02, frame.duration_ms / 1000.0) for frame in sequence.frames]
+    next_tick = time.monotonic()
+    loop_count = 0
+    print("Pushing pre-rendered frames in a timed loop (no native upload/loading overlay).")
+    while True:
+        for payload, delay in zip(frame_payloads, frame_delays):
+            pixoo.push_buffer(payload)
+            next_tick += delay
+            sleep_for = next_tick - time.monotonic()
+            if sleep_for > 0:
+                time.sleep(sleep_for)
+        loop_count += 1
+        if loop_count % 10 == 0:
+            print(f"completed {loop_count} loops", flush=True)
+
+
+def _run_upload_loop(pixoo: Pixoo, sequence, upload_mode: UploadMode, chunk_size: int, refresh_seconds: float) -> None:
+    pixoo.upload_sequence(
+        sequence,
+        mode=upload_mode,
+        chunk_size=chunk_size,
+    )
+    if refresh_seconds <= 0:
+        print("Uploaded once. Device should loop natively (Ctrl+C to stop)...")
+        while True:
+            time.sleep(1.0)
+    else:
+        print(
+            f"Uploaded initial sequence. Refreshing every {refresh_seconds:.1f}s "
+            "(Ctrl+C to stop)..."
+        )
+        while True:
+            time.sleep(max(0.1, refresh_seconds))
+            pixoo.upload_sequence(
+                sequence,
+                mode=upload_mode,
+                chunk_size=chunk_size,
+            )
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Loop Storybook Clock smoothly via V2 native sequence upload")
+    parser = argparse.ArgumentParser(description="Loop Storybook Clock smoothly via push or native upload delivery")
     parser.add_argument("--ip", default=IP_DEFAULT, help=f"Device IP (default: {IP_DEFAULT})")
     parser.add_argument("--url", default=CLOCK_URL_DEFAULT, help="Clock iframe URL")
     parser.add_argument("--fps", type=int, default=10, help="Frames per second (default: 10)")
     parser.add_argument("--loop-seconds", type=float, default=2.0, help="Animation loop length in seconds (default: 2)")
     parser.add_argument(
+        "--delivery",
+        choices=["push", "upload"],
+        default="push",
+        help="Frame delivery mode: push=no-loading loop, upload=native sequence upload",
+    )
+    parser.add_argument(
         "--upload-mode",
         choices=[UploadMode.FRAME_BY_FRAME.value, UploadMode.COMMAND_LIST.value],
         default=UploadMode.COMMAND_LIST.value,
-        help="Native upload transport mode",
+        help="Upload mode only: native upload transport mode",
     )
-    parser.add_argument("--chunk-size", type=int, default=40, help="CommandList chunk size")
+    parser.add_argument("--chunk-size", type=int, default=40, help="Upload mode only: CommandList chunk size")
+    parser.add_argument(
+        "--refresh-seconds",
+        type=float,
+        default=0.0,
+        help="Upload mode only: periodic re-upload interval. 0 means upload once and rely on native loop.",
+    )
     args = parser.parse_args()
 
     fps = max(1, args.fps)
@@ -71,14 +125,16 @@ def main() -> None:
         if not pixoo.connect():
             raise RuntimeError("Failed to connect to Pixoo")
 
-        print("Looping Clock animation with native upload (Ctrl+C to stop)...")
-        while True:
-            pixoo.upload_sequence(
+        if args.delivery == "push":
+            _run_push_loop(pixoo, seq)
+        else:
+            _run_upload_loop(
+                pixoo,
                 seq,
-                mode=UploadMode(args.upload_mode),
-                chunk_size=args.chunk_size,
+                UploadMode(args.upload_mode),
+                args.chunk_size,
+                args.refresh_seconds,
             )
-            time.sleep(max(0.1, cycle_seconds))
     except KeyboardInterrupt:
         print("\nStopped")
     finally:

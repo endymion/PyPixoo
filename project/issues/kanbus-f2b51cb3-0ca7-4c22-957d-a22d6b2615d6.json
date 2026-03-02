@@ -490,10 +490,28 @@
       "author": "ryan.porter",
       "text": "Clock demos updated for V2 and smoother playback.\n\n- `demos/storybook_clock.py` now uses native `upload_sequence` looping (no legacy `AnimationPlayer`).\n- `demos/clock_realtime.py` now pre-renders multi-frame windows and uploads native HttpGif sequences (`command_list` by default), avoiding one-frame-per-second just-in-time pushes.\n\nValidation:\n- Both scripts run on device (`192.168.0.37`).\n- `storybook_clock.py` precomputed and looped successfully.\n- `clock_realtime.py` repeatedly uploaded 8-frame windows at `fps=4` with stable cycles.\n",
       "created_at": "2026-03-02T05:56:17.384647Z"
+    },
+    {
+      "id": "511e240f-f77d-4b3a-a6cd-79c407f5428d",
+      "author": "ryan.porter",
+      "text": "Adjusted clock demos to address Loading indicator behavior.  now uploads once and relies on native device loop by default ( optional).  now defaults to , which pre-renders future frames and sends single-frame pushes () to avoid repeated animation upload/loading states. Kept optional  for native sequence windows. Device validation on 192.168.0.37: both scripts run and display with the new defaults.",
+      "created_at": "2026-03-02T06:02:50.438668Z"
+    },
+    {
+      "id": "8919e7e2-def3-4b1e-b700-1973220acae1",
+      "author": "ryan.porter",
+      "text": "Adjusted clock demos to address Loading indicator behavior.\n\n- `demos/storybook_clock.py` now uploads once and relies on native device loop by default (`--refresh-seconds` optional).\n- `demos/clock_realtime.py` now defaults to `--delivery push`, which pre-renders future frames and sends single-frame pushes (`push_buffer`) to avoid repeated animation upload/loading states.\n- Optional `--delivery upload` remains available for native sequence windows.\n\nDevice validation on `192.168.0.37`:\n- `storybook_clock.py` runs and displays with one initial upload.\n- `clock_realtime.py` runs in push mode and continuously updates without repeated upload loops.\n",
+      "created_at": "2026-03-02T06:02:55.730068Z"
+    },
+    {
+      "id": "27ebc95e-8e89-4cb4-90b0-556f7d352e5f",
+      "author": "ryan.porter",
+      "text": "Adjusted clock demos to avoid Pixoo \"Loading...\" overlay in the default path.\n\nChanges:\n- `demos/storybook_clock.py` now defaults to `--delivery push` (timed `push_buffer` loop of pre-rendered frames).\n- Native upload remains available via `--delivery upload` for explicit testing.\n- `demos/README.md` updated to reflect no-loading default and explicit upload option.\n\nValidation:\n- `python demos/storybook_clock.py --help`\n- `python demos/clock_realtime.py --help`\n- `pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n",
+      "created_at": "2026-03-02T06:05:01.678564Z"
     }
   ],
   "created_at": "2026-03-01T22:06:40.289727Z",
-  "updated_at": "2026-03-02T05:56:17.384647Z",
+  "updated_at": "2026-03-02T06:05:01.678564Z",
   "closed_at": null,
   "custom": {}
 }

@@ -20,15 +20,19 @@ python demos/black_band_chained.py
 # Requires: pip install -e ".[browser]"
 python demos/browser_mixed.py
 
-# Storybook Clock animation (t 0..1), precomputed + native sequence upload
+# Storybook Clock animation (t 0..1), pre-rendered then pushed in timed loop (no loading overlay)
 # Requires: Storybook running (cd storybook-app && npm run storybook)
 python demos/storybook_clock.py
 python demos/storybook_clock.py --fps 10 --loop-seconds 2
+python demos/storybook_clock.py --delivery upload --upload-mode command_list
 
-# Smooth real-time clock: pre-renders a short window and uploads as native sequence
-# Optional: --fps, --window-seconds, --preload-ms, --dial-color, --hands-color
+# Smooth real-time clock (default push mode avoids repeated "Loading..." indicator)
+# Optional: --fps, --render-lead-ms, --dial-color, --hands-color
 python demos/clock_realtime.py
-python demos/clock_realtime.py --fps 8 --window-seconds 3 --dial-color "#111" --hands-color cyan
+python demos/clock_realtime.py --fps 3 --render-lead-ms 1500 --dial-color "#111" --hands-color cyan
+
+# Optional: native upload windows mode (may show loading indicator while uploading)
+python demos/clock_realtime.py --delivery upload --fps 6 --window-seconds 3
 
 # Font showcase: cycle Tiny5 text screens (alphabet, numbers, alert, warning, success, info) — 5s per screen
 # Uses local 192x192 fixture + 3x downsample (no Storybook required)
