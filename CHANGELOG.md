@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v2.0.2 (2026-03-02)
+
+### Bug Fixes
+
+- Default clock demos to no-loading push delivery
+  ([`d0bb72d`](https://github.com/endymion/PyPixoo/commit/d0bb72d6567c8bff88f81c8e56e0b2e65dc3515a))
+
+
 ## v2.0.1 (2026-03-02)
 
 ### Bug Fixes
