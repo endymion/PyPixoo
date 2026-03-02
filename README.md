@@ -7,13 +7,17 @@
 
 > The Pixoo library you can trust — BDD-first, well-tested.
 
-A Python library for the [Divoom Pixoo 64](https://www.divoom.com/products/pixoo-64) display. This is a **true behavior-driven design** project: **behaviors come first**. We work **outside-in** and **backward** from observable behavior — write Gherkin scenarios first, run them (expect failures), implement until they pass. Specs mock the device and assert library behavior; we test the library, not the device.
+A Python library for the [Divoom Pixoo 64](https://www.divoom.com/products/pixoo-64) display. This is a **true behavior-driven design** project: **behaviors come first**.
 
 ## What is this?
 
-PyPixoo is a reimplementation of Pixoo control logic, inspired by [pixoo](https://github.com/SomethingWithComputers/pixoo) but built with BDD from the ground up. Outside-in: we specify observable behavior in Gherkin before writing production code, then implement just enough to make the specs pass. CI runs without a real Pixoo; specs mock HTTP and verify our buffer handling, API payloads, and control flow.
+PyPixoo is a reimplementation of Pixoo control logic, inspired by [pixoo](https://github.com/SomethingWithComputers/pixoo) but built with BDD from the ground up.
 
-Features include: a Pydantic buffer model with introspection; animation sequences with per-frame timing and loop control; async fire-and-forget playback with `on_finished` and `on_loop` callbacks; headless browser rendering (Playwright) for web-sourced frames; mixing static buffers and web-rendered frames in the same sequence; and `on_first_frame` / `on_all_frames` callbacks to react to precompute readiness. See [PR_FAQ.md](PR_FAQ.md) for rationale. See [AGENTS.md](AGENTS.md) for agent guidance.
+V2 is a breaking redesign that aligns with native Pixoo command behavior:
+- Native sequence upload via `Draw/SendHttpGif` and `Draw/CommandList`
+- Native GIF playback via `Device/PlayTFGif`
+- Native text overlays via `Draw/SendHttpText` / `Draw/ClearHttpText`
+- Native cycle orchestration across uploaded sequences and GIF sources
 
 ## Requirements
 
@@ -33,7 +37,7 @@ pip install -e ".[dev]"
 behave
 ```
 
-Specs mock the device HTTP layer, so no Pixoo is required. The first scenario uses a hardcoded IP (`192.168.0.37`) in the step text; the mock fakes all API calls. Edit `features/display.feature` if you change the IP in your assertions.
+Specs mock the device HTTP layer, so no Pixoo is required.
 
 ### CLI
 
@@ -42,14 +46,20 @@ A `pypixoo` command is installed with the package. Set `PIXOO_REAL_DEVICE=1` to 
 ```bash
 # Fill the display with a color (hex or name)
 PIXOO_REAL_DEVICE=1 pypixoo fill FF00FF
-PIXOO_REAL_DEVICE=1 pypixoo fill f0f
-PIXOO_REAL_DEVICE=1 pypixoo fill fuchsia
 
 # Load an image (resized to 64×64) and push
 PIXOO_REAL_DEVICE=1 pypixoo load-image path/to/image.png
 
-# Optional: device IP (default 192.168.0.37)
-PIXOO_REAL_DEVICE=1 pypixoo --ip 192.168.0.38 fill black
+# Upload native sequence
+PIXOO_REAL_DEVICE=1 pypixoo upload-sequence frame1.png frame2.png --speed-ms 120 --mode command_list --chunk-size 40
+
+# Native GIF playback
+PIXOO_REAL_DEVICE=1 pypixoo play-gif-url https://example.com/anim.gif
+PIXOO_REAL_DEVICE=1 pypixoo play-gif-file divoom_gif/1.gif
+PIXOO_REAL_DEVICE=1 pypixoo play-gif-dir divoom_gif/
+
+# Cycle ordered items
+PIXOO_REAL_DEVICE=1 pypixoo cycle --item 'sequence=120:frame1.png,frame2.png' --item 'url=https://example.com/anim.gif' --loop 2
 ```
 
 If the `pypixoo` script is not on your PATH, run `python -m pypixoo.cli` instead.
@@ -63,92 +73,76 @@ from pypixoo import Pixoo
 
 pixoo = Pixoo("192.168.0.37")
 pixoo.connect()
-pixoo.fill(255, 0, 68)  # RGB red
+pixoo.fill(255, 0, 68)
 pixoo.push()
 ```
 
-### Asynchronous animations
-
-Play sequences without blocking. Use callbacks to time events to the animation lifecycle:
+### Native HttpGif upload
 
 ```python
-from pypixoo import Pixoo, AnimationPlayer, AnimationSequence, Frame
+from pypixoo import GifFrame, GifSequence, Pixoo, UploadMode
 from pypixoo.buffer import Buffer
 
 pixoo = Pixoo("192.168.0.37")
 pixoo.connect()
 
-# Build a sequence from buffers
 buf = Buffer.from_flat_list([c for _ in range(64 * 64) for c in (255, 0, 0)])
-seq = AnimationSequence(frames=[Frame(image=buf, duration_ms=100)])
+seq = GifSequence(frames=[GifFrame(image=buf, duration_ms=120)], speed_ms=120)
 
-player = AnimationPlayer(
-    seq,
-    loop=2,
-    on_finished=lambda: print("animation done"),
-    on_loop=lambda n: print(f"loop {n}"),
-)
-player.play_async(pixoo)  # Returns immediately
-player.wait()             # Block until done
+pic_id = pixoo.upload_sequence(seq, mode=UploadMode.COMMAND_LIST, chunk_size=40)
+print(pic_id)
 ```
 
-### Mix static and generated frames
-
-Combine pre-built buffers with frames rendered from web URLs in a single sequence. The frame order is preserved: `[static, web, static, web, ...]` stays in that order. Use `on_first_frame` to react when the first web-rendered frame is ready (e.g. to start playback early), and `on_all_frames` when the full sequence is ready:
+### Native GIF playback and overlays
 
 ```python
-from pypixoo import Pixoo, FrameRenderer, StaticFrameSource, WebFrameSource, AnimationPlayer
+from pypixoo import GifSource, Pixoo, TextOverlay
+
+pixoo = Pixoo("192.168.0.37")
+pixoo.connect()
+
+pixoo.play_gif(GifSource.url("https://example.com/anim.gif"))
+
+# Overlay text is intended for uploaded HttpGif playback contexts
+pixoo.send_text_overlay(TextOverlay(text="hello", x=0, y=40, text_id=1))
+pixoo.clear_text_overlay()
+```
+
+### Mix static and generated frames, then upload natively
+
+```python
+from pypixoo import FrameRenderer, Pixoo, StaticFrameSource, UploadMode, WebFrameSource
 from pypixoo.buffer import Buffer
 
 buf = Buffer.from_flat_list([80] * (64 * 64 * 3))
-sources = [
-    StaticFrameSource(buffer=buf, duration_ms=100),
-    WebFrameSource(
-        url="http://localhost:6006/?t=0.1",
-        timestamps=[0.0, 0.5, 1.0],
-        duration_per_frame_ms=150,
-        browser_mode="persistent",  # or "per_frame"
-    ),
-    StaticFrameSource(buffer=buf, duration_ms=100),
-]
-
-renderer = FrameRenderer(sources)
-seq = renderer.precompute(
-    on_first_frame=lambda: print("first web frame ready"),
-    on_all_frames=lambda: print("all frames ready"),
+renderer = FrameRenderer(
+    sources=[
+        StaticFrameSource(buffer=buf, duration_ms=100),
+        WebFrameSource(url="http://localhost:6006/?t=0.1", timestamps=[0.0, 0.5, 1.0], duration_per_frame_ms=150),
+    ]
 )
+seq = renderer.precompute()
 
-player = AnimationPlayer(seq)
-player.play_async(pixoo)
-player.wait()
+pixoo = Pixoo("192.168.0.37")
+pixoo.connect()
+pixoo.upload_sequence(seq, mode=UploadMode.COMMAND_LIST)
 ```
 
-Requires Playwright: `pip install -e ".[browser]"` (or `.[dev]`).
-
-### React components (Storybook)
-
-The **storybook-app/** directory contains React components built for the 64×64 display. Run Storybook locally, then use `WebFrameSource` with the story’s iframe URL and a `t` (time) query param for animation:
-
-```bash
-cd storybook-app && npm install && npm run storybook   # http://localhost:6006
-```
+### Cycle orchestration
 
 ```python
-# In Python: capture frames from the Clock story at t = 0, 0.25, 0.5, 0.75
-WebFrameSource(
-    url="http://localhost:6006/iframe.html?id=pixoo-clock--default",
-    timestamps=[0, 0.25, 0.5, 0.75],
-    duration_per_frame_ms=200,
-    timestamp_param="t",
-)
+from pypixoo import CycleItem, GifSource, Pixoo
+
+pixoo = Pixoo("192.168.0.37")
+pixoo.connect()
+
+items = [
+    CycleItem(source=GifSource.url("https://example.com/a.gif")),
+    CycleItem(source=GifSource.tf_file("divoom_gif/1.gif")),
+]
+handle = pixoo.start_cycle(items, loop=2)
+handle.wait()
 ```
-
-See [storybook-app/README.md](storybook-app/README.md) for details.
-
-### Blend modes and end behavior
-
-- **Blend mode**: `opaque` (frame as-is) or `transparent` (composite over background with transparent color).
-- **End on**: `last_frame` (hold final frame) or `blank` (clear to `blank_background`).
 
 ## Project structure
 

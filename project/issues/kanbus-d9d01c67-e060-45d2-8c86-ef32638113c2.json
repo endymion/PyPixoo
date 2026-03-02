@@ -10,9 +10,16 @@
   "parent": "kanbus-199c65b3-dacc-4284-bbca-512fa8397d28",
   "labels": [],
   "dependencies": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "79911898-bfd2-401e-8c63-9a371dd096c6",
+      "author": "ryan.porter",
+      "text": "Implementation for V2 breaking redesign is complete and test/coverage gates are green locally. This task remains open for final release execution semantics and tagging flow.",
+      "created_at": "2026-03-02T05:44:24.097190Z"
+    }
+  ],
   "created_at": "2026-03-02T05:31:06.603342Z",
-  "updated_at": "2026-03-02T05:31:06.603342Z",
+  "updated_at": "2026-03-02T05:44:24.097190Z",
   "closed_at": null,
   "custom": {}
 }

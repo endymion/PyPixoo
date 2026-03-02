@@ -3,16 +3,23 @@
   "title": "Add command payload models and serializer helpers",
   "description": "Implement payload models/helpers for Draw/SendHttpGif, Draw/CommandList, Device/PlayTFGif, Draw/SendHttpText, Draw/ClearHttpText.",
   "type": "task",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 1,
   "assignee": null,
   "creator": null,
   "parent": "kanbus-52f2ab71-e717-4b50-92d8-d2afe39c79f6",
   "labels": [],
   "dependencies": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "37317ecd-d7f3-4c57-a72c-8563aed7ba36",
+      "author": "ryan.porter",
+      "text": "Implemented V2 native payload modeling through the new  module and Pixoo command payload builders for HttpGif upload, PlayTFGif playback, and text overlay commands.",
+      "created_at": "2026-03-02T05:43:55.823389Z"
+    }
+  ],
   "created_at": "2026-03-02T05:31:04.570052Z",
-  "updated_at": "2026-03-02T05:31:15.619530Z",
-  "closed_at": null,
+  "updated_at": "2026-03-02T05:43:55.921741Z",
+  "closed_at": "2026-03-02T05:43:55.921741Z",
   "custom": {}
 }

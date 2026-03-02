@@ -8,8 +8,8 @@ from typing import Callable, Dict, List, Literal, Optional, Union
 from PIL import Image
 from pydantic import BaseModel, Field
 
-from pypixoo.animation import AnimationSequence, Frame
 from pypixoo.buffer import Buffer
+from pypixoo.native import GifFrame, GifSequence
 
 SIZE = 64
 
@@ -259,18 +259,18 @@ class FrameRenderer:
     ):
         self.sources = sources
         self.background = background
-        self._sequence: Optional[AnimationSequence] = None
+        self._sequence: Optional[GifSequence] = None
 
     def precompute(
         self,
         *,
         on_first_frame: Optional[Callable[[], None]] = None,
         on_all_frames: Optional[Callable[[], None]] = None,
-    ) -> AnimationSequence:
-        """Render web frames asynchronously; return AnimationSequence when done."""
+    ) -> GifSequence:
+        """Render web frames asynchronously; return GifSequence when done."""
         first_web_fired = [False]
 
-        def _run_web(source: WebFrameSource) -> List[Frame]:
+        def _run_web(source: WebFrameSource) -> List[GifFrame]:
             scale = source.device_scale_factor
             vp = source.viewport_size
             raw_path = source.save_raw_screenshot_path
@@ -296,7 +296,7 @@ class FrameRenderer:
                     downsample_mode,
                 )
             result = [
-                Frame(image=buf, duration_ms=source.duration_per_frame_ms)
+                GifFrame(image=buf, duration_ms=source.duration_per_frame_ms)
                 for buf in bufs
             ]
             if on_first_frame is not None and not first_web_fired[0]:
@@ -310,11 +310,11 @@ class FrameRenderer:
                 if isinstance(src, WebFrameSource):
                     source_futures[i] = executor.submit(_run_web, src)
 
-            frames: List[Frame] = []
+            frames: List[GifFrame] = []
             for i, src in enumerate(self.sources):
                 if isinstance(src, StaticFrameSource):
                     frames.append(
-                        Frame(image=src.buffer, duration_ms=src.duration_ms)
+                        GifFrame(image=src.buffer, duration_ms=src.duration_ms)
                     )
                 else:
                     frames.extend(source_futures[i].result())
@@ -322,8 +322,6 @@ class FrameRenderer:
         if on_all_frames is not None:
             on_all_frames()
 
-        self._sequence = AnimationSequence(
-            frames=frames,
-            background=self.background,
-        )
+        speed_ms = frames[0].duration_ms if frames else 100
+        self._sequence = GifSequence(frames=frames, speed_ms=speed_ms)
         return self._sequence

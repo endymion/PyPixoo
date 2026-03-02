@@ -3,16 +3,23 @@
   "title": "Implement play_gif source variants",
   "description": "Implement GifSource mapping and play_gif for url/tf_file/tf_directory.",
   "type": "task",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 1,
   "assignee": null,
   "creator": null,
   "parent": "kanbus-36c97aa4-14de-4d27-acdc-38e8046c6d9f",
   "labels": [],
   "dependencies": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "43a9df74-ef14-4f8c-bd67-cd56031dfa99",
+      "author": "ryan.porter",
+      "text": "Implemented  variants and  mapping to Device/PlayTFGif FileType 0/1/2.",
+      "created_at": "2026-03-02T05:43:56.311759Z"
+    }
+  ],
   "created_at": "2026-03-02T05:31:05.255779Z",
-  "updated_at": "2026-03-02T05:31:16.043700Z",
-  "closed_at": null,
+  "updated_at": "2026-03-02T05:43:56.396828Z",
+  "closed_at": "2026-03-02T05:43:56.396828Z",
   "custom": {}
 }

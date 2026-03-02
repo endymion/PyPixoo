@@ -2,11 +2,10 @@
 
 import time
 
-from behave import given, when, then
+from behave import given, then, when
 
-from pypixoo import Pixoo
-from pypixoo.animation import AnimationPlayer, AnimationSequence, Frame
 from pypixoo.buffer import Buffer
+from pypixoo.native import CycleItem, GifFrame, GifSequence, GifSource, TextOverlay, UploadMode
 
 
 def _solid_buffer(r: int, g: int, b: int) -> Buffer:
@@ -14,220 +13,273 @@ def _solid_buffer(r: int, g: int, b: int) -> Buffer:
     return Buffer.from_flat_list(data)
 
 
-def _frame_transparent_center_magenta_edges() -> Buffer:
-    """Frame: center (31,31) is black (transparent); rest magenta."""
-    data = []
-    for y in range(64):
-        for x in range(64):
-            if 30 <= x <= 33 and 30 <= y <= 33:
-                data.extend([0, 0, 0])
-            else:
-                data.extend([255, 0, 255])
-    return Buffer.from_flat_list(data)
+def _commands(context, command: str):
+    return [c for c in context._command_history if c.get("Command") == command]
 
 
-@given('a 2-frame sequence with {duration}ms duration each')
-def step_two_frame_sequence(context, duration):
-    black = _solid_buffer(0, 0, 0)
-    context.sequence = AnimationSequence(
-        frames=[
-            Frame(image=black, duration_ms=int(duration)),
-            Frame(image=black, duration_ms=int(duration)),
-        ]
+@given('a native GIF sequence with {n} frames and speed {speed}ms')
+def step_native_sequence(context, n, speed):
+    count = int(n)
+    speed_ms = int(speed)
+    frames = []
+    for i in range(count):
+        color = (i * 13) % 255
+        frames.append(
+            GifFrame(
+                image=_solid_buffer(color, 0, 255 - color),
+                duration_ms=speed_ms,
+            )
+        )
+    context.native_sequence = GifSequence(frames=frames, speed_ms=speed_ms)
+
+
+@given('I upload the native sequence in mode "{mode}"')
+@when('I upload the native sequence in mode "{mode}"')
+def step_upload_sequence_mode(context, mode):
+    context.uploaded_pic_id = context.pixoo.upload_sequence(
+        context.native_sequence,
+        mode=UploadMode(mode),
     )
-    context.player_kwargs = {}
 
 
-@given('a 1-frame sequence with solid color {r} {g} {b} and duration {d}')
-def step_one_frame_solid(context, r, g, b, d):
-    buf = _solid_buffer(int(r), int(g), int(b))
-    context.sequence = AnimationSequence(
-        frames=[Frame(image=buf, duration_ms=int(d))]
+@when('I upload the native sequence in mode "{mode}" with chunk size {chunk_size}')
+def step_upload_sequence_chunked(context, mode, chunk_size):
+    context.uploaded_pic_id = context.pixoo.upload_sequence(
+        context.native_sequence,
+        mode=UploadMode(mode),
+        chunk_size=int(chunk_size),
     )
-    context.player_kwargs = {}
 
 
-@given('a 1-frame sequence with transparent center and magenta background')
-def step_one_frame_transparent_center(context):
-    frame_buf = _frame_transparent_center_magenta_edges()
-    bg_buf = _solid_buffer(255, 0, 255)
-    context.sequence = AnimationSequence(
-        frames=[Frame(image=frame_buf, duration_ms=0)],
-        background=bg_buf,
+@then('{n} Draw/SendHttpGif commands should be sent')
+def step_send_httpgif_count(context, n):
+    actual = len(_commands(context, "Draw/SendHttpGif"))
+    assert actual == int(n), f"Expected {n} Draw/SendHttpGif commands, got {actual}"
+
+
+@then('all uploaded frames should use the same PicID')
+def step_all_uploaded_same_pic_id(context):
+    cmds = _commands(context, "Draw/SendHttpGif")
+    pic_ids = {c.get("PicID") for c in cmds}
+    assert len(pic_ids) == 1, f"Expected one PicID, got {pic_ids}"
+
+
+@then('uploaded frame offsets should be 0,1')
+def step_offsets_two(context):
+    cmds = _commands(context, "Draw/SendHttpGif")
+    offsets = [c.get("PicOffset") for c in cmds]
+    assert offsets == [0, 1], f"Expected offsets [0, 1], got {offsets}"
+
+
+@then('all uploaded frames should have PicNum {pic_num}')
+def step_pic_num(context, pic_num):
+    expected = int(pic_num)
+    cmds = _commands(context, "Draw/SendHttpGif")
+    assert cmds, "No Draw/SendHttpGif commands recorded"
+    for cmd in cmds:
+        assert cmd.get("PicNum") == expected, f"Expected PicNum {expected}, got {cmd.get('PicNum')}"
+
+
+@then('all uploaded frames should have PicSpeed {speed}')
+def step_pic_speed(context, speed):
+    expected = int(speed)
+    cmds = _commands(context, "Draw/SendHttpGif")
+    assert cmds, "No Draw/SendHttpGif commands recorded"
+    for cmd in cmds:
+        assert cmd.get("PicSpeed") == expected, f"Expected PicSpeed {expected}, got {cmd.get('PicSpeed')}"
+
+
+@then('{n} Draw/CommandList commands should be sent')
+def step_command_list_count(context, n):
+    actual = len(_commands(context, "Draw/CommandList"))
+    assert actual == int(n), f"Expected {n} Draw/CommandList commands, got {actual}"
+
+
+@then('command list chunk sizes should be {a},{b},{c}')
+def step_chunk_sizes(context, a, b, c):
+    cmd_lists = _commands(context, "Draw/CommandList")
+    sizes = [len(x.get("CommandList", [])) for x in cmd_lists]
+    expected = [int(a), int(b), int(c)]
+    assert sizes == expected, f"Expected chunk sizes {expected}, got {sizes}"
+
+
+@then('nested uploaded frame offsets should span {start} through {end}')
+def step_nested_offsets(context, start, end):
+    cmd_lists = _commands(context, "Draw/CommandList")
+    offsets = []
+    for cmd in cmd_lists:
+        for nested in cmd.get("CommandList", []):
+            offsets.append(nested.get("PicOffset"))
+    expected = list(range(int(start), int(end) + 1))
+    assert offsets == expected, f"Expected offsets {expected[:5]}...{expected[-5:]}, got {offsets[:5]}...{offsets[-5:]}"
+
+
+@then('all nested uploaded frames should use the same PicID')
+def step_nested_same_pic_id(context):
+    cmd_lists = _commands(context, "Draw/CommandList")
+    pic_ids = set()
+    for cmd in cmd_lists:
+        for nested in cmd.get("CommandList", []):
+            pic_ids.add(nested.get("PicID"))
+    assert len(pic_ids) == 1, f"Expected one nested PicID, got {pic_ids}"
+
+
+@when('I query the HTTP GIF ID')
+def step_query_http_gif_id(context):
+    context.returned_http_gif_id = context.pixoo.get_http_gif_id()
+
+
+@then('the returned HTTP GIF ID should be {value}')
+def step_returned_http_gif_id(context, value):
+    assert context.returned_http_gif_id == int(value), (
+        f"Expected HTTP GIF ID {value}, got {context.returned_http_gif_id}"
     )
-    context.player_kwargs = {}
 
 
-@given('a 2-frame sequence with different colors')
-def step_two_frame_different_colors(context):
-    red = _solid_buffer(255, 0, 0)
-    blue = _solid_buffer(0, 0, 255)
-    context.sequence = AnimationSequence(
-        frames=[
-            Frame(image=red, duration_ms=0),
-            Frame(image=blue, duration_ms=0),
-        ]
-    )
-    context.player_kwargs = {"end_on": "last_frame"}
+@when('I reset the HTTP GIF ID')
+def step_reset_http_gif_id(context):
+    context.pixoo.reset_http_gif_id()
 
 
-@given('end on last frame')
-def step_end_on_last_frame(context):
-    context.player_kwargs["end_on"] = "last_frame"
+@then('a Draw/ResetHttpGifId command should be sent')
+def step_reset_command_sent(context):
+    cmds = _commands(context, "Draw/ResetHttpGifId")
+    assert len(cmds) == 1, f"Expected one Draw/ResetHttpGifId command, got {len(cmds)}"
 
 
-@given('end on blank with background color {r} {g} {b}')
-def step_end_on_blank(context, r, g, b):
-    context.player_kwargs["end_on"] = "blank"
-    context.player_kwargs["blank_background"] = _solid_buffer(int(r), int(g), int(b))
+@when('I play GIF source type "{source_type}" with value "{value}"')
+@given('I play GIF source type "{source_type}" with value "{value}"')
+def step_play_gif_source(context, source_type, value):
+    source_factory = {
+        "url": GifSource.url,
+        "tf_file": GifSource.tf_file,
+        "tf_directory": GifSource.tf_directory,
+    }
+    context.pixoo.play_gif(source_factory[source_type](value))
 
 
-@given('blend mode opaque')
-def step_blend_opaque(context):
-    context.player_kwargs["blend_mode"] = "opaque"
+@then('the last Device/PlayTFGif command should use FileType {file_type}')
+def step_last_play_file_type(context, file_type):
+    cmds = _commands(context, "Device/PlayTFGif")
+    assert cmds, "No Device/PlayTFGif commands were recorded"
+    actual = cmds[-1].get("FileType")
+    assert actual == int(file_type), f"Expected FileType {file_type}, got {actual}"
 
 
-@given('loop {n} times')
-def step_loop_n(context, n):
-    context.player_kwargs["loop"] = int(n)
-
-
-@given('an on_finished callback')
-def step_on_finished_callback(context):
-    context.on_finished_called = []
-    context.player_kwargs["on_finished"] = lambda: context.on_finished_called.append(True)
-
-
-@given('an on_loop callback')
-def step_on_loop_callback(context):
-    context.on_loop_calls = []
-    context.player_kwargs["on_loop"] = lambda n: context.on_loop_calls.append(n)
-
-
-@given('a 1-frame sequence with {d}ms duration and loop forever')
-def step_one_frame_loop_forever(context, d):
-    black = _solid_buffer(0, 0, 0)
-    context.sequence = AnimationSequence(
-        frames=[Frame(image=black, duration_ms=int(d))]
-    )
-    context.player_kwargs = {"loop": None}
-
-
-@when('I play the animation async')
-def step_play_async(context):
-    kwargs = getattr(context, "player_kwargs", {})
-    context.player = AnimationPlayer(context.sequence, **kwargs)
-    context.player.play_async(context.pixoo)
-
-
-@when('I play the animation async with transparent blend')
-def step_play_async_transparent(context):
-    kwargs = getattr(context, "player_kwargs", {}).copy()
-    kwargs["blend_mode"] = "transparent"
-    context.player = AnimationPlayer(context.sequence, **kwargs)
-    context.player.play_async(context.pixoo)
-
-
-@when('I play the animation async with transparent blend and no background')
-def step_play_async_transparent_no_bg(context):
-    context.animation_error = None
-    seq = AnimationSequence(
-        frames=[Frame(image=_solid_buffer(255, 0, 0), duration_ms=0)],
-        background=None,
-    )
+@when('I send text overlay "{text}"')
+def step_send_text_overlay(context, text):
+    context.native_error = None
     try:
-        player = AnimationPlayer(seq, blend_mode="transparent")
-        player.play_async(context.pixoo)
+        context.pixoo.send_text_overlay(
+            TextOverlay(
+                text=text,
+                text_id=7,
+                x=1,
+                y=2,
+                direction=0,
+                font=4,
+                text_width=56,
+                speed=10,
+                color="#FFFF00",
+                align=1,
+            )
+        )
     except Exception as e:
-        context.animation_error = e
+        context.native_error = e
 
 
-@when('I play the animation async again')
-def step_play_async_again(context):
-    context.animation_error = None
-    try:
-        context.player.play_async(context.pixoo)
-    except Exception as e:
-        context.animation_error = e
+@then('a Draw/SendHttpText command should be sent')
+def step_send_text_cmd(context):
+    cmds = _commands(context, "Draw/SendHttpText")
+    assert len(cmds) == 1, f"Expected one Draw/SendHttpText command, got {len(cmds)}"
 
 
-@when('I wait a short time')
-def step_wait_short(context):
+@when('I clear the text overlay')
+def step_clear_text_overlay(context):
+    context.pixoo.clear_text_overlay()
+
+
+@then('a Draw/ClearHttpText command should be sent')
+def step_clear_text_cmd(context):
+    cmds = _commands(context, "Draw/ClearHttpText")
+    assert len(cmds) == 1, f"Expected one Draw/ClearHttpText command, got {len(cmds)}"
+
+
+@then('a native ValueError should occur')
+def step_native_value_error(context):
+    assert context.native_error is not None, "Expected ValueError but no exception occurred"
+    assert isinstance(context.native_error, ValueError), (
+        f"Expected ValueError, got {type(context.native_error).__name__}: {context.native_error}"
+    )
+
+
+@given('cycle items of sequence, url gif, and tf file gif')
+def step_cycle_items_three(context):
+    seq = GifSequence(
+        frames=[GifFrame(image=_solid_buffer(10, 20, 30), duration_ms=40)],
+        speed_ms=40,
+    )
+    context.cycle_items = [
+        CycleItem(sequence=seq, upload_mode=UploadMode.FRAME_BY_FRAME),
+        CycleItem(source=GifSource.url("https://example.com/cycle.gif")),
+        CycleItem(source=GifSource.tf_file("divoom_gif/2.gif")),
+    ]
+
+
+@given('cycle items containing one url gif')
+def step_cycle_items_one(context):
+    context.cycle_items = [CycleItem(source=GifSource.url("https://example.com/infinite.gif"))]
+
+
+@given('cycle callbacks are registered')
+def step_cycle_callbacks(context):
+    context.cycle_on_item = []
+    context.cycle_on_loop = []
+
+
+@when('I start cycle with loop count {n}')
+def step_start_cycle_n(context, n):
+    context.cycle_handle = context.pixoo.start_cycle(
+        context.cycle_items,
+        loop=int(n),
+        on_item=lambda idx, item: context.cycle_on_item.append(idx),
+        on_loop=lambda count: context.cycle_on_loop.append(count),
+    )
+
+
+@when('I wait for cycle completion')
+def step_wait_cycle(context):
+    assert context.cycle_handle.wait(2.0), "Cycle did not complete in time"
+
+
+@then('cycle on_item callback order should be 0,1,2')
+def step_cycle_item_order(context):
+    assert context.cycle_on_item == [0, 1, 2], (
+        f"Expected on_item order [0, 1, 2], got {context.cycle_on_item}"
+    )
+
+
+@then('cycle on_loop callback counts should be 1')
+def step_cycle_loop_counts(context):
+    assert context.cycle_on_loop == [1], f"Expected on_loop [1], got {context.cycle_on_loop}"
+
+
+@when('I start cycle with infinite loop')
+def step_start_cycle_infinite(context):
+    context.cycle_handle = context.pixoo.start_cycle(context.cycle_items, loop=None)
+
+
+@when('I wait briefly')
+def step_wait_briefly(context):
     time.sleep(0.1)
 
 
-@when('I wait for the animation to complete')
-def step_wait_animation(context):
-    context.player.wait()
+@when('I stop the running cycle')
+def step_stop_cycle(context):
+    context.cycle_handle.stop()
+    context.cycle_handle.wait(2.0)
 
 
-@then('the animation should have pushed {n} frames')
-def step_assert_push_count(context, n):
-    history = context._push_history
-    assert len(history) == int(n), f"Expected {n} pushes, got {len(history)}"
-
-
-@then('the first pushed frame should be solid RGB {r} {g} {b}')
-def step_assert_first_frame_solid(context, r, g, b):
-    history = context._push_history
-    assert len(history) >= 1, "No pushes recorded"
-    data = history[0]
-    expected = (int(r), int(g), int(b))
-    for i in range(0, len(data), 3):
-        pixel = (data[i], data[i + 1], data[i + 2])
-        assert pixel == expected, f"Expected {expected}, got {pixel} at index {i}"
-
-
-@then('the first pushed frame should have magenta at center')
-def step_assert_first_frame_magenta_center(context):
-    history = context._push_history
-    assert len(history) >= 1, "No pushes recorded"
-    data = history[0]
-    center_idx = (31 * 64 + 31) * 3
-    pixel = (data[center_idx], data[center_idx + 1], data[center_idx + 2])
-    assert pixel == (255, 0, 255), f"Expected magenta at center, got {pixel}"
-
-
-@then('the last pushed frame should match the last frame of the sequence')
-def step_assert_last_matches_last_frame(context):
-    history = context._push_history
-    assert len(history) >= 1, "No pushes recorded"
-    last_frame = context.sequence.frames[-1]
-    expected = list(last_frame.image.data)
-    actual = history[-1]
-    assert actual == expected, f"Last frame mismatch"
-
-
-@then('the on_finished callback should have been called')
-def step_assert_on_finished_called(context):
-    assert getattr(context, "on_finished_called", []), "on_finished was not called"
-    assert len(context.on_finished_called) >= 1, "on_finished should have been called at least once"
-
-
-@then('the on_loop callback should have been called {n} times')
-def step_assert_on_loop_called_n(context, n):
-    calls = getattr(context, "on_loop_calls", [])
-    assert len(calls) == int(n), f"Expected on_loop to be called {n} times, got {len(calls)}"
-
-
-@then('an animation ValueError should occur')
-def step_animation_value_error(context):
-    assert getattr(context, "animation_error", None) is not None
-    assert isinstance(context.animation_error, ValueError)
-
-
-@then('an animation RuntimeError should occur')
-def step_animation_runtime_error(context):
-    assert getattr(context, "animation_error", None) is not None
-    assert isinstance(context.animation_error, RuntimeError)
-
-
-@then('the last pushed frame should be solid RGB {r} {g} {b}')
-def step_assert_last_frame_solid(context, r, g, b):
-    history = context._push_history
-    assert len(history) >= 1, "No pushes recorded"
-    data = history[-1]
-    expected = (int(r), int(g), int(b))
-    for i in range(0, len(data), 3):
-        pixel = (data[i], data[i + 1], data[i + 2])
-        assert pixel == expected, f"Expected {expected}, got {pixel} at index {i}"
+@then('the cycle should not be running')
+def step_cycle_not_running(context):
+    assert context.cycle_handle.is_running is False, "Expected cycle to be stopped"

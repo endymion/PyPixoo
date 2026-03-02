@@ -3,16 +3,23 @@
   "title": "Block invalid overlay combinations with PlayTFGif",
   "description": "Feature: Block invalid overlay combinations with PlayTFGif\nScenario: Overlay is rejected after native GIF playback\nGiven a PlayTFGif playback context\nWhen send_text_overlay is called\nThen a clear ValueError is raised and no Draw/SendHttpText command is sent",
   "type": "story",
-  "status": "open",
+  "status": "closed",
   "priority": 1,
   "assignee": null,
   "creator": null,
   "parent": "kanbus-36c97aa4-14de-4d27-acdc-38e8046c6d9f",
   "labels": [],
   "dependencies": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "cab6a594-a335-4a12-a20c-cca5535050fb",
+      "author": "ryan.porter",
+      "text": "Implemented compatibility guard: overlay attempts after PlayTFGif now raise clear ValueError.",
+      "created_at": "2026-03-02T05:43:58.174703Z"
+    }
+  ],
   "created_at": "2026-03-02T05:31:05.160424Z",
-  "updated_at": "2026-03-02T05:31:05.160424Z",
-  "closed_at": null,
+  "updated_at": "2026-03-02T05:43:58.255593Z",
+  "closed_at": "2026-03-02T05:43:58.255593Z",
   "custom": {}
 }

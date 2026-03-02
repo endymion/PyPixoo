@@ -10,9 +10,16 @@
   "parent": "kanbus-36c97aa4-14de-4d27-acdc-38e8046c6d9f",
   "labels": [],
   "dependencies": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "bbd20ee3-43e4-4fd3-a0b3-5ed0f1cdfc04",
+      "author": "ryan.porter",
+      "text": "README and PR_FAQ were updated for V2 native workflows. Demo script migration is intentionally deferred per user direction (\"we're going to have to deal with getting those demos working again after this is all changed\").",
+      "created_at": "2026-03-02T05:44:16.591623Z"
+    }
+  ],
   "created_at": "2026-03-02T05:31:05.543299Z",
-  "updated_at": "2026-03-02T05:31:16.692823Z",
+  "updated_at": "2026-03-02T05:44:16.591623Z",
   "closed_at": null,
   "custom": {}
 }

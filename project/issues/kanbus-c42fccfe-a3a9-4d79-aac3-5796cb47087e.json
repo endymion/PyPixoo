@@ -3,16 +3,23 @@
   "title": "Migration guidance from v1.x to v2.0",
   "description": "Feature: Migration guidance from v1.x to v2.0\nScenario: Breaking changes are documented with replacement paths\nGiven a user upgrading from v1.x\nWhen they read README and PR_FAQ migration sections\nThen they can map removed APIs to V2 alternatives",
   "type": "story",
-  "status": "open",
+  "status": "closed",
   "priority": 1,
   "assignee": null,
   "creator": null,
   "parent": "kanbus-199c65b3-dacc-4284-bbca-512fa8397d28",
   "labels": [],
   "dependencies": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "790e3c69-e8a1-41eb-964c-254a23132b40",
+      "author": "ryan.porter",
+      "text": "Added migration-oriented documentation updates in README and PR_FAQ for v1->v2 breaking changes.",
+      "created_at": "2026-03-02T05:43:58.915119Z"
+    }
+  ],
   "created_at": "2026-03-02T05:31:06.320023Z",
-  "updated_at": "2026-03-02T05:31:06.320023Z",
-  "closed_at": null,
+  "updated_at": "2026-03-02T05:43:59.002856Z",
+  "closed_at": "2026-03-02T05:43:59.002856Z",
   "custom": {}
 }

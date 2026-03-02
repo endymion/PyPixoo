@@ -3,16 +3,23 @@
   "title": "CLI supports native GIF and cycle workflows",
   "description": "Feature: CLI supports native GIF and cycle workflows\nScenario: Native subcommands invoke V2 methods\nGiven a configured CLI invocation\nWhen upload-sequence or play-gif or cycle commands are run\nThen the expected Pixoo methods are called with validated arguments",
   "type": "story",
-  "status": "open",
+  "status": "closed",
   "priority": 1,
   "assignee": null,
   "creator": null,
   "parent": "kanbus-199c65b3-dacc-4284-bbca-512fa8397d28",
   "labels": [],
   "dependencies": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "db4467b7-518c-40e7-8cb7-c40e996cf30b",
+      "author": "ryan.porter",
+      "text": "CLI now supports native GIF upload/play/cycle workflows with validated argument wiring.",
+      "created_at": "2026-03-02T05:43:58.767460Z"
+    }
+  ],
   "created_at": "2026-03-02T05:31:06.218537Z",
-  "updated_at": "2026-03-02T05:31:06.218537Z",
-  "closed_at": null,
+  "updated_at": "2026-03-02T05:43:58.846389Z",
+  "closed_at": "2026-03-02T05:43:58.846389Z",
   "custom": {}
 }

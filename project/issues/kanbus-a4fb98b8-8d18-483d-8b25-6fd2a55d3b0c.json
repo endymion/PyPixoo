@@ -3,16 +3,23 @@
   "title": "Explicit GIF ID reserve/reset semantics",
   "description": "Feature: Explicit GIF ID reserve/reset semantics\nScenario: PicID lifecycle is observable\nGiven a connected Pixoo client\nWhen get_http_gif_id and reset_http_gif_id are called\nThen the corresponding device commands are sent and return values are exposed",
   "type": "story",
-  "status": "open",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
   "parent": "kanbus-52f2ab71-e717-4b50-92d8-d2afe39c79f6",
   "labels": [],
   "dependencies": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "360c9160-125f-4f0b-80c1-728c77c19715",
+      "author": "ryan.porter",
+      "text": "Implemented explicit get/reset GIF ID methods with observable command behavior.",
+      "created_at": "2026-03-02T05:43:57.722510Z"
+    }
+  ],
   "created_at": "2026-03-02T05:31:04.473496Z",
-  "updated_at": "2026-03-02T05:31:04.473496Z",
-  "closed_at": null,
+  "updated_at": "2026-03-02T05:43:57.801622Z",
+  "closed_at": "2026-03-02T05:43:57.801622Z",
   "custom": {}
 }

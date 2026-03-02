@@ -3,7 +3,7 @@
   "title": "Add/adjust CLI pytest coverage",
   "description": "Add tests for upload-sequence, play-gif-url/file/dir, and cycle CLI behavior and validation.",
   "type": "task",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 1,
   "assignee": null,
   "creator": null,
@@ -16,10 +16,16 @@
       "author": "ryan.porter",
       "text": "CLI migration task started: adding upload/play/cycle subcommands and tests for argument-to-method wiring.",
       "created_at": "2026-03-02T05:31:21.942019Z"
+    },
+    {
+      "id": "e1bdfdb7-ade5-481b-897e-f5bfbcc5a485",
+      "author": "ryan.porter",
+      "text": "Expanded CLI and pytest coverage for V2 subcommands (, , ) plus parser/error-path coverage.",
+      "created_at": "2026-03-02T05:43:57.275089Z"
     }
   ],
   "created_at": "2026-03-02T05:31:06.514236Z",
-  "updated_at": "2026-03-02T05:31:21.942019Z",
-  "closed_at": null,
+  "updated_at": "2026-03-02T05:43:57.357099Z",
+  "closed_at": "2026-03-02T05:43:57.357099Z",
   "custom": {}
 }

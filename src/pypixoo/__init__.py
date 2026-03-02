@@ -1,18 +1,30 @@
 """PyPixoo — BDD-first Python library for Divoom Pixoo 64."""
 
-from pypixoo.animation import AnimationPlayer, AnimationSequence, Frame
 from pypixoo.browser import FrameRenderer, StaticFrameSource, WebFrameSource
 from pypixoo.buffer import Buffer
-from pypixoo.pixoo import Pixoo, DeviceInUseError
+from pypixoo.native import (
+    CycleHandle,
+    CycleItem,
+    GifFrame,
+    GifSequence,
+    GifSource,
+    TextOverlay,
+    UploadMode,
+)
+from pypixoo.pixoo import DeviceInUseError, Pixoo
 
 __all__ = [
-    "AnimationPlayer",
-    "AnimationSequence",
     "Buffer",
+    "CycleHandle",
+    "CycleItem",
     "DeviceInUseError",
-    "Frame",
     "FrameRenderer",
+    "GifFrame",
+    "GifSequence",
+    "GifSource",
     "Pixoo",
     "StaticFrameSource",
+    "TextOverlay",
+    "UploadMode",
     "WebFrameSource",
 ]

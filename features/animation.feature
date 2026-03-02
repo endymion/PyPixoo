@@ -1,91 +1,87 @@
-Feature: Animation sequences
-  In order to animate content on the Pixoo 64
+Feature: Native GIF sequencing and playback
+  In order to align with Pixoo native capabilities
   As a developer
-  I want to play sequences of frames with timing and blend controls
+  I want to upload sequences, play native GIF sources, and orchestrate cycles
 
-  Scenario: Play 2-frame sequence once
+  Scenario: Upload sequence frame-by-frame with stable PicID
     Given a Pixoo at IP "192.168.0.37"
     And I connect
-    And a 2-frame sequence with 100ms duration each
-    When I play the animation async
-    And I wait for the animation to complete
-    Then the animation should have pushed 2 frames
+    And a native GIF sequence with 2 frames and speed 120ms
+    When I upload the native sequence in mode "frame_by_frame"
+    Then 2 Draw/SendHttpGif commands should be sent
+    And all uploaded frames should use the same PicID
+    And uploaded frame offsets should be 0,1
+    And all uploaded frames should have PicNum 2
+    And all uploaded frames should have PicSpeed 120
 
-  Scenario: Blend mode opaque sends frame as-is
+  Scenario: Upload sequence via CommandList with chunking
     Given a Pixoo at IP "192.168.0.37"
     And I connect
-    And a 1-frame sequence with solid color 255 0 0 and duration 0
-    And blend mode opaque
-    When I play the animation async
-    And I wait for the animation to complete
-    Then the first pushed frame should be solid RGB 255 0 0
+    And a native GIF sequence with 90 frames and speed 50ms
+    When I upload the native sequence in mode "command_list" with chunk size 40
+    Then 3 Draw/CommandList commands should be sent
+    And command list chunk sizes should be 40,40,10
+    And nested uploaded frame offsets should span 0 through 89
+    And all nested uploaded frames should use the same PicID
 
-  Scenario: Blend mode transparent composites over background
+  Scenario: Get and reset HTTP GIF ID
     Given a Pixoo at IP "192.168.0.37"
     And I connect
-    And a 1-frame sequence with transparent center and magenta background
-    When I play the animation async with transparent blend
-    And I wait for the animation to complete
-    Then the first pushed frame should have magenta at center
+    When I query the HTTP GIF ID
+    Then the returned HTTP GIF ID should be 1
+    When I reset the HTTP GIF ID
+    Then a Draw/ResetHttpGifId command should be sent
 
-  Scenario: End on last frame
+  Scenario: Play GIF from URL
     Given a Pixoo at IP "192.168.0.37"
     And I connect
-    And a 2-frame sequence with different colors
-    And end on last frame
-    When I play the animation async
-    And I wait for the animation to complete
-    Then the last pushed frame should match the last frame of the sequence
+    When I play GIF source type "url" with value "https://example.com/a.gif"
+    Then the last Device/PlayTFGif command should use FileType 2
 
-  Scenario: End on blank
+  Scenario: Play GIF from TF file
     Given a Pixoo at IP "192.168.0.37"
     And I connect
-    And a 1-frame sequence with solid color 0 255 0 and duration 0
-    And end on blank with background color 0 0 255
-    When I play the animation async
-    And I wait for the animation to complete
-    Then the last pushed frame should be solid RGB 0 0 255
+    When I play GIF source type "tf_file" with value "divoom_gif/1.gif"
+    Then the last Device/PlayTFGif command should use FileType 0
 
-  Scenario: Loop 2 times
+  Scenario: Play GIF from TF directory
     Given a Pixoo at IP "192.168.0.37"
     And I connect
-    And a 2-frame sequence with 0ms duration each
-    And loop 2 times
-    When I play the animation async
-    And I wait for the animation to complete
-    Then the animation should have pushed 4 frames
+    When I play GIF source type "tf_directory" with value "divoom_gif/"
+    Then the last Device/PlayTFGif command should use FileType 1
 
-  Scenario: Transparent without background raises
+  Scenario: Send and clear text overlay for HttpGif context
     Given a Pixoo at IP "192.168.0.37"
     And I connect
-    And a 1-frame sequence with solid color 255 0 0 and duration 0
-    When I play the animation async with transparent blend and no background
-    Then an animation ValueError should occur
+    And a native GIF sequence with 1 frames and speed 100ms
+    And I upload the native sequence in mode "frame_by_frame"
+    When I send text overlay "hello, pixoo"
+    Then a Draw/SendHttpText command should be sent
+    When I clear the text overlay
+    Then a Draw/ClearHttpText command should be sent
 
-  Scenario: on_finished callback is called when animation completes
+  Scenario: Text overlay is blocked after PlayTFGif
     Given a Pixoo at IP "192.168.0.37"
     And I connect
-    And a 1-frame sequence with solid color 0 0 0 and duration 0
-    And an on_finished callback
-    When I play the animation async
-    And I wait for the animation to complete
-    Then the on_finished callback should have been called
+    And I play GIF source type "url" with value "https://example.com/a.gif"
+    When I send text overlay "not allowed"
+    Then a native ValueError should occur
 
-  Scenario: on_loop callback is called for each loop
+  Scenario: Cycle items execute in configured order
     Given a Pixoo at IP "192.168.0.37"
     And I connect
-    And a 2-frame sequence with 0ms duration each
-    And loop 2 times
-    And an on_loop callback
-    When I play the animation async
-    And I wait for the animation to complete
-    Then the on_loop callback should have been called 2 times
+    And cycle items of sequence, url gif, and tf file gif
+    And cycle callbacks are registered
+    When I start cycle with loop count 1
+    And I wait for cycle completion
+    Then cycle on_item callback order should be 0,1,2
+    And cycle on_loop callback counts should be 1
 
-  Scenario: Play async when already playing raises
+  Scenario: Cycle handle can stop an infinite cycle
     Given a Pixoo at IP "192.168.0.37"
     And I connect
-    And a 1-frame sequence with 0ms duration and loop forever
-    When I play the animation async
-    And I wait a short time
-    When I play the animation async again
-    Then an animation RuntimeError should occur
+    And cycle items containing one url gif
+    When I start cycle with infinite loop
+    And I wait briefly
+    And I stop the running cycle
+    Then the cycle should not be running
