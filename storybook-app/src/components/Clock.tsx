@@ -35,6 +35,7 @@ const TAU = 2 * Math.PI;
 const CX = PIXOO_SIZE / 2;
 const CY = PIXOO_SIZE / 2;
 const MARKER_ANGLES = Array.from({ length: 12 }, (_, i) => (i / 12) * TAU);
+const MARKER_OUTWARD_OFFSET = 1.0;
 
 /** Angle 0 = 12 o'clock, clockwise in radians. */
 function angleToXY(angleRad: number, length: number) {
@@ -88,9 +89,9 @@ export function Clock({
   const secondEnd =
     secondAngle !== null ? angleToXY(secondAngle, secondLength) : null;
 
-  const markerOuter = radius * 0.96;
-  const markerInner = radius * 0.82;
-  const markerDot = radius * 0.90;
+  const markerOuter = Math.min(CX - 0.25, (radius * 0.96) + MARKER_OUTWARD_OFFSET);
+  const markerInner = Math.min(CX - 0.25, (radius * 0.82) + MARKER_OUTWARD_OFFSET);
+  const markerDot = Math.min(CX - 0.25, (radius * 0.90) + MARKER_OUTWARD_OFFSET);
 
   const markers = MARKER_ANGLES.map((angle, i) => {
     const quarter = isQuarterHour(i);
