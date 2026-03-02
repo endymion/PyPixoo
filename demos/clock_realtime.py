@@ -12,6 +12,7 @@ Requires: pip install -e ".[browser]"
   python demos/clock_realtime.py
   python demos/clock_realtime.py --fps 3 --render-lead-ms 1500
   python demos/clock_realtime.py --clockface ticks_all_thick_quarters --no-second-hand
+  python demos/clock_realtime.py --no-second-hand --marker-color "#ff00ff"
   python demos/clock_realtime.py --delivery upload --fps 6 --window-seconds 3
 
 Press Ctrl+C to stop.
@@ -62,6 +63,7 @@ def build_clock_url(
     show_second_hand: bool,
     second_hand_color: str,
     marker_mode: str,
+    marker_color: str,
 ) -> str:
     """Build Storybook iframe URL using args=... semantics for deterministic frame rendering."""
     dt = datetime.fromtimestamp(frame_time_epoch)
@@ -75,6 +77,7 @@ def build_clock_url(
         "handColor": hand_color,
         "secondHandColor": second_hand_color,
         "markerMode": marker_mode,
+        "markerColor": marker_color,
     }
     args_str = ";".join(f"{key}:{_format_story_arg(value)}" for key, value in args_map.items())
     return f"{STORYBOOK_IFRAME}?{urlencode({'id': CLOCK_STORY_ID, 'viewMode': 'story', 'args': args_str})}"
@@ -94,6 +97,7 @@ def _render_single_frame(
     show_second_hand: bool,
     second_hand_color: str,
     marker_mode: str,
+    marker_color: str,
 ):
     source = WebFrameSource(
         url=build_clock_url(
@@ -103,6 +107,7 @@ def _render_single_frame(
             show_second_hand,
             second_hand_color,
             marker_mode,
+            marker_color,
         ),
         timestamps=[0],
         duration_per_frame_ms=0,
@@ -146,6 +151,7 @@ def _run_push_mode(pixoo: Pixoo, args, fps: int) -> None:
             show_second_hand=show_second_hand,
             second_hand_color=args.second_hand_color,
             marker_mode=marker_mode,
+            marker_color=args.marker_color,
         )
         render_dur = time.time() - render_started
         avg_render_sec = (avg_render_sec * 0.8) + (render_dur * 0.2)
@@ -196,6 +202,7 @@ def _run_upload_mode(pixoo: Pixoo, args, fps: int) -> None:
                         not args.no_second_hand,
                         args.second_hand_color,
                         marker_mode,
+                        args.marker_color,
                     ),
                     timestamps=[0],
                     duration_per_frame_ms=frame_duration_ms,
@@ -279,6 +286,11 @@ def main() -> None:
             "Fixed clockface marker mode. If omitted, demo mode cycles marker styles "
             "every minute in this order: " + ", ".join(CLOCKFACE_MODES)
         ),
+    )
+    parser.add_argument(
+        "--marker-color",
+        default="rgba(255,255,255,0.75)",
+        help="Clockface marker color (default: rgba(255,255,255,0.75))",
     )
     parser.add_argument(
         "--upload-mode",

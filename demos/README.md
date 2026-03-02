@@ -32,6 +32,7 @@ python demos/storybook_clock.py --delivery upload --upload-mode command_list
 python demos/clock_realtime.py
 python demos/clock_realtime.py --fps 3 --render-lead-ms 1500 --dial-color "#111" --hands-color cyan
 python demos/clock_realtime.py --clockface ticks_all_thick_quarters --no-second-hand
+python demos/clock_realtime.py --no-second-hand --marker-color "#ff00ff"
 
 # Optional: native upload windows mode (may show loading indicator while uploading)
 python demos/clock_realtime.py --delivery upload --fps 6 --window-seconds 3
