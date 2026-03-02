@@ -44,7 +44,7 @@ CLOCKFACE_MODES = [
     "dot12",
     "dots_quarters",
     "ticks_all",
-    "dots_quarters_ticks_others",
+    "dots_all_thick_quarters",
     "ticks_all_thick_quarters",
 ]
 

@@ -5,7 +5,7 @@ const markerModes = [
   "dot12",
   "dots_quarters",
   "ticks_all",
-  "dots_quarters_ticks_others",
+  "dots_all_thick_quarters",
   "ticks_all_thick_quarters",
 ] as const;
 
@@ -88,7 +88,7 @@ export const TimeNoSecondHand: Story = {
     minute: 15,
     showSecondHand: false,
     handColor: "white",
-    markerMode: "dots_quarters_ticks_others",
+    markerMode: "dots_all_thick_quarters",
     faceColor: "black",
   },
 };

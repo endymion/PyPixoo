@@ -46,10 +46,22 @@
       "author": "ryan.porter",
       "text": "Implemented resilience for `demos/clock_realtime.py` so unplug/replug no longer terminates the demo.\n\nWhat changed:\n- Added auto-reconnect loop around demo execution.\n- On startup and after disconnect, the script retries `pixoo.connect()` until successful.\n- Added handling for `requests` connection errors and command/runtime errors during playback.\n- Added CLI option: `--reconnect-delay-seconds` (default `3.0`).\n- Added timestamped logging and reconnect status messages.\n- README demo section updated to document automatic reconnect behavior.\n\nValidation:\n- `python demos/clock_realtime.py --help`\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- Fault simulation: `--ip 192.0.2.1 --reconnect-delay-seconds 1` now keeps retrying instead of exiting.\n- Live device run restarted successfully in magenta mode with no second hand.\n",
       "created_at": "2026-03-02T12:54:26.621853Z"
+    },
+    {
+      "id": "25b9d6a9-3629-492e-b677-f03d9bebaead",
+      "author": "ryan.porter",
+      "text": "Applying follow-up clockface adjustment per user feedback:\n- Remove mixed mode (dots on quarters + ticks on others).\n- Replace with all-dot mode using two dot sizes (larger on 12/3/6/9, smaller on other hours).\n- Update mode names in Storybook Clock + realtime clock CLI cycle list.\n- Restart live clock demo after patch.\n",
+      "created_at": "2026-03-02T13:03:05.165337Z"
+    },
+    {
+      "id": "7dad1370-8484-455d-b937-a59ff85553c1",
+      "author": "ryan.porter",
+      "text": "Replaced the broken mixed marker mode with a two-dot-size mode.\n\nChanges:\n- Removed `dots_quarters_ticks_others` mode.\n- Added `dots_all_thick_quarters` mode:\n  - larger dots at 12/3/6/9\n  - smaller dots at all other hour positions\n- Updated mode lists in:\n  - `storybook-app/src/components/Clock.tsx`\n  - `storybook-app/src/components/Clock.stories.tsx`\n  - `demos/clock_realtime.py`\n- Restarted live realtime clock demo; minute-cycle now uses `dots_all_thick_quarters` in place of the old mixed mode.\n\nValidation:\n- `python demos/clock_realtime.py --help` (updated mode choices)\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- `cd storybook-app && npm run build-storybook` (success)\n- Live run shows: `clockface mode -> dots_all_thick_quarters (minute cycle)`.\n",
+      "created_at": "2026-03-02T13:04:11.787065Z"
     }
   ],
   "created_at": "2026-03-02T05:31:05.543299Z",
-  "updated_at": "2026-03-02T12:54:26.621853Z",
+  "updated_at": "2026-03-02T13:04:11.787065Z",
   "closed_at": null,
   "custom": {}
 }

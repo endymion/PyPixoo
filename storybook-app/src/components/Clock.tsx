@@ -5,7 +5,7 @@ export type ClockMarkerMode =
   | "dot12"
   | "dots_quarters"
   | "ticks_all"
-  | "dots_quarters_ticks_others"
+  | "dots_all_thick_quarters"
   | "ticks_all_thick_quarters";
 
 export interface ClockProps {
@@ -106,11 +106,17 @@ export function Clock({
     const shouldDrawDot =
       markerMode === "dot12" ||
       (markerMode === "dots_quarters" && quarter) ||
-      (markerMode === "dots_quarters_ticks_others" && quarter);
+      markerMode === "dots_all_thick_quarters";
 
     if (shouldDrawDot) {
       const pos = angleToXY(angle, markerDot);
-      return <circle key={key} cx={pos.x} cy={pos.y} r={1.2} fill={markerColor} />;
+      const dotRadius =
+        markerMode === "dots_all_thick_quarters"
+          ? quarter
+            ? 1.25
+            : 0.8
+          : 1.2;
+      return <circle key={key} cx={pos.x} cy={pos.y} r={dotRadius} fill={markerColor} />;
     }
 
     const thickTick = markerMode === "ticks_all_thick_quarters" && quarter;
