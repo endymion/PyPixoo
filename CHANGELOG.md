@@ -2,6 +2,36 @@
 
 <!-- version list -->
 
+## v2.0.0 (2026-03-02)
+
+### Bug Fixes
+
+- Update font showcase demo for V2 native playback
+  ([`98e7792`](https://github.com/endymion/PyPixoo/commit/98e7792235c9447286573a71e14e8f1484bba5d5))
+
+### Chores
+
+- Checkpoint workspace before v2 redesign
+  ([`1e3ec88`](https://github.com/endymion/PyPixoo/commit/1e3ec882204fe07b2cbabf432a588d5788731fd3))
+
+- Close Async fire-and-forget animation epic
+  ([`43dae71`](https://github.com/endymion/PyPixoo/commit/43dae7191bfa570dde0b5f35c5b45c1898ccf9d7))
+
+- Update coverage badge [skip ci]
+  ([`826ca59`](https://github.com/endymion/PyPixoo/commit/826ca59ac1f01ba4bff74693f552156c9f4c96f5))
+
+- Update coverage badge [skip ci]
+  ([`93dd297`](https://github.com/endymion/PyPixoo/commit/93dd2975e96e8bbcab74c28894f7f59b2a37e2bc))
+
+### Features
+
+- Migrate PyPixoo to native V2 GIF sequencing API
+  ([`a45847f`](https://github.com/endymion/PyPixoo/commit/a45847fb73eb24da2c10ca53e982086d058ea6b0))
+
+- Storybook clock, realtime device clock, demos use device by default
+  ([`02a45be`](https://github.com/endymion/PyPixoo/commit/02a45be865ef95c8f18bf188979d69b443db458e))
+
+
 ## v1.3.0 (2026-03-01)
 
 ### Chores
