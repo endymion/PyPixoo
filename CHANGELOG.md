@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v2.2.4 (2026-03-02)
+
+### Bug Fixes
+
+- Push clock markers further outward
+  ([`f7e33e1`](https://github.com/endymion/PyPixoo/commit/f7e33e1fe8e0fa38a3c5d250f4953fde0831602d))
+
+
 ## v2.2.3 (2026-03-02)
 
 ### Bug Fixes
