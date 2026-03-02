@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v2.2.1 (2026-03-02)
+
+### Bug Fixes
+
+- Make realtime clock demo auto-reconnect on disconnect
+  ([`5695d75`](https://github.com/endymion/PyPixoo/commit/5695d75d7c6e5ebe13cef57c385825e0ee1234c7))
+
+
 ## v2.2.0 (2026-03-02)
 
 ### Features
