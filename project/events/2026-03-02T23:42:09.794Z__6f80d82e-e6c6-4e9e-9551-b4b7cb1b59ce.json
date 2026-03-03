@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "event_id": "6f80d82e-e6c6-4e9e-9551-b4b7cb1b59ce",
+  "issue_id": "kanbus-3d4a6263-f7d7-40be-8604-5bb49f743146",
+  "event_type": "state_transition",
+  "occurred_at": "2026-03-02T23:42:09.794Z",
+  "actor_id": "unknown",
+  "payload": {
+    "from_status": "in_progress",
+    "to_status": "closed"
+  }
+}

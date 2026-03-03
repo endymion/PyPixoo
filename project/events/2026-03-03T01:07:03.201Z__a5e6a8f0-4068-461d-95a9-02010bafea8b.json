@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "a5e6a8f0-4068-461d-95a9-02010bafea8b",
+  "issue_id": "kanbus-3d5fad38-0d29-41f5-8343-516651325e7f",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T01:07:03.201Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "initiative",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "PyPixoo acceptance testing"
+  }
+}

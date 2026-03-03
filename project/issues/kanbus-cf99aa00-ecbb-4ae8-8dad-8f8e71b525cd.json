@@ -1,0 +1,31 @@
+{
+  "id": "kanbus-cf99aa00-ecbb-4ae8-8dad-8f8e71b525cd",
+  "title": "Native fonts and overlays",
+  "description": "",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-813595c0-31b1-4eb4-bb9c-43e179b302fe",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "a6931939-d088-4e2a-9717-46ceef4fc77b",
+      "author": "unknown",
+      "text": "Feature: Native fonts and overlays\n  Scenario: TextOverlay accepts built-in font name\n    Given a Pixoo at IP \"192.168.0.37\"\n    And I connect\n    When I send text overlay \"hello\" using built-in font \"minin Then a Draw/SendHttpText command should be sentn And the font id should be 4nn Scenario: List fonts returns built-in registryn Given a Pixoo at IP \"192.168.0.37\"n And I connectn When I list built-in fontsn Then the font list should include \"mini\n\n  Scenario: Upload sequence with overlays sends overlays after upload\n    Given a Pixoo at IP \"192.168.0.37\"\n    And I connect\n    And a native GIF sequence with 1 frames and speed 100ms\n    When I upload the native sequence with 2 overlays\n    Then the overlays should be sent after the upload",
+      "created_at": "2026-03-02T18:11:18.995214Z"
+    },
+    {
+      "id": "c6dc4164-7879-4d47-9a61-646e8fe6f161",
+      "author": "unknown",
+      "text": "Closing as obsolete per user request during board cleanup.",
+      "created_at": "2026-03-03T01:06:59.264216Z"
+    }
+  ],
+  "created_at": "2026-03-02T18:11:12.060804Z",
+  "updated_at": "2026-03-03T01:06:59.355639Z",
+  "closed_at": "2026-03-03T01:06:59.355639Z",
+  "custom": {}
+}

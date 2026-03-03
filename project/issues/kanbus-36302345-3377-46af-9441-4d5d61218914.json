@@ -3,7 +3,7 @@
   "title": "Update demos/docs for native GIF paths",
   "description": "Update README and demos to reflect V2 native GIF upload/playback usage patterns.",
   "type": "task",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
@@ -94,10 +94,16 @@
       "author": "ryan.porter",
       "text": "Implemented fine-grained clock color controls + face fade.\n\nClock component changes (`storybook-app/src/components/Clock.tsx`):\n- Added props: `hourHandColor`, `minuteHandColor`, `topMarkerColor`, `faceFade`.\n- Preserved back-compat `handColor` fallback:\n  - `hourStroke = hourHandColor ?? handColor ?? \"white\"`\n  - `minuteStroke = minuteHandColor ?? handColor ?? \"white\"`\n- Top marker override applies only at marker index 0 (12 o'clock) for both dot and tick modes.\n- Added `<g opacity={faceFade}>` wrapper over markers + hands only (background unchanged).\n- Clamps `faceFade` to `[0,1]`.\n\nRealtime demo changes (`demos/clock_realtime.py`):\n- Added CLI args: `--hour-hand-color`, `--minute-hand-color`, `--top-marker-color`, `--fade`.\n- Extended Storybook arg mapping with `hourHandColor`, `minuteHandColor`, `topMarkerColor`, `faceFade`.\n- Kept `--hands-color` as legacy fallback.\n- Updated defaults to requested profile:\n  - marker ring: `rgba(255,0,255,0.5)`\n  - top marker: `rgba(255,0,255,0.3)`\n  - hour hand: `rgba(242,232,255,0.6)`\n  - minute hand: `rgba(242,232,255,0.5)`\n  - fade default: `100` (maps to `1.0`)\n\nStorybook stories/docs:\n- Added Storybook controls for new props in `Clock.stories.tsx`.\n- Updated `demos/README.md` examples and notes for fade/color controls.\n\nValidation:\n- `python demos/clock_realtime.py --help`\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- `cd storybook-app && npm run build-storybook` (success)\n- Live run check: `python demos/clock_realtime.py --fade 20 --fps 1 --no-second-hand --delivery push` (connected, rendered, pushed frames)\n",
       "created_at": "2026-03-02T14:01:09.971163Z"
+    },
+    {
+      "id": "7d3376d6-c0fc-42bf-ba94-3dfc4cb41db0",
+      "author": "unknown",
+      "text": "Closing per user request. Demo/doc updates for native GIF paths covered by recent clock/demo/README updates noted in issue history.",
+      "created_at": "2026-03-03T00:19:44.585402Z"
     }
   ],
   "created_at": "2026-03-02T05:31:05.543299Z",
-  "updated_at": "2026-03-02T14:01:09.971163Z",
-  "closed_at": null,
+  "updated_at": "2026-03-03T00:19:49.943465Z",
+  "closed_at": "2026-03-03T00:19:49.943465Z",
   "custom": {}
 }

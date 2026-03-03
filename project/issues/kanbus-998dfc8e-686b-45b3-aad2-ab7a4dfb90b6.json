@@ -3,16 +3,23 @@
   "title": "PyPixoo image and animation platform",
   "description": "",
   "type": "initiative",
-  "status": "open",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
   "parent": null,
   "labels": [],
   "dependencies": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "078eb80b-d5b3-4a41-a592-5cb5dbbe64d8",
+      "author": "unknown",
+      "text": "Closing as obsolete per user request during board cleanup.",
+      "created_at": "2026-03-03T01:06:58.932262Z"
+    }
+  ],
   "created_at": "2026-03-01T05:42:08.806782Z",
-  "updated_at": "2026-03-01T05:42:08.806782Z",
-  "closed_at": null,
+  "updated_at": "2026-03-03T01:06:59.022087Z",
+  "closed_at": "2026-03-03T01:06:59.022087Z",
   "custom": {}
 }

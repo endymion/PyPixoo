@@ -9,3 +9,5 @@ htmlcov/
 project/.cache/
 docs/_build/
 docs/api/showdoc/
+.env
+.run/

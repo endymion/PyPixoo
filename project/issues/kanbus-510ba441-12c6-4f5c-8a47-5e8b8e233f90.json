@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-510ba441-12c6-4f5c-8a47-5e8b8e233f90",
+  "title": "Acceptance test: black_band_opaque.py",
+  "description": "",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-03T01:07:09.705200Z",
+  "updated_at": "2026-03-03T01:07:09.705200Z",
+  "closed_at": null,
+  "custom": {}
+}

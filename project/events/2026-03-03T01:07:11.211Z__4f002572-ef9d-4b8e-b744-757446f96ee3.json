@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "4f002572-ef9d-4b8e-b744-757446f96ee3",
+  "issue_id": "kanbus-189e5435-06a2-435c-94c4-08196a4e94b5",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T01:07:11.211Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: screen_test.py"
+  }
+}

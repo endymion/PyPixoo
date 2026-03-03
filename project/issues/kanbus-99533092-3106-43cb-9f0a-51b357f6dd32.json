@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+  "title": "Acceptance testing: demo checklist",
+  "description": "",
+  "type": "epic",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-3d5fad38-0d29-41f5-8343-516651325e7f",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-03T01:07:06.555238Z",
+  "updated_at": "2026-03-03T01:07:06.555238Z",
+  "closed_at": null,
+  "custom": {}
+}

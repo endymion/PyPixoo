@@ -1,0 +1,55 @@
+{
+  "id": "kanbus-d33feb55-bcc3-4d03-9fab-0a27a00aeba2",
+  "title": "Acceptance test: black_band_chained.py",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "5fbe85d7-9689-4956-910b-a69a88ca2f65",
+      "author": "unknown",
+      "text": "Starting manual acceptance test on real device: running demos/black_band_chained.py and validating expected chained sequence behavior.",
+      "created_at": "2026-03-03T01:08:14.650915Z"
+    },
+    {
+      "id": "7389fb04-ae82-4c66-a62a-bcc38edc65e0",
+      "author": "unknown",
+      "text": "Test result: FAILED immediately. Running  raises . Demo still depends on legacy AnimationPlayer/AnimationSequence API and is not executable on current V2 package.",
+      "created_at": "2026-03-03T01:08:28.540565Z"
+    },
+    {
+      "id": "59dda94e-140d-4be3-808c-406d09c0fbc8",
+      "author": "unknown",
+      "text": "Clean result summary: FAILED. Command  fails on startup with .",
+      "created_at": "2026-03-03T01:08:32.153536Z"
+    },
+    {
+      "id": "12da14eb-ecc1-4c68-9fa7-b923ae475af0",
+      "author": "unknown",
+      "text": "Clean result summary: FAILED. Running demos/black_band_chained.py fails on startup with missing module pypixoo.animation. The demo depends on legacy AnimationPlayer/AnimationSequence API.",
+      "created_at": "2026-03-03T01:08:36.055979Z"
+    },
+    {
+      "id": "f1188d44-d2ab-4b58-984b-4891fc167bd0",
+      "author": "unknown",
+      "text": "Status update: task is active (in_progress). Failure captured and linked bug opened: kanbus-4c8cd0. Next action is fixing that bug, then re-running this acceptance test.",
+      "created_at": "2026-03-03T01:39:19.601848Z"
+    },
+    {
+      "id": "026da406-5a06-44dc-994d-e2fca51d4538",
+      "author": "unknown",
+      "text": "Acceptance test PASSED after bug fix. Ran demos/black_band_chained.py on device; observed chained loop start and clean stop on Ctrl+C.",
+      "created_at": "2026-03-03T01:47:57.275870Z"
+    }
+  ],
+  "created_at": "2026-03-03T01:07:09.589647Z",
+  "updated_at": "2026-03-03T01:47:57.365100Z",
+  "closed_at": "2026-03-03T01:47:57.365100Z",
+  "custom": {}
+}

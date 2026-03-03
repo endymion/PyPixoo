@@ -1,0 +1,25 @@
+{
+  "id": "kanbus-d74e5514-eacc-4fd1-afd8-a2e249c6b0f7",
+  "title": "Phase 1: fonts and overlays implementation",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-813595c0-31b1-4eb4-bb9c-43e179b302fe",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "23fb25d1-d2da-4669-b621-9882b81d9278",
+      "author": "unknown",
+      "text": "Implemented built-in font registry, overlay sequencing API, new text.feature + steps, and tests for overlays/font listing.",
+      "created_at": "2026-03-02T18:28:21.110985Z"
+    }
+  ],
+  "created_at": "2026-03-02T18:11:01.745559Z",
+  "updated_at": "2026-03-02T18:28:24.006422Z",
+  "closed_at": "2026-03-02T18:28:24.006422Z",
+  "custom": {}
+}

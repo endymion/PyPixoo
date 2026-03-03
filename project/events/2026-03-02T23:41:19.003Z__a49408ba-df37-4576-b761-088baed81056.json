@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "a49408ba-df37-4576-b761-088baed81056",
+  "issue_id": "kanbus-a968e77f-6814-45cb-b4a7-9af48989f13a",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T23:41:19.003Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-813595c0-31b1-4eb4-bb9c-43e179b302fe",
+    "priority": 2,
+    "status": "open",
+    "title": "Sphinx documentation setup"
+  }
+}

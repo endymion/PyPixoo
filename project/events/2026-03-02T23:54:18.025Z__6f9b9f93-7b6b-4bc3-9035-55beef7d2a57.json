@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "6f9b9f93-7b6b-4bc3-9035-55beef7d2a57",
+  "issue_id": "kanbus-af0457a8-c7ca-4d41-a906-a171e55eb38d",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T23:54:18.025Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-813595c0-31b1-4eb4-bb9c-43e179b302fe",
+    "priority": 2,
+    "status": "open",
+    "title": "Remove PIXOO_REAL_DEVICE gating"
+  }
+}

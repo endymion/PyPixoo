@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "1eb56c5e-2b27-4039-a5df-6322d889fa55",
+  "issue_id": "kanbus-8f7830a4-6eac-4473-a58f-652ee965d687",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T01:07:09.921Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: browser_mixed.py"
+  }
+}

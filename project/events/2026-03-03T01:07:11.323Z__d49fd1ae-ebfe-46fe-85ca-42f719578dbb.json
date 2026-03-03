@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "d49fd1ae-ebfe-46fe-85ca-42f719578dbb",
+  "issue_id": "kanbus-76c7449a-407a-45e7-9ec0-b3655bbf9e7c",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T01:07:11.323Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: single_pixel_test.py"
+  }
+}

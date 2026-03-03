@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "3de0303f-f0de-45e3-941a-037dcfe4efb4",
+  "issue_id": "kanbus-0b7b5bfd-6fd3-45a0-b8a7-45345db44dcd",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T18:10:55.640Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-813595c0-31b1-4eb4-bb9c-43e179b302fe",
+    "priority": 2,
+    "status": "open",
+    "title": "ShowDoc export tooling"
+  }
+}

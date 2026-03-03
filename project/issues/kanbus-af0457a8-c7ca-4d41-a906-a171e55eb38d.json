@@ -1,0 +1,25 @@
+{
+  "id": "kanbus-af0457a8-c7ca-4d41-a906-a171e55eb38d",
+  "title": "Remove PIXOO_REAL_DEVICE gating",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-813595c0-31b1-4eb4-bb9c-43e179b302fe",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "99babf2d-94f1-453a-846b-9a9de41c0595",
+      "author": "unknown",
+      "text": "Removed PIXOO_REAL_DEVICE gating across demos/tests/docs. Real-device selection now relies on @real_device tag in Behave; demos no longer set env var. Tests not run.",
+      "created_at": "2026-03-02T23:59:09.988264Z"
+    }
+  ],
+  "created_at": "2026-03-02T23:54:18.025190Z",
+  "updated_at": "2026-03-02T23:59:12.227093Z",
+  "closed_at": "2026-03-02T23:59:12.227093Z",
+  "custom": {}
+}

@@ -1,0 +1,25 @@
+{
+  "id": "kanbus-1287f3e7-3cce-4a5c-a87e-1da9a2a0b685",
+  "title": "API command matrix generator",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-813595c0-31b1-4eb4-bb9c-43e179b302fe",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "b46f4d2f-a5bc-4b67-807e-44aafee67834",
+      "author": "unknown",
+      "text": "Added command matrix builder and generated docs/api/command_matrix.md from ShowDoc export.",
+      "created_at": "2026-03-02T18:28:14.421112Z"
+    }
+  ],
+  "created_at": "2026-03-02T18:10:59.132625Z",
+  "updated_at": "2026-03-02T18:28:18.112359Z",
+  "closed_at": "2026-03-02T18:28:18.112359Z",
+  "custom": {}
+}

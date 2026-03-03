@@ -1,0 +1,25 @@
+{
+  "id": "kanbus-a391de97-7ac3-4621-b524-7d39538e8c6f",
+  "title": "Docstring expansion for device/web paths",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-813595c0-31b1-4eb4-bb9c-43e179b302fe",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "21229b1c-5d0c-4bd1-aaa8-bc69afd2d9dd",
+      "author": "unknown",
+      "text": "Expanded docstrings in pixoo/native/fonts/browser to explain device vs client paths, overlays, and font distinctions.",
+      "created_at": "2026-03-02T23:41:51.149333Z"
+    }
+  ],
+  "created_at": "2026-03-02T23:41:22.885226Z",
+  "updated_at": "2026-03-02T23:41:55.534363Z",
+  "closed_at": "2026-03-02T23:41:55.534363Z",
+  "custom": {}
+}

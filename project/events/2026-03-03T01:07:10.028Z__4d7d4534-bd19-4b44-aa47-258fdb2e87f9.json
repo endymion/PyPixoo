@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "4d7d4534-bd19-4b44-aa47-258fdb2e87f9",
+  "issue_id": "kanbus-cc38e836-3e4f-4dab-90b8-45e74cd98d49",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T01:07:10.028Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: clock_realtime.py"
+  }
+}

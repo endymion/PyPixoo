@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "f14f1ac2-5087-4155-9838-1ee34a6696a9",
+  "issue_id": "kanbus-7b15e550-a137-4572-a6f9-8c4404b6f581",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T00:00:02.710Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-813595c0-31b1-4eb4-bb9c-43e179b302fe",
+    "priority": 2,
+    "status": "open",
+    "title": "Implement CLI dotenv support"
+  }
+}

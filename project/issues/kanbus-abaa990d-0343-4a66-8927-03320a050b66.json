@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-abaa990d-0343-4a66-8927-03320a050b66",
+  "title": "Acceptance test: stripe_pattern_test.py",
+  "description": "",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-03T01:07:11.542982Z",
+  "updated_at": "2026-03-03T01:07:11.542982Z",
+  "closed_at": null,
+  "custom": {}
+}

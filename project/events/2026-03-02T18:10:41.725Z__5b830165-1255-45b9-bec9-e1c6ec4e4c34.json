@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "5b830165-1255-45b9-bec9-e1c6ec4e4c34",
+  "issue_id": "kanbus-813595c0-31b1-4eb4-bb9c-43e179b302fe",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-02T18:10:41.725Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": "kanbus-998dfc8e-686b-45b3-aad2-ab7a4dfb90b6",
+    "priority": 2,
+    "status": "open",
+    "title": "API parity with official docs"
+  }
+}

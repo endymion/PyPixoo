@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "d8e6228d-976a-4651-8631-f6e24f9adc22",
+  "issue_id": "kanbus-ce049741-fbf8-42d9-9d46-86e8e017cc62",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T01:07:10.771Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: demo_weather.py"
+  }
+}

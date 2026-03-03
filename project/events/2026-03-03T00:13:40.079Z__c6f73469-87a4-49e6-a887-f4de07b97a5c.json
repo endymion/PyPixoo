@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "c6f73469-87a4-49e6-a887-f4de07b97a5c",
+  "issue_id": "kanbus-1f99751c-9f77-4a03-86e5-8b426b778038",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T00:13:40.079Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-813595c0-31b1-4eb4-bb9c-43e179b302fe",
+    "priority": 2,
+    "status": "open",
+    "title": "Demos use PIXOO_DEVICE_IP"
+  }
+}
