@@ -3,7 +3,7 @@
   "title": "Consolidate clock demos into unified pixooclock",
   "description": "Create one unified smooth clock entrypoint named pixooclock with face selection, second-hand toggle (default on), anti-aliasing toggle (default off), full color options, and existing face variants.",
   "type": "task",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 1,
   "assignee": null,
   "creator": null,
@@ -79,7 +79,7 @@
     }
   ],
   "created_at": "2026-03-03T04:39:19.938162Z",
-  "updated_at": "2026-03-03T05:04:58.272068Z",
-  "closed_at": null,
+  "updated_at": "2026-03-03T05:11:59.024114Z",
+  "closed_at": "2026-03-03T05:11:59.024114Z",
   "custom": {}
 }

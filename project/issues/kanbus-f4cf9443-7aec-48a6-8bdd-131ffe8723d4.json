@@ -3,7 +3,7 @@
   "title": "Clock palette tweak: dark Radix purple scale",
   "description": "Set three-hand clock default colors to dark-mode Radix purple tokens: top marker purple10, markers purple7, hour purple9, minute purple7, second purple5.",
   "type": "task",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
@@ -34,10 +34,16 @@
       "author": "unknown",
       "text": "Applied minute-hand motion visibility tweak: added sub-pixel minute-tip accent so minute progression is visible at 1-second cadence on the 64x64 grid. Restarted live demo for validation.",
       "created_at": "2026-03-03T04:32:00.869311Z"
+    },
+    {
+      "id": "dd29efbd-4d16-4f6b-a72f-75da791b278c",
+      "author": "unknown",
+      "text": "Superseded by unified pixooclock implementation and now included in committed defaults/face-band system.",
+      "created_at": "2026-03-03T05:12:05.935533Z"
     }
   ],
   "created_at": "2026-03-03T04:26:27.540670Z",
-  "updated_at": "2026-03-03T04:32:00.869311Z",
-  "closed_at": null,
+  "updated_at": "2026-03-03T05:12:06.034460Z",
+  "closed_at": "2026-03-03T05:12:06.034460Z",
   "custom": {}
 }
