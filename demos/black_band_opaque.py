@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 from PIL import Image
 
-from pypixoo import CycleItem, GifFrame, GifSequence, Pixoo, UploadMode
+from pypixoo import GifFrame, GifSequence, Pixoo, UploadMode
 from pypixoo.buffer import Buffer
 
 load_dotenv()
@@ -50,11 +50,7 @@ def main():
     try:
         if not pixoo.connect():
             raise RuntimeError("Failed to connect to Pixoo")
-        handle = pixoo.start_cycle(
-            [CycleItem(sequence=sequence, upload_mode=UploadMode.COMMAND_LIST, chunk_size=40)],
-            loop=1,
-        )
-        handle.wait(10.0)
+        pixoo.upload_sequence(sequence, mode=UploadMode.FRAME_BY_FRAME, chunk_size=1)
         print("Done (opaque)")
     finally:
         pixoo.close()

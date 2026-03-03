@@ -652,6 +652,20 @@ def render_clock_frame(ts: float, style: ClockStyle) -> Buffer:
             anti_aliasing=style.anti_aliasing,
         )
 
+    # Keep the Movado-style top dot visible in dot12 mode by rendering it
+    # above hands.
+    if style.face == "dot12":
+        top_angle = -math.pi / 2.0
+        tx, ty = _point_on_angle(top_angle, style.marker_outer_radius)
+        _draw_dot(
+            data,
+            tx,
+            ty,
+            max(1, style.top_marker_thickness),
+            style.top_marker_color,
+            style.dot_anti_aliasing,
+        )
+
     # Tip accents ensure both hour and minute hands visibly progress each
     # second on a 64x64 grid, even when integer endpoints would look static.
     _draw_subpixel_dot(data, hour_tip_x, hour_tip_y, style.hour_hand_color, strength=1.4)
@@ -968,7 +982,7 @@ def _run_push_demo(
     interval = 1.0 / adaptive_fps
     next_tick = time.time()
     frame_index = 0
-    bands = (args.band,) if args.band else tuple(args.demo_bands)
+    bands = tuple(args.demo_bands)
     variants = _demo_variants(base_style, bands=bands)
     demo_hold = max(0.5, args.demo_interval_seconds)
     variant_index = 0

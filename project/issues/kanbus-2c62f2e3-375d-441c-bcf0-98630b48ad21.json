@@ -76,10 +76,28 @@
       "author": "unknown",
       "text": "Made dot anti-aliasing default (parser default true), updated README default preset text, updated parser-default test assertion, and relaunched pixooclock with no args to verify live default behavior.",
       "created_at": "2026-03-03T05:04:58.272068Z"
+    },
+    {
+      "id": "7cf3573b-7852-41b3-b384-f7ac1bdbe4c0",
+      "author": "unknown",
+      "text": "Starting full manual acceptance sweep: running pixooclock in --demo mode across all bands/faces/toggles for visual verification.",
+      "created_at": "2026-03-03T05:16:16.573091Z"
+    },
+    {
+      "id": "5725089d-f330-4eac-a4e0-0120c3f7ce26",
+      "author": "unknown",
+      "text": "Adjusted demo sweep behavior so --demo uses --demo-bands regardless of default band preset; restarted full sweep now showing 744 variations (31 bands x 6 faces x second-hand x anti-aliasing).",
+      "created_at": "2026-03-03T05:17:03.455650Z"
+    },
+    {
+      "id": "a240be43-4281-4a4a-a125-82c4743c0c19",
+      "author": "unknown",
+      "text": "Moving on from clock: starting manual acceptance for next demo group beginning with demo_upload_sequence.py.",
+      "created_at": "2026-03-03T05:19:26.874495Z"
     }
   ],
   "created_at": "2026-03-03T04:39:19.938162Z",
-  "updated_at": "2026-03-03T05:11:59.024114Z",
+  "updated_at": "2026-03-03T05:19:26.874495Z",
   "closed_at": "2026-03-03T05:11:59.024114Z",
   "custom": {}
 }

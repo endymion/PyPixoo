@@ -10,7 +10,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from pypixoo import CycleItem, GifFrame, GifSequence, Pixoo, UploadMode
+from pypixoo import GifFrame, GifSequence, Pixoo, UploadMode
 from pypixoo.buffer import Buffer
 
 load_dotenv()
@@ -50,13 +50,7 @@ def main():
     try:
         if not pixoo.connect():
             raise RuntimeError("Failed to connect to Pixoo")
-        handle = pixoo.start_cycle(
-            [CycleItem(sequence=sequence, upload_mode=UploadMode.COMMAND_LIST, chunk_size=40)],
-            loop=1,
-        )
-        if not handle.wait(30.0):
-            handle.stop()
-            handle.wait(2.0)
+        pixoo.upload_sequence(sequence, mode=UploadMode.FRAME_BY_FRAME, chunk_size=1)
         print("Done (transparent blend)")
     finally:
         pixoo.close()

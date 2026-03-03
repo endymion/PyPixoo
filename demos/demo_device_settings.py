@@ -27,15 +27,33 @@ def main() -> None:
     if not pixoo.connect():
         raise SystemExit("Failed to connect")
 
-    pixoo.set_brightness(50)
-    time.sleep(1)
-    pixoo.set_screen_on(True)
-    time.sleep(1)
-    pixoo.set_screen_rotation(1)
-    time.sleep(1)
-    pixoo.set_mirror_mode(1)
-    time.sleep(1)
-    pixoo.set_time_24_flag(1)
+    original_rotation = 0
+    original_mirror = 0
+    try:
+        conf = pixoo.get_all_conf()
+        if isinstance(conf.get("ScreenRotationAngle"), int):
+            original_rotation = int(conf["ScreenRotationAngle"])
+        if isinstance(conf.get("MirrorMode"), int):
+            original_mirror = int(conf["MirrorMode"])
+    except Exception:
+        # Keep safe defaults if config keys are unavailable on a firmware variant.
+        pass
+
+    try:
+        pixoo.set_brightness(50)
+        time.sleep(1)
+        pixoo.set_screen_on(True)
+        time.sleep(1)
+        pixoo.set_screen_rotation(1)
+        time.sleep(1)
+        pixoo.set_mirror_mode(1)
+        time.sleep(1)
+        pixoo.set_time_24_flag(1)
+    finally:
+        # Prevent this demo from leaving the device in a rotated/mirrored state.
+        pixoo.set_screen_rotation(original_rotation)
+        pixoo.set_mirror_mode(original_mirror)
+        pixoo.close()
 
 
 if __name__ == "__main__":
