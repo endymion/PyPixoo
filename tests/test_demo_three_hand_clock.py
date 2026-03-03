@@ -180,7 +180,10 @@ def test_parser_rejects_invalid_numeric_values():
     args = parser.parse_args([])
     assert args.delivery == "push"
     assert args.face == "dot12"
-    assert args.band == "sand"
+    assert args.band == "auto"
+    assert args.day_band == "sand"
+    assert args.night_band == "bronze"
+    assert args.sun_check_seconds == pytest.approx(60.0)
     assert args.second_hand is False
     assert args.anti_aliasing is True
     assert args.dot_anti_aliasing is True
@@ -232,6 +235,49 @@ def test_band_defaults_apply_expected_intensity_slots():
     assert style.minute_hand_color == clock_demo.parse_color("dark.tomato7")
     assert style.second_hand_color == clock_demo.parse_color("dark.tomato5")
     assert style.center_color == clock_demo.parse_color("dark.tomato5")
+
+
+def test_style_from_args_is_pure_for_adaptive_band_selection():
+    parser = clock_demo.build_parser(ip_default="192.168.0.37")
+    args = parser.parse_args(["--band", "auto", "--day-band", "sand", "--night-band", "bronze"])
+
+    day_style = clock_demo._style_from_args(args, effective_band="sand")
+    night_style = clock_demo._style_from_args(args, effective_band="bronze")
+
+    assert args.band == "auto"
+    assert args.day_band == "sand"
+    assert args.night_band == "bronze"
+    assert day_style.band == "sand"
+    assert night_style.band == "bronze"
+
+
+def test_maybe_refresh_adaptive_style_switches_band(monkeypatch):
+    parser = clock_demo.build_parser(ip_default="192.168.0.37")
+    args = parser.parse_args(["--band", "auto", "--day-band", "sand", "--night-band", "bronze"])
+    style = clock_demo._style_from_args(args, effective_band="sand")
+    state = clock_demo.AdaptivePaletteState(
+        enabled=True,
+        day_band="sand",
+        night_band="bronze",
+        location=None,
+        hemisphere="north",
+        current_band="sand",
+        last_check_epoch=0.0,
+    )
+
+    decision = clock_demo.BandDecision(
+        band="bronze",
+        source="tz_seasonal",
+        sunrise=None,
+        sunset=None,
+    )
+    monkeypatch.setattr(clock_demo, "resolve_effective_band", lambda **kwargs: decision)
+    monkeypatch.setattr(clock_demo.time, "time", lambda: 10_000.0)
+    monkeypatch.setattr(clock_demo, "_log", lambda msg: None)
+
+    refreshed = clock_demo._maybe_refresh_adaptive_style(args, style, state)
+    assert refreshed.band == "bronze"
+    assert state.current_band == "bronze"
 
 
 def test_demo_variants_cover_bands_faces_and_toggles():

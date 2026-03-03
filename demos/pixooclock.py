@@ -21,13 +21,20 @@ import re
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Sequence
+from typing import Optional, Sequence
 
 import requests
 from dotenv import load_dotenv
 
 from pypixoo import GifFrame, GifSequence, Pixoo, UploadMode
 from pypixoo.buffer import Buffer
+from pypixoo.clock_palette import (
+    BandDecision,
+    GeoLocation,
+    resolve_effective_band,
+    resolve_hemisphere,
+    resolve_location,
+)
 from pypixoo.color import list_radix_tokens, parse_color
 
 load_dotenv()
@@ -82,6 +89,20 @@ class ClockStyle:
     dot_anti_aliasing: bool
 
 
+@dataclass
+class AdaptivePaletteState:
+    enabled: bool
+    day_band: str
+    night_band: str
+    location: Optional[GeoLocation]
+    hemisphere: str
+    current_band: str
+    last_check_epoch: float = 0.0
+    last_source: str = "explicit"
+    last_sunrise: Optional[datetime] = None
+    last_sunset: Optional[datetime] = None
+
+
 def _positive_int(value: str) -> int:
     parsed = int(value)
     if parsed <= 0:
@@ -128,6 +149,13 @@ def _parse_band_arg(value: str) -> str:
             f"unknown Radix dark band '{value}' (valid: {', '.join(ALL_DARK_BANDS)})"
         )
     return band
+
+
+def _parse_band_or_auto_arg(value: str) -> str:
+    normalized = value.strip().lower().replace("-", "").replace("_", "")
+    if normalized == "auto":
+        return "auto"
+    return _parse_band_arg(value)
 
 
 def _parse_band_list_arg(value: str) -> tuple[str, ...]:
@@ -213,9 +241,39 @@ def build_parser(ip_default: str = DEFAULT_IP) -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--band",
+        type=_parse_band_or_auto_arg,
+        default="auto",
+        help="Clock color band: 'auto' (day/night adaptive) or an explicit Radix dark band",
+    )
+    parser.add_argument(
+        "--day-band",
         type=_parse_band_arg,
         default="sand",
-        help="Apply Radix dark color band to marker/hands/center (example: purple, tomato)",
+        help="Band used during daytime when --band auto",
+    )
+    parser.add_argument(
+        "--night-band",
+        type=_parse_band_arg,
+        default="bronze",
+        help="Band used during nighttime when --band auto",
+    )
+    parser.add_argument(
+        "--latitude",
+        type=float,
+        default=None,
+        help="Optional latitude override for adaptive day/night calculation",
+    )
+    parser.add_argument(
+        "--longitude",
+        type=float,
+        default=None,
+        help="Optional longitude override for adaptive day/night calculation",
+    )
+    parser.add_argument(
+        "--sun-check-seconds",
+        type=_positive_float,
+        default=60.0,
+        help="Adaptive band re-check cadence in seconds",
     )
     parser.add_argument(
         "--second-hand",
@@ -259,9 +317,19 @@ def build_parser(ip_default: str = DEFAULT_IP) -> argparse.ArgumentParser:
     return parser
 
 
-def _apply_band_defaults(args: argparse.Namespace) -> None:
-    if not args.band:
-        return
+def _resolved_band_colors(
+    args: argparse.Namespace,
+    effective_band: str,
+) -> tuple[tuple[int, int, int], tuple[int, int, int], tuple[int, int, int], tuple[int, int, int], tuple[int, int, int], tuple[int, int, int]]:
+    marker = args.marker_color
+    top_marker = args.top_marker_color
+    hour = args.hour_hand_color
+    minute = args.minute_hand_color
+    second = args.second_hand_color
+    center = args.center_color
+
+    if not effective_band:
+        return marker, top_marker, hour, minute, second, center
 
     # Band colors only replace values still on defaults so explicit color args
     # always win.
@@ -273,22 +341,37 @@ def _apply_band_defaults(args: argparse.Namespace) -> None:
         ("second_hand_color", DEFAULT_SECOND_HAND_COLOR, 5),
         ("center_color", DEFAULT_CENTER_COLOR, 5),
     )
-    for attr, default_value, level in band_levels:
-        if getattr(args, attr) != default_value:
-            continue
-        setattr(args, attr, parse_color(f"dark.{args.band}{level}"))
+    replacements = {
+        attr: parse_color(f"dark.{effective_band}{level}")
+        for attr, _, level in band_levels
+    }
+
+    if marker == DEFAULT_MARKER_COLOR:
+        marker = replacements["marker_color"]
+    if top_marker == DEFAULT_TOP_MARKER_COLOR:
+        top_marker = replacements["top_marker_color"]
+    if hour == DEFAULT_HOUR_HAND_COLOR:
+        hour = replacements["hour_hand_color"]
+    if minute == DEFAULT_MINUTE_HAND_COLOR:
+        minute = replacements["minute_hand_color"]
+    if second == DEFAULT_SECOND_HAND_COLOR:
+        second = replacements["second_hand_color"]
+    if center == DEFAULT_CENTER_COLOR:
+        center = replacements["center_color"]
+    return marker, top_marker, hour, minute, second, center
 
 
-def _style_from_args(args: argparse.Namespace) -> ClockStyle:
-    _apply_band_defaults(args)
+def _style_from_args(args: argparse.Namespace, *, effective_band: Optional[str] = None) -> ClockStyle:
+    band = effective_band or (args.band if args.band != "auto" else args.day_band)
+    marker, top_marker, hour, minute, second, center = _resolved_band_colors(args, band)
     return ClockStyle(
         dial_color=args.dial_color,
-        marker_color=args.marker_color,
-        top_marker_color=args.top_marker_color,
-        hour_hand_color=args.hour_hand_color,
-        minute_hand_color=args.minute_hand_color,
-        second_hand_color=args.second_hand_color,
-        center_color=args.center_color,
+        marker_color=marker,
+        top_marker_color=top_marker,
+        hour_hand_color=hour,
+        minute_hand_color=minute,
+        second_hand_color=second,
+        center_color=center,
         hour_length=min(args.hour_length, 30),
         minute_length=min(args.minute_length, 30),
         second_length=min(args.second_length, 30),
@@ -302,7 +385,7 @@ def _style_from_args(args: argparse.Namespace) -> ClockStyle:
         second_thickness=args.second_thickness,
         center_radius=max(0, min(args.center_radius, 8)),
         face=args.face,
-        band=args.band or "custom",
+        band=band or "custom",
         second_hand=args.second_hand,
         anti_aliasing=args.anti_aliasing,
         dot_anti_aliasing=args.dot_anti_aliasing,
@@ -810,6 +893,96 @@ def _log(msg: str) -> None:
     print(f"{datetime.now().strftime('%H:%M:%S')} {msg}", flush=True)
 
 
+def _decision_window_text(decision: BandDecision) -> str:
+    if decision.sunrise is None or decision.sunset is None:
+        return "window=unknown"
+    return (
+        f"window={decision.sunrise.strftime('%H:%M')}.."
+        f"{decision.sunset.strftime('%H:%M')}"
+    )
+
+
+def _build_adaptive_state(args: argparse.Namespace) -> tuple[ClockStyle, Optional[AdaptivePaletteState]]:
+    if args.band != "auto":
+        return _style_from_args(args, effective_band=args.band), None
+
+    now_local = datetime.now().astimezone()
+    tz_name = getattr(now_local.tzinfo, "key", None) or str(now_local.tzinfo)
+    location = resolve_location(
+        latitude=args.latitude,
+        longitude=args.longitude,
+        env=os.environ,
+    )
+    hemisphere = resolve_hemisphere(
+        tz_name=tz_name,
+        env_override=os.environ.get("PIXOO_HEMISPHERE"),
+    )
+    decision = resolve_effective_band(
+        local_now=now_local,
+        band_mode="auto",
+        day_band=args.day_band,
+        night_band=args.night_band,
+        location=location,
+        hemisphere=hemisphere,
+    )
+    style = _style_from_args(args, effective_band=decision.band)
+    state = AdaptivePaletteState(
+        enabled=True,
+        day_band=args.day_band,
+        night_band=args.night_band,
+        location=location,
+        hemisphere=hemisphere,
+        current_band=decision.band,
+        last_check_epoch=time.time(),
+        last_source=decision.source,
+        last_sunrise=decision.sunrise,
+        last_sunset=decision.sunset,
+    )
+    location_source = location.source if location is not None else "tz_fallback"
+    _log(
+        "adaptive palette enabled: "
+        f"source={decision.source} location={location_source} "
+        f"band={decision.band} {_decision_window_text(decision)}"
+    )
+    return style, state
+
+
+def _maybe_refresh_adaptive_style(
+    args: argparse.Namespace,
+    style: ClockStyle,
+    state: Optional[AdaptivePaletteState],
+) -> ClockStyle:
+    if state is None or not state.enabled:
+        return style
+    now_epoch = time.time()
+    if now_epoch - state.last_check_epoch < args.sun_check_seconds:
+        return style
+
+    now_local = datetime.now().astimezone()
+    decision = resolve_effective_band(
+        local_now=now_local,
+        band_mode="auto",
+        day_band=state.day_band,
+        night_band=state.night_band,
+        location=state.location,
+        hemisphere=state.hemisphere,
+    )
+    state.last_check_epoch = now_epoch
+    state.last_source = decision.source
+    state.last_sunrise = decision.sunrise
+    state.last_sunset = decision.sunset
+    if decision.band == state.current_band:
+        return style
+
+    old_band = state.current_band
+    state.current_band = decision.band
+    _log(
+        f"Adaptive band change: {old_band} -> {decision.band} "
+        f"(source={decision.source}, {_decision_window_text(decision)})"
+    )
+    return _style_from_args(args, effective_band=decision.band)
+
+
 def _band_palette(band: str) -> tuple[tuple[int, int, int], tuple[int, int, int], tuple[int, int, int], tuple[int, int, int], tuple[int, int, int], tuple[int, int, int]]:
     return (
         DEFAULT_DIAL_COLOR,
@@ -883,7 +1056,7 @@ def _demo_variants(base_style: ClockStyle, bands: Sequence[str]) -> list[ClockSt
 
 
 def run(args: argparse.Namespace) -> None:
-    style = _style_from_args(args)
+    style, adaptive_state = _build_adaptive_state(args)
     requested_fps = max(1, args.fps)
     adaptive_fps = requested_fps
     segment_seconds = args.segment_seconds
@@ -917,17 +1090,20 @@ def run(args: argparse.Namespace) -> None:
         _log("Clock should show continuously advancing time with smooth hand movement.")
 
         if args.demo:
+            if args.band == "auto":
+                _log("--demo bypasses adaptive palette switching and uses demo band cycling.")
             _run_push_demo(pixoo, args, style, requested_fps)
             return
 
         if args.delivery == "push":
-            _run_push_clock(pixoo, args, style, requested_fps)
+            _run_push_clock(pixoo, args, style, requested_fps, adaptive_state)
             return
 
         segment_index = 0
         next_start = aligned_segment_start(time.time(), segment_seconds)
 
         while True:
+            style = _maybe_refresh_adaptive_style(args, style, adaptive_state)
             now = time.time()
             if next_start <= now:
                 missed = int((now - next_start) // segment_seconds) + 1
@@ -995,6 +1171,7 @@ def _run_push_clock(
     args: argparse.Namespace,
     style: ClockStyle,
     requested_fps: int,
+    adaptive_state: Optional[AdaptivePaletteState],
 ) -> None:
     adaptive_fps = requested_fps
     interval = 1.0 / adaptive_fps
@@ -1007,6 +1184,7 @@ def _run_push_clock(
     _log("delivery=push: no per-segment upload swap; avoids device loading overlay.")
 
     while True:
+        style = _maybe_refresh_adaptive_style(args, style, adaptive_state)
         now = time.time()
         if args.sync_utc and now >= next_resync_at:
             _call_with_recovery(

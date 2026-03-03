@@ -56,12 +56,14 @@ python demos/demo_sequence_switching.py --mode live
 
 # Unified smooth clock demo
 # `pixooclock` is the canonical clock script; demo_three_hand_clock.py is a compatibility wrapper.
-# Default preset is user-validated: face=dot12, band=sand, hand AA on, dot AA on, second hand off.
+# Default preset is adaptive: face=dot12, band=auto, day=sand, night=bronze, hand AA on, dot AA on, second hand off.
 python demos/pixooclock.py
 python demos/pixooclock.py --face default --second-hand --no-anti-aliasing
 python demos/pixooclock.py --band tomato
 python demos/pixooclock.py --face ticks_all_thick_quarters --anti-aliasing
 python demos/pixooclock.py --face dot12 --band sand --dot-anti-aliasing
+python demos/pixooclock.py --band auto --day-band sand --night-band bronze
+python demos/pixooclock.py --latitude 40.7484 --longitude -73.9857
 python demos/pixooclock.py --once --fps 4 --segment-seconds 10
 python demos/pixooclock.py --delivery stitched --fps 4 --segment-seconds 10
 
@@ -77,6 +79,7 @@ python demos/pixooclock.py --demo --demo-bands tomato,purple,blue
 # - If you see periodic "Loading..." flashes, use/keep --delivery push (default).
 # - If hands appear truncated or updates stall, lower --fps or --segment-seconds.
 # - Color args support hex/rgb/name and Radix tokens (gray11, dark.gray11, grayDark11).
+# - In `--band auto`, location priority is CLI lat/lon -> PIXOO_LATITUDE/LONGITUDE -> cached/live ipapi -> timezone seasonal fallback.
 # - `--band tomato` remaps the default intensity slots: top=10, markers/minute=7, hour=9, second/center=5.
 # - `--dot-anti-aliasing` smooths marker/center dots independently from hand anti-aliasing.
 
