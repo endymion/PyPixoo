@@ -4,26 +4,39 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pixoo Web Font Demo</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Tiny5&display=swap" rel="stylesheet" />
   <style>
+    @font-face {
+      font-family: 'Tiny5Local';
+      src: url('./fonts/Tiny5-Regular.ttf') format('truetype');
+      font-display: block;
+    }
+
     body {
       margin: 0;
-      width: 192px;
-      height: 192px;
+      width: 64px;
+      height: 64px;
       background: #000;
       color: #fff;
-      font-family: 'Tiny5', monospace;
-      font-size: 18px;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      font-smooth: never;
+      -webkit-font-smoothing: none;
+      text-rendering: optimizeSpeed;
+    }
+
+    .label {
+      position: absolute;
+      left: 1px;
+      top: 24px;
+      font-family: 'Tiny5Local', monospace;
+      font-size: 16px;
+      line-height: 16px;
+      letter-spacing: 0;
+      white-space: nowrap;
     }
   </style>
 </head>
 <body>
-  WEB FONT
+  <div class="label">WEB FONT</div>
 </body>
 </html>

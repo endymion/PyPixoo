@@ -96,6 +96,7 @@ class DisplayItem(BaseModel):
     text: Optional[str] = None
     speed: int = Field(default=10, ge=0)
     color: str = "#FFFF00"
+    align: int = Field(default=1, ge=0)
 
 
 class TimerTool(BaseModel):

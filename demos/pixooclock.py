@@ -723,6 +723,59 @@ def _is_retriable_upload_error(exc: Exception) -> bool:
     return "illegal json" in msg or "timed out" in msg or "timeout" in msg
 
 
+def _is_connection_loss(exc: Exception) -> bool:
+    if isinstance(exc, requests.exceptions.RequestException):
+        return True
+    msg = str(exc).lower()
+    return any(
+        token in msg
+        for token in (
+            "failed to connect",
+            "connection refused",
+            "connection reset",
+            "remote disconnected",
+            "max retries exceeded",
+            "timed out",
+            "timeout",
+            "connection aborted",
+            "temporarily unavailable",
+            "broken pipe",
+        )
+    )
+
+
+def _reconnect_until_ready(pixoo: Pixoo, sync_utc: bool) -> None:
+    delay = 1.0
+    while True:
+        try:
+            pixoo.close()
+        except Exception:
+            pass
+        try:
+            if pixoo.connect():
+                if sync_utc:
+                    pixoo.set_utc_time(int(time.time()))
+                _log("Device connection restored; resumed clock updates.")
+                return
+        except Exception as exc:  # pragma: no cover - depends on reboot timing
+            _log(f"Reconnect attempt failed: {exc}")
+        time.sleep(delay)
+        delay = min(10.0, delay * 1.5)
+
+
+def _call_with_recovery(pixoo: Pixoo, sync_utc: bool, operation_name: str, fn):
+    while True:
+        try:
+            return fn()
+        except KeyboardInterrupt:
+            raise
+        except Exception as exc:
+            if not _is_connection_loss(exc):
+                raise
+            _log(f"{operation_name} interrupted by device disconnect/reboot: {exc}")
+            _reconnect_until_ready(pixoo, sync_utc=sync_utc)
+
+
 def upload_sequence_resilient(
     pixoo: Pixoo,
     sequence: GifSequence,
@@ -837,12 +890,23 @@ def run(args: argparse.Namespace) -> None:
     upload_mode = UploadMode(args.upload_mode)
 
     pixoo = Pixoo(args.ip)
-    if not pixoo.connect():
-        raise SystemExit("Failed to connect to Pixoo device")
+    connected = False
+    try:
+        connected = pixoo.connect()
+    except Exception:
+        connected = False
+    if not connected:
+        _log("Initial connect failed; waiting for device...")
+        _reconnect_until_ready(pixoo, sync_utc=args.sync_utc)
 
     try:
         if args.sync_utc:
-            pixoo.set_utc_time(int(time.time()))
+            _call_with_recovery(
+                pixoo,
+                sync_utc=args.sync_utc,
+                operation_name="UTC sync",
+                fn=lambda: pixoo.set_utc_time(int(time.time())),
+            )
 
         _log(
             "Starting pixooclock: "
@@ -883,14 +947,24 @@ def run(args: argparse.Namespace) -> None:
                 time.sleep(wait_s)
 
             if args.sync_utc and segment_index > 0 and segment_index % args.utc_resync_segments == 0:
-                pixoo.set_utc_time(int(time.time()))
+                _call_with_recovery(
+                    pixoo,
+                    sync_utc=args.sync_utc,
+                    operation_name="Periodic UTC sync",
+                    fn=lambda: pixoo.set_utc_time(int(time.time())),
+                )
 
             upload_started = time.time()
-            mode_used, retries, frame_count = upload_sequence_resilient(
+            mode_used, retries, frame_count = _call_with_recovery(
                 pixoo,
-                sequence,
-                upload_mode=upload_mode,
-                chunk_size=args.chunk_size,
+                sync_utc=args.sync_utc,
+                operation_name="Stitched upload",
+                fn=lambda: upload_sequence_resilient(
+                    pixoo,
+                    sequence,
+                    upload_mode=upload_mode,
+                    chunk_size=args.chunk_size,
+                ),
             )
             upload_elapsed = time.time() - upload_started
             lag = time.time() - next_start
@@ -935,12 +1009,22 @@ def _run_push_clock(
     while True:
         now = time.time()
         if args.sync_utc and now >= next_resync_at:
-            pixoo.set_utc_time(int(now))
+            _call_with_recovery(
+                pixoo,
+                sync_utc=args.sync_utc,
+                operation_name="Periodic UTC sync",
+                fn=lambda: pixoo.set_utc_time(int(now)),
+            )
             next_resync_at = now + resync_every_seconds
 
         frame = render_clock_frame(now, style)
         upload_started = time.time()
-        pixoo.push_buffer(list(frame.data))
+        _call_with_recovery(
+            pixoo,
+            sync_utc=args.sync_utc,
+            operation_name="Frame push",
+            fn=lambda: pixoo.push_buffer(list(frame.data)),
+        )
         upload_elapsed = time.time() - upload_started
 
         if frame_index % max(1, adaptive_fps) == 0:
@@ -1008,7 +1092,12 @@ def _run_push_demo(
             now = time.time()
             frame = render_clock_frame(now, style)
             upload_started = time.time()
-            pixoo.push_buffer(list(frame.data))
+            _call_with_recovery(
+                pixoo,
+                sync_utc=args.sync_utc,
+                operation_name="Demo frame push",
+                fn=lambda: pixoo.push_buffer(list(frame.data)),
+            )
             upload_elapsed = time.time() - upload_started
 
             budget = interval * 0.90

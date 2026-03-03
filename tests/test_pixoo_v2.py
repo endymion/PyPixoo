@@ -261,6 +261,7 @@ class TestCommandWrappers:
             text="TEST",
             speed=10,
             color="#FFFFFF",
+            align=1,
         )
         pixoo.send_display_list([item])
 
@@ -275,3 +276,4 @@ class TestCommandWrappers:
             "PlayTotalTime": 3000,
         }
         assert calls[5]["Command"] == "Draw/SendHttpItemList"
+        assert calls[5]["ItemList"][0]["align"] == 1

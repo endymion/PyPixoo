@@ -409,6 +409,7 @@ class Pixoo:
                     "Textheight": item.text_height,
                     "TextString": item.text or "",
                     "speed": item.speed,
+                    "align": item.align,
                     "color": item.color,
                 }
             )
