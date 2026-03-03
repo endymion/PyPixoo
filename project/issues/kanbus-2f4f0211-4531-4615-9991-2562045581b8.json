@@ -1,0 +1,31 @@
+{
+  "id": "kanbus-2f4f0211-4531-4615-9991-2562045581b8",
+  "title": "shared clock core",
+  "description": "",
+  "type": "sub-task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-c5ae3bf7-4d28-4922-8186-2a1e6e3c7fe2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "5b91e71d-11bb-4553-844c-05c75401ad45",
+      "author": "unknown",
+      "text": "Starting implementation of shared clock core module for both demos, including explicit mode routing and logging.",
+      "created_at": "2026-03-03T03:28:58.160825Z"
+    },
+    {
+      "id": "0ba1b85e-4322-4f81-94f3-007610b13c1f",
+      "author": "unknown",
+      "text": "Implemented shared clock core at src/pypixoo/_clock_demo.py and converted demos/clock_realtime.py + demos/storybook_clock.py into thin wrappers over the shared runtime. Added shared mode semantics, logging, reconnect loop, and routing.",
+      "created_at": "2026-03-03T03:32:44.289691Z"
+    }
+  ],
+  "created_at": "2026-03-03T03:27:24.757076Z",
+  "updated_at": "2026-03-03T03:32:44.406664Z",
+  "closed_at": "2026-03-03T03:32:44.406664Z",
+  "custom": {}
+}

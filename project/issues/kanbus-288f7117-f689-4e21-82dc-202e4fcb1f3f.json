@@ -1,0 +1,43 @@
+{
+  "id": "kanbus-288f7117-f689-4e21-82dc-202e4fcb1f3f",
+  "title": "Demo: smooth sequence switching experiment",
+  "description": "Add a real-device demo to test smooth switching between sequences with two strategies: stitched single upload (deterministic) and live upload switching (experimental).",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "98b810a1-eff2-4aa3-98e9-aa237604e3d8",
+      "author": "unknown",
+      "text": "Started implementation: adding demo script + README instructions for stitched vs live switch playback experiments.",
+      "created_at": "2026-03-03T03:45:24.220551Z"
+    },
+    {
+      "id": "ed1e676e-6399-419b-8424-408ec38c8fba",
+      "author": "unknown",
+      "text": "Implemented demos/demo_sequence_switching.py with two strategies: stitched (single upload) and live (repeated uploads). Added resilient fallback when device rejects large CommandList payloads/timeouts. Verified both modes execute against real device IP from .env.",
+      "created_at": "2026-03-03T03:48:33.963245Z"
+    },
+    {
+      "id": "786f9c64-c9e0-41c1-a204-b8c714fc2d4f",
+      "author": "unknown",
+      "text": "Tuned switching demo for real-device limits: added edge-hold frames (endpoint visibility), bounded stitched frame budget with auto-downsample, and default upload_mode=frame_by_frame for reliability. Re-ran stitched mode successfully.",
+      "created_at": "2026-03-03T03:54:38.425969Z"
+    },
+    {
+      "id": "2f8b3ad9-4041-4a53-b9f1-d9273ea21505",
+      "author": "unknown",
+      "text": "Completed: sequence switching experiment validated on device, tuned for frame budget limits, and documented. Closing.",
+      "created_at": "2026-03-03T04:25:56.607638Z"
+    }
+  ],
+  "created_at": "2026-03-03T03:45:18.241506Z",
+  "updated_at": "2026-03-03T04:25:56.710407Z",
+  "closed_at": "2026-03-03T04:25:56.710407Z",
+  "custom": {}
+}

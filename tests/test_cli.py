@@ -35,6 +35,17 @@ class TestCliFill:
             mock_pixoo.push.assert_called_once()
             mock_pixoo.close.assert_called_once()
 
+    def test_parse_radix_color_integration(self):
+        with patch("pypixoo.cli._connect") as mock_connect:
+            mock_pixoo = MagicMock()
+            mock_connect.return_value = mock_pixoo
+
+            cmd_fill("192.168.0.37", "gray11")
+            mock_pixoo.fill.assert_called_once()
+            assert len(mock_pixoo.fill.call_args[0]) == 3
+            mock_pixoo.push.assert_called_once()
+            mock_pixoo.close.assert_called_once()
+
 
 class TestCliLoadImage:
     def test_load_image_calls_load_and_push(self, tmp_path):

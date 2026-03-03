@@ -1,0 +1,31 @@
+{
+  "id": "kanbus-725873dd-18d9-45c0-bda5-e5588bed029f",
+  "title": "Support Radix color tokens in parser/CLI/demos",
+  "description": "Add Radix light/dark token registry and parsing support (gray11, dark.gray11, grayDark11) across shared color parser, CLI, and clock demo arguments.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "ad6efdab-e458-4493-b912-d69c9d3b2882",
+      "author": "unknown",
+      "text": "Implemented: generated static Radix light/dark token registry, extended parse_color, updated CLI/demo color argument support, and added tests for Radix token parsing.",
+      "created_at": "2026-03-03T04:23:46.617118Z"
+    },
+    {
+      "id": "5d66d5c1-adc1-49a8-b67a-cba3e3526158",
+      "author": "unknown",
+      "text": "Validation complete: Radix registry + parser + CLI/demo integration in place; tests passing (53). Ready for user palette selection.",
+      "created_at": "2026-03-03T04:25:10.883001Z"
+    }
+  ],
+  "created_at": "2026-03-03T04:23:41.512814Z",
+  "updated_at": "2026-03-03T04:25:10.990454Z",
+  "closed_at": "2026-03-03T04:25:10.990454Z",
+  "custom": {}
+}

@@ -3,6 +3,7 @@
 import pytest
 
 from pypixoo.color import parse_color
+from pypixoo.radix_colors import RADIX_DARK_COLORS, RADIX_LIGHT_COLORS
 
 
 class TestParseColorHex6:
@@ -66,3 +67,29 @@ class TestParseColorInvalid:
     def test_unknown_name_raises(self):
         with pytest.raises(ValueError):
             parse_color("notacolor")
+
+
+class TestParseColorRadix:
+    def test_radix_light_token(self):
+        expected = RADIX_LIGHT_COLORS["gray11"]
+        assert parse_color("gray11") == parse_color(expected)
+
+    def test_radix_light_token_with_dash(self):
+        expected = RADIX_LIGHT_COLORS["tomato9"]
+        assert parse_color("tomato-9") == parse_color(expected)
+
+    def test_radix_dark_token_dot_prefix(self):
+        expected = RADIX_DARK_COLORS["gray11"]
+        assert parse_color("dark.gray11") == parse_color(expected)
+
+    def test_radix_dark_token_inline_alias(self):
+        expected = RADIX_DARK_COLORS["gray11"]
+        assert parse_color("grayDark11") == parse_color(expected)
+
+
+class TestParseColorAdditionalFormats:
+    def test_csv_rgb(self):
+        assert parse_color("153, 128, 102") == (153, 128, 102)
+
+    def test_rgba_hex_composites_over_black(self):
+        assert parse_color("#ffffff80") == (128, 128, 128)

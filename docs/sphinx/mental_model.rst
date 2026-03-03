@@ -41,3 +41,15 @@ The Pixoo has built-in modes like weather, countdown, stopwatch, and
 scoreboard. PyPixoo exposes these as command wrappers that call device
 endpoints. For weather you set location with `Sys/LogAndLat` and read
 current device weather via `Device/GetWeatherInfo`.
+
+Clock modes (discovery-first)
+-----------------------------
+
+Clock demos now expose two explicit modes:
+
+- `native_clock`: device commands only (`SetClockSelectId`, `GetClockInfo`,
+  `SetUTC`, `SetTime24Flag`).
+- `web_clock_experimental`: browser-rendered frames uploaded to the device.
+
+`web_clock_experimental` is intentionally labeled experimental because smoothness
+depends on host-side rendering throughput, not only device capability.

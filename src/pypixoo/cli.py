@@ -280,7 +280,7 @@ def main() -> None:
     load_dotenv()
     default_ip = _resolve_default_ip()
     parser = argparse.ArgumentParser(
-        prog="pypixoo",
+        prog="pixoo",
         description="PyPixoo CLI for Divoom Pixoo 64.",
     )
     parser.add_argument(
@@ -291,7 +291,13 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     fill_p = subparsers.add_parser("fill", help="Fill the display with a solid color")
-    fill_p.add_argument("color", help="Color: hex (FF00FF, f0f, #f0f) or name (fuchsia, red)")
+    fill_p.add_argument(
+        "color",
+        help=(
+            "Color: hex/rgb/name or Radix token "
+            "(e.g. gray11, dark.gray11, grayDark11)"
+        ),
+    )
     fill_p.set_defaults(func=lambda ns: cmd_fill(ns.ip, ns.color))
 
     load_p = subparsers.add_parser("load-image", help="Load an image file (resized to 64x64) and push")
@@ -334,7 +340,11 @@ def main() -> None:
     text_p.add_argument("--font", default="font_4", help="Font id (0-7) or name (font_4)")
     text_p.add_argument("--width", type=int, default=64, help="Text width")
     text_p.add_argument("--speed", type=int, default=10, help="Scroll speed")
-    text_p.add_argument("--color", default="#FFFF00", help="Font color hex")
+    text_p.add_argument(
+        "--color",
+        default="#FFFF00",
+        help="Font color: hex/rgb/name or Radix token (e.g. gray11, dark.gray11)",
+    )
     text_p.add_argument("--align", type=int, default=1, help="Align mode")
     text_p.add_argument("--direction", type=int, default=0, help="Scroll direction")
     text_p.set_defaults(

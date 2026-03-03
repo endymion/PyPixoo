@@ -17,7 +17,7 @@ import time
 
 from dotenv import load_dotenv
 
-from pypixoo import Pixoo, FrameRenderer, StaticFrameSource, WebFrameSource, AnimationPlayer
+from pypixoo import FrameRenderer, Pixoo, UploadMode, StaticFrameSource, WebFrameSource
 from pypixoo.buffer import Buffer
 
 load_dotenv()
@@ -81,17 +81,11 @@ def main():
         if not pixoo.connect():
             raise RuntimeError("Failed to connect to Pixoo")
 
-        player = AnimationPlayer(
-            sequence,
-            loop=1,
-            end_on="last_frame",
-            blend_mode="opaque",
-        )
-
-        print("Looping (Ctrl+C to stop)...")
+        pixoo.upload_sequence(sequence, mode=UploadMode.COMMAND_LIST)
+        print("Uploaded mixed sequence; device should now loop natively.")
+        print("Press Ctrl+C to stop.")
         while True:
-            player.play_async(pixoo)
-            player.wait()
+            time.sleep(1.0)
     except KeyboardInterrupt:
         print("\nStopped")
     finally:

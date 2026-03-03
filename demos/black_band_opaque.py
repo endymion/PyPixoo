@@ -13,8 +13,7 @@ from dotenv import load_dotenv
 
 from PIL import Image
 
-from pypixoo import Pixoo
-from pypixoo.animation import AnimationPlayer, AnimationSequence, Frame
+from pypixoo import CycleItem, GifFrame, GifSequence, Pixoo, UploadMode
 from pypixoo.buffer import Buffer
 
 load_dotenv()
@@ -43,22 +42,19 @@ def _make_band_frame_opaque(band_x: int, gradient_data: list) -> Buffer:
 def main():
     gradient_data = _load_gradient_data()
     frames = [
-        Frame(image=_make_band_frame_opaque(x, gradient_data), duration_ms=50)
+        GifFrame(image=_make_band_frame_opaque(x, gradient_data), duration_ms=50)
         for x in range(SIZE)
     ]
-    sequence = AnimationSequence(frames=frames)
-    player = AnimationPlayer(
-        sequence,
-        loop=1,
-        end_on="last_frame",
-        blend_mode="opaque",
-    )
+    sequence = GifSequence(frames=frames, speed_ms=50)
     pixoo = Pixoo(IP)
     try:
         if not pixoo.connect():
             raise RuntimeError("Failed to connect to Pixoo")
-        player.play_async(pixoo)
-        player.wait()
+        handle = pixoo.start_cycle(
+            [CycleItem(sequence=sequence, upload_mode=UploadMode.COMMAND_LIST, chunk_size=40)],
+            loop=1,
+        )
+        handle.wait(10.0)
         print("Done (opaque)")
     finally:
         pixoo.close()

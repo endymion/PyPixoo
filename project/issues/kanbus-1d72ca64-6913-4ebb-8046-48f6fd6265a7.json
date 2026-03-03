@@ -1,0 +1,31 @@
+{
+  "id": "kanbus-1d72ca64-6913-4ebb-8046-48f6fd6265a7",
+  "title": "Fix demo black_band_opaque.py for V2 API",
+  "description": "Demo fails with ModuleNotFoundError: pypixoo.animation. Migrate black_band_opaque.py to V2 API and verify real-device execution.",
+  "type": "bug",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-510ba441-12c6-4f5c-8a47-5e8b8e233f90",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "45dc4929-4eac-4d54-bcf2-92112659d17c",
+      "author": "unknown",
+      "text": "Starting fix now. Root cause: demo still imports removed legacy animation API.",
+      "created_at": "2026-03-03T02:39:54.019698Z"
+    },
+    {
+      "id": "2f193c20-f7de-4a9c-8660-8115a2783d3c",
+      "author": "unknown",
+      "text": "Fix implemented: migrated demos/black_band_opaque.py from legacy animation API to V2 flow (GifSequence + CycleItem + start_cycle loop=1). Validation: demo runs successfully on device and exits with 'Done (opaque)'.",
+      "created_at": "2026-03-03T02:40:26.895751Z"
+    }
+  ],
+  "created_at": "2026-03-03T02:39:50.031669Z",
+  "updated_at": "2026-03-03T02:40:26.991211Z",
+  "closed_at": "2026-03-03T02:40:26.991211Z",
+  "custom": {}
+}

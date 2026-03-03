@@ -52,42 +52,42 @@ Real-device demos live in `demos/` and are documented in `demos/README.md`.
 
 ### CLI
 
-A `pypixoo` command is installed with the package. Use a real device on your network to run commands.
+A `pixoo` command is installed with the package. Use a real device on your network to run commands.
 By default the CLI reads `PIXOO_DEVICE_IP` (or legacy `PIXOO_IP`) from the environment or a local `.env` file.
 Use `--ip` to override for a single command.
 
 ```bash
 # Fill the display with a color (hex or name)
-pypixoo fill FF00FF
+pixoo fill FF00FF
 
 # Load an image (resized to 64×64) and push
-pypixoo load-image path/to/image.png
+pixoo load-image path/to/image.png
 
 # Upload native sequence
-pypixoo upload-sequence frame1.png frame2.png --speed-ms 120 --mode command_list --chunk-size 40
+pixoo upload-sequence frame1.png frame2.png --speed-ms 120 --mode command_list --chunk-size 40
 
 # Native GIF playback
-pypixoo play-gif-url https://example.com/anim.gif
-pypixoo play-gif-file divoom_gif/1.gif
-pypixoo play-gif-dir divoom_gif/
+pixoo play-gif-url https://example.com/anim.gif
+pixoo play-gif-file divoom_gif/1.gif
+pixoo play-gif-dir divoom_gif/
 
 # Cycle ordered items
-pypixoo cycle --item 'sequence=120:frame1.png,frame2.png' --item 'url=https://example.com/anim.gif' --loop 2
+pixoo cycle --item 'sequence=120:frame1.png,frame2.png' --item 'url=https://example.com/anim.gif' --loop 2
 
 # List built-in display list fonts (no device required)
-pypixoo list-fonts
+pixoo list-fonts
 
 # Send a native text overlay (requires a prior animation upload)
-pypixoo text-overlay "hello" --x 0 --y 40 --font font_4 --width 56 --speed 10
+pixoo text-overlay "hello" --x 0 --y 40 --font font_4 --width 56 --speed 10
 
 # Clear overlays
-pypixoo clear-text
+pixoo clear-text
 
 # Raw command passthrough
-pypixoo raw-command Device/SetHighLightMode Mode=1
+pixoo raw-command Device/SetHighLightMode Mode=1
 ```
 
-If the `pypixoo` script is not on your PATH, run `python -m pypixoo.cli` instead.
+If the `pixoo` script is not on your PATH, run `python -m pypixoo.cli` instead.
 
 ## Usage
 

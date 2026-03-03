@@ -94,7 +94,7 @@ export const TimeNoSecondHand: Story = {
     hourHandColor: "rgba(242,232,255,0.6)",
     minuteHandColor: "rgba(242,232,255,0.5)",
     markerColor: "rgba(255,0,255,0.5)",
-    topMarkerColor: "rgba(255,0,255,0.3)",
+    topMarkerColor: "rgba(255,0,255,0.8)",
     faceFade: 1.0,
     markerMode: "dots_all_thick_quarters",
     faceColor: "black",

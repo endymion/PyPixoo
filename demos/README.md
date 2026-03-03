@@ -22,25 +22,23 @@ python demos/black_band_chained.py
 # Requires: pip install -e ".[browser]"
 python demos/browser_mixed.py
 
-# Storybook Clock animation (t 0..1), pre-rendered then pushed in timed loop (no loading overlay)
-# Requires: Storybook running (cd storybook-app && npm run storybook)
-python demos/storybook_clock.py
-python demos/storybook_clock.py --fps 10 --loop-seconds 2
-python demos/storybook_clock.py --delivery upload --upload-mode command_list
-
-# Smooth real-time clock (default push mode avoids repeated "Loading..." indicator)
-# Default demo mode cycles clockface marker style every minute.
-# Automatically reconnects after device/network interruptions (default retry every 3s).
-# Defaults: magenta markers, lighter top marker, mauve hour/minute hands.
-# Optional: --fps, --render-lead-ms, --dial-color, --hour-hand-color, --minute-hand-color, --fade
+# Clock demos (shared core)
+# Default mode is native_clock (device-side clock features only; discovery-first safe default)
+# Native default preserves the current device clock face unless you pass --clock-id.
 python demos/clock_realtime.py
-python demos/clock_realtime.py --fps 3 --render-lead-ms 1500 --dial-color "#111"
-python demos/clock_realtime.py --clockface ticks_all_thick_quarters --no-second-hand
-python demos/clock_realtime.py --no-second-hand --marker-color "#ff00ff"
-python demos/clock_realtime.py --fade 20
+python demos/storybook_clock.py
 
-# Optional: native upload windows mode (may show loading indicator while uploading)
-python demos/clock_realtime.py --delivery upload --fps 6 --window-seconds 3
+# Native clock mode options (device commands only)
+python demos/clock_realtime.py --mode native_clock --clock-id 846 --sync-utc
+python demos/clock_realtime.py --mode native_clock --twenty-four-hour --poll-seconds 5
+
+# Experimental web clock mode (browser-rendered + upload; non-native)
+# Requires: Storybook running (cd storybook-app && npm run storybook)
+python demos/clock_realtime.py --mode web_clock_experimental --fps 3 --render-lead-ms 1500
+python demos/clock_realtime.py --mode web_clock_experimental --clockface ticks_all_thick_quarters --no-second-hand
+python demos/clock_realtime.py --mode web_clock_experimental --no-second-hand --marker-color "#ff00ff"
+python demos/clock_realtime.py --mode web_clock_experimental --fade 20
+python demos/clock_realtime.py --mode web_clock_experimental --delivery upload --fps 6 --window-seconds 3
 
 # Font showcase: cycle Tiny5 text screens (alphabet, numbers, alert, warning, success, info) — 5s per screen
 # Uses local 192x192 fixture + 3x downsample (no Storybook required)
@@ -49,6 +47,26 @@ python demos/font_showcase.py --duration 3
 
 # Upload a short sequence (client pushes frames)
 python demos/demo_upload_sequence.py
+
+# Sequence switching experiment:
+# stitched = smoothest switch (single upload), live = repeated uploads (experimental)
+# defaults are tuned for device compatibility (frame_by_frame + bounded frame count)
+python demos/demo_sequence_switching.py --mode stitched
+python demos/demo_sequence_switching.py --mode live
+
+# Three-hand analog clock via stitched native uploads (phase-locked segments)
+# Default delivery is push to avoid device "Loading..." overlays between segments
+python demos/demo_three_hand_clock.py
+python demos/demo_three_hand_clock.py --once --fps 4 --segment-seconds 10
+python demos/demo_three_hand_clock.py --fps 6 --segment-seconds 12
+python demos/demo_three_hand_clock.py --delivery stitched --fps 4 --segment-seconds 10
+python demos/demo_three_hand_clock.py --hour-hand-color gray11 --minute-hand-color dark.gray11 --second-hand-color grayDark11
+
+# Troubleshooting:
+# - If you only see a static/default channel, run with --once and lower fps first.
+# - If you see periodic "Loading..." flashes, use/keep --delivery push (default).
+# - If hands appear truncated or updates stall, lower --fps or --segment-seconds.
+# - Color args support hex/rgb/name and Radix tokens (gray11, dark.gray11, grayDark11).
 
 # Device fetches and plays a GIF from a URL
 python demos/demo_play_url_gif.py --url https://example.com/anim.gif

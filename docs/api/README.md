@@ -22,3 +22,9 @@ python scripts/build_command_matrix.py --docs docs/api/showdoc --out docs/api/co
 ```
 
 The command matrix compares the official docs to SDK support status.
+
+## Clock capability matrix
+
+Clock-specific discovery status lives in:
+
+- `docs/api/clock_capability_matrix.md`

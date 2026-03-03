@@ -10,8 +10,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from pypixoo import Pixoo
-from pypixoo.animation import AnimationPlayer, AnimationSequence, Frame
+from pypixoo import CycleItem, GifFrame, GifSequence, Pixoo, UploadMode
 from pypixoo.buffer import Buffer
 
 load_dotenv()
@@ -31,39 +30,33 @@ def _load_gradient_buffer() -> Buffer:
     return Buffer.from_flat_list(data)
 
 
-def _make_band_frame(band_x: int, transparent_color: tuple) -> Buffer:
-    """Frame: black vertical band at band_x, rest transparent (transparent_color)."""
-    data = []
+def _make_band_frame_opaque(band_x: int, gradient: Buffer) -> Buffer:
+    """Frame: pre-composited gradient with a black vertical band at band_x."""
+    data = list(gradient.data)
     for y in range(SIZE):
-        for x in range(SIZE):
-            if x == band_x:
-                data.extend([0, 0, 0])  # black band (visible)
-            else:
-                data.extend(transparent_color)  # transparent (show background)
+        base = (y * SIZE + band_x) * 3
+        data[base : base + 3] = [0, 0, 0]
     return Buffer.from_flat_list(data)
 
 
 def main():
-    transparent_color = (255, 0, 255)  # magenta = transparent
     gradient = _load_gradient_buffer()
     frames = [
-        Frame(image=_make_band_frame(x, transparent_color), duration_ms=50)
+        GifFrame(image=_make_band_frame_opaque(x, gradient), duration_ms=50)
         for x in range(SIZE)
     ]
-    sequence = AnimationSequence(frames=frames, background=gradient)
-    player = AnimationPlayer(
-        sequence,
-        loop=1,
-        end_on="last_frame",
-        blend_mode="transparent",
-        transparent_color=transparent_color,
-    )
+    sequence = GifSequence(frames=frames, speed_ms=50)
     pixoo = Pixoo(IP)
     try:
         if not pixoo.connect():
             raise RuntimeError("Failed to connect to Pixoo")
-        player.play_async(pixoo)
-        player.wait()
+        handle = pixoo.start_cycle(
+            [CycleItem(sequence=sequence, upload_mode=UploadMode.COMMAND_LIST, chunk_size=40)],
+            loop=1,
+        )
+        if not handle.wait(30.0):
+            handle.stop()
+            handle.wait(2.0)
         print("Done (transparent blend)")
     finally:
         pixoo.close()
