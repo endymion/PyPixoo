@@ -9,7 +9,16 @@ import requests
 from pydantic import ValidationError
 
 from pypixoo.buffer import Buffer
-from pypixoo.native import CycleHandle, CycleItem, GifFrame, GifSequence, GifSource, UploadMode
+from pypixoo.fonts import BuiltinFont, FontRegistry
+from pypixoo.native import (
+    CycleHandle,
+    CycleItem,
+    DisplayItem,
+    GifFrame,
+    GifSequence,
+    GifSource,
+    UploadMode,
+)
 from pypixoo.pixoo import (
     DeviceInUseError,
     Pixoo,
@@ -40,17 +49,11 @@ class TestLockHelpers:
         path = _device_lock_path("192.168.0.37")
         assert str(path).startswith(str(tmp_path))
 
-    def test_acquire_device_lock_returns_none_when_not_real_device(self, monkeypatch):
-        monkeypatch.delenv("PIXOO_REAL_DEVICE", raising=False)
-        assert _acquire_device_lock("192.168.0.37") is None
-
     def test_acquire_device_lock_returns_none_without_fcntl(self, monkeypatch):
-        monkeypatch.setenv("PIXOO_REAL_DEVICE", "1")
         with patch("pypixoo.pixoo.fcntl", None):
             assert _acquire_device_lock("192.168.0.37") is None
 
     def test_acquire_device_lock_raises_when_open_fails(self, monkeypatch):
-        monkeypatch.setenv("PIXOO_REAL_DEVICE", "1")
         fake_fcntl = MagicMock()
         fake_fcntl.LOCK_EX = 1
         fake_fcntl.LOCK_NB = 2
@@ -59,7 +62,6 @@ class TestLockHelpers:
                 _acquire_device_lock("192.168.0.37")
 
     def test_acquire_device_lock_raises_when_already_locked(self, tmp_path, monkeypatch):
-        monkeypatch.setenv("PIXOO_REAL_DEVICE", "1")
         monkeypatch.setenv("PYPIXOO_LOCK_DIR", str(tmp_path))
 
         class FakeFcntl:
@@ -149,3 +151,127 @@ class TestPixooV2:
             from pypixoo.native import TextOverlay
 
             pixoo.send_text_overlay(TextOverlay(text="blocked"))
+
+
+class TestFontsAndOverlays:
+    def test_text_overlay_font_range(self):
+        from pypixoo.native import TextOverlay
+
+        assert TextOverlay(text="ok", font=BuiltinFont.FONT_4)
+        with pytest.raises(ValueError):
+            TextOverlay(text="bad", font=8)
+
+    def test_list_fonts_returns_registry(self):
+        pixoo = Pixoo("192.168.0.37")
+        with patch(
+            "pypixoo.pixoo.requests.post",
+            return_value=_response(
+                {
+                    "ReturnCode": 0,
+                    "FontList": [
+                        {"id": 4, "name": "font_4", "width": "8", "high": "8", "type": 0},
+                        {"id": 7, "name": "font_7", "width": "8", "high": "8", "type": 0},
+                    ],
+                }
+            ),
+        ):
+            registry = pixoo.list_fonts()
+        assert isinstance(registry, FontRegistry)
+        assert registry.find("font_4") is not None
+
+    def test_upload_sequence_with_overlays_order(self):
+        pixoo = Pixoo("192.168.0.37")
+        calls = []
+
+        def fake_post(payload):
+            calls.append(payload)
+            return {"error_code": 0}
+
+        pixoo._post_command = fake_post  # type: ignore[method-assign]
+
+        frame = _frame()
+        seq = GifSequence(frames=[frame], speed_ms=100)
+        from pypixoo.native import TextOverlay
+
+        overlays = [
+            TextOverlay(text="one", text_id=1, font=4, text_width=32),
+            TextOverlay(text="two", text_id=2, font=4, text_width=32),
+        ]
+        pixoo.upload_sequence_with_overlays(seq, overlays, clear_before=False)
+
+        commands = [c.get("Command") for c in calls]
+        assert "Draw/SendHttpText" in commands
+        upload_indices = [
+            i for i, cmd in enumerate(commands) if cmd in ("Draw/SendHttpGif", "Draw/CommandList")
+        ]
+        assert upload_indices, "Expected upload commands before overlays"
+        assert min(i for i, cmd in enumerate(commands) if cmd == "Draw/SendHttpText") > max(upload_indices)
+
+
+class TestCommandWrappers:
+    def test_basic_command_wrappers(self):
+        pixoo = Pixoo("192.168.0.37")
+        calls = []
+
+        def fake_post(payload):
+            calls.append(payload)
+            return {"error_code": 0, "SelectIndex": 2}
+
+        pixoo._post_command = fake_post  # type: ignore[method-assign]
+
+        pixoo.set_brightness(80)
+        pixoo.set_channel_index(2)
+        pixoo.set_custom_page_index(1)
+        pixoo.set_eq_position(0)
+        pixoo.set_cloud_index(1)
+        assert pixoo.get_channel_index() == 2
+
+        assert calls[0] == {"Command": "Channel/SetBrightness", "Brightness": 80}
+        assert calls[1] == {"Command": "Channel/SetIndex", "SelectIndex": 2}
+        assert calls[2] == {"Command": "Channel/SetCustomPageIndex", "CustomPageIndex": 1}
+        assert calls[3] == {"Command": "Channel/SetEqPosition", "EqPosition": 0}
+        assert calls[4] == {"Command": "Channel/CloudIndex", "Index": 1}
+        assert calls[5] == {"Command": "Channel/GetIndex"}
+
+    def test_tools_and_display_list(self):
+        pixoo = Pixoo("192.168.0.37")
+        calls = []
+
+        def fake_post(payload):
+            calls.append(payload)
+            return {"error_code": 0}
+
+        pixoo._post_command = fake_post  # type: ignore[method-assign]
+
+        pixoo.set_countdown_timer((1, 0, 1))
+        pixoo.set_stopwatch(1)
+        pixoo.set_scoreboard((3, 4))
+        pixoo.set_noise_status(1)
+        pixoo.play_buzzer(500, 500, 3000)
+
+        item = DisplayItem(
+            text_id=1,
+            item_type=1,
+            x=0,
+            y=0,
+            direction=0,
+            font=4,
+            text_width=32,
+            text_height=16,
+            text="TEST",
+            speed=10,
+            color="#FFFFFF",
+        )
+        pixoo.send_display_list([item])
+
+        assert calls[0] == {"Command": "Tools/SetTimer", "Minute": 1, "Second": 0, "Status": 1}
+        assert calls[1] == {"Command": "Tools/SetStopWatch", "Status": 1}
+        assert calls[2] == {"Command": "Tools/SetScoreBoard", "BlueScore": 3, "RedScore": 4}
+        assert calls[3] == {"Command": "Tools/SetNoiseStatus", "NoiseStatus": 1}
+        assert calls[4] == {
+            "Command": "Device/PlayBuzzer",
+            "ActiveTimeInCycle": 500,
+            "OffTimeInCycle": 500,
+            "PlayTotalTime": 3000,
+        }
+        assert calls[5]["Command"] == "Draw/SendHttpItemList"

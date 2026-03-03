@@ -30,15 +30,14 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 import requests
-
-# Demos always use the real device; set env so the library acquires the device lock.
-os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
+from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pypixoo import FrameRenderer, Pixoo, UploadMode, WebFrameSource
 
-IP_DEFAULT = "192.168.0.37"
+load_dotenv()
+IP_DEFAULT = os.environ.get("PIXOO_DEVICE_IP") or os.environ.get("PIXOO_IP") or "192.168.0.37"
 STORYBOOK_IFRAME = "http://localhost:6006/iframe.html"
 CLOCK_STORY_ID = "pixoo-clock--time-with-seconds"
 CLOCKFACE_MODES = [

@@ -1,6 +1,5 @@
 """Tests for pypixoo CLI native V2 subcommands."""
 
-import os
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -9,14 +8,19 @@ import pytest
 from pypixoo.cli import (
     cmd_cycle,
     cmd_fill,
+    cmd_list_fonts,
     cmd_load_image,
     cmd_play_gif_dir,
     cmd_play_gif_file,
     cmd_play_gif_url,
+    cmd_raw_command,
+    cmd_text_overlay,
+    cmd_clear_text,
     cmd_upload_sequence,
     main,
 )
-from pypixoo.native import GifFrame, GifSequence, UploadMode
+from pypixoo.fonts import FontInfo, FontRegistry
+from pypixoo.native import GifFrame, GifSequence, UploadMode, TextOverlay
 from pypixoo.buffer import Buffer
 
 
@@ -25,7 +29,6 @@ class TestCliFill:
         with patch("pypixoo.cli._connect") as mock_connect:
             mock_pixoo = MagicMock()
             mock_connect.return_value = mock_pixoo
-            os.environ["PIXOO_REAL_DEVICE"] = "1"
 
             cmd_fill("192.168.0.37", "FF00FF")
             mock_pixoo.fill.assert_called_once_with(255, 0, 255)
@@ -40,7 +43,6 @@ class TestCliLoadImage:
         with patch("pypixoo.cli._connect") as mock_connect:
             mock_pixoo = MagicMock()
             mock_connect.return_value = mock_pixoo
-            os.environ["PIXOO_REAL_DEVICE"] = "1"
 
             cmd_load_image("192.168.0.37", img)
             mock_pixoo.load_image.assert_called_once_with(img)
@@ -49,7 +51,6 @@ class TestCliLoadImage:
 
     def test_load_image_missing_file_exits(self):
         with patch("pypixoo.cli._connect"):
-            os.environ["PIXOO_REAL_DEVICE"] = "1"
             with pytest.raises(SystemExit):
                 cmd_load_image("192.168.0.37", Path("/nonexistent/image.png"))
 
@@ -155,6 +156,52 @@ class TestCliNativeCommands:
                 default_speed_ms=100,
             )
 
+    def test_list_fonts_calls_registry(self):
+        with patch(
+            "pypixoo.cli.Pixoo.list_fonts",
+            return_value=FontRegistry(fonts=[FontInfo(id=4, name="font_4")]),
+        ):
+            cmd_list_fonts()
+
+    def test_text_overlay_calls_pixoo(self):
+        with patch("pypixoo.cli._connect") as mock_connect:
+            mock_pixoo = MagicMock()
+            mock_connect.return_value = mock_pixoo
+            cmd_text_overlay(
+                "192.168.0.37",
+                "hello",
+                x=1,
+                y=2,
+                font="font_4",
+                width=56,
+                speed=10,
+                color="#FFFF00",
+                align=1,
+                direction=0,
+            )
+            overlay = mock_pixoo.send_text_overlay.call_args[0][0]
+            assert isinstance(overlay, TextOverlay)
+            assert int(overlay.font) == 4
+            mock_pixoo.close.assert_called_once()
+
+    def test_clear_text_calls_pixoo(self):
+        with patch("pypixoo.cli._connect") as mock_connect:
+            mock_pixoo = MagicMock()
+            mock_connect.return_value = mock_pixoo
+            cmd_clear_text("192.168.0.37")
+            mock_pixoo.clear_text_overlay.assert_called_once()
+            mock_pixoo.close.assert_called_once()
+
+    def test_raw_command_parses_payload(self):
+        with patch("pypixoo.cli._connect") as mock_connect:
+            mock_pixoo = MagicMock()
+            mock_connect.return_value = mock_pixoo
+            cmd_raw_command("192.168.0.37", "Device/SetHighLightMode", ["Mode=1", "Flag=on"])
+            mock_pixoo.command.assert_called_once_with(
+                "Device/SetHighLightMode",
+                {"Mode": 1, "Flag": "on"},
+            )
+
 
 class TestCliMain:
     def test_fill_subcommand_parses_color(self):
@@ -221,3 +268,21 @@ class TestCliMain:
             args = mock_cmd.call_args[0]
             assert args[1] == ["url=https://example.com/a.gif"]
             assert args[2] == 2
+
+    def test_list_fonts_subcommand(self):
+        with patch("pypixoo.cli.cmd_list_fonts") as mock_cmd:
+            with patch("sys.argv", ["pypixoo", "list-fonts"]):
+                main()
+            mock_cmd.assert_called_once()
+
+    def test_text_overlay_subcommand(self):
+        with patch("pypixoo.cli.cmd_text_overlay") as mock_cmd:
+            with patch("sys.argv", ["pypixoo", "text-overlay", "hello", "--x", "1", "--y", "2"]):
+                main()
+            mock_cmd.assert_called_once()
+
+    def test_raw_command_subcommand(self):
+        with patch("pypixoo.cli.cmd_raw_command") as mock_cmd:
+            with patch("sys.argv", ["pypixoo", "raw-command", "Device/SetHighLightMode", "Mode=1"]):
+                main()
+            mock_cmd.assert_called_once()

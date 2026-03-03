@@ -2,7 +2,6 @@
 
 import base64
 import json
-import os
 from unittest.mock import MagicMock, patch
 
 import requests
@@ -43,62 +42,78 @@ def _parse_payload(data, kwargs):
 
 
 def before_all(context):
-    """Mock device HTTP so specs run without a real Pixoo on the network.
-    Set PIXOO_REAL_DEVICE=1 to disable mocking for @real_device scenarios."""
-    context._real_device = os.environ.get("PIXOO_REAL_DEVICE") == "1"
+    """Mock device HTTP so specs run without a real Pixoo on the network."""
+    context._real_device = False
     context._push_history = []
     context._command_history = []
     context._mock_pic_id = 1
-    if context._real_device:
-        context._post_patcher = None
-        return
+    context._post_patcher = None
 
-    def fake_post(url, data=None, **kwargs):
-        payload = _parse_payload(data, kwargs)
-        command = payload.get("Command")
-        mode = getattr(context, "mock_mode", "success")
 
-        if mode == "validate_fail" and command == "Channel/GetAllConf":
-            raise requests.exceptions.RequestException("mock network failure")
-        if mode == "load_counter_fail" and command == "Draw/GetHttpGifId":
-            return _mock_response({"error_code": 1})
-        if mode == "push_fail" and command in ("Draw/SendHttpGif", "Draw/CommandList"):
-            return _mock_response({"error_code": 1})
+def _fake_post(context, url, data=None, **kwargs):
+    if "GetTimeDialFont" in url:
+        return _mock_response(
+            {
+                "ReturnCode": 0,
+                "ReturnMessage": "",
+                "FontList": [
+                    {
+                        "id": 4,
+                        "name": "font_4",
+                        "width": "8",
+                        "high": "8",
+                        "charset": "",
+                        "type": 0,
+                    }
+                ],
+            }
+        )
+    payload = _parse_payload(data, kwargs)
+    command = payload.get("Command")
+    mode = getattr(context, "mock_mode", "success")
 
-        if command == "Draw/GetHttpGifId":
-            context._command_history.append(payload)
-            return _mock_response({"error_code": 0, "PicId": context._mock_pic_id})
+    if mode == "validate_fail" and command == "Channel/GetAllConf":
+        raise requests.exceptions.RequestException("mock network failure")
+    if mode == "load_counter_fail" and command == "Draw/GetHttpGifId":
+        return _mock_response({"error_code": 1})
+    if mode == "push_fail" and command in ("Draw/SendHttpGif", "Draw/CommandList"):
+        return _mock_response({"error_code": 1})
 
-        if command == "Draw/ResetHttpGifId":
-            context._mock_pic_id = 1
-            context._command_history.append(payload)
-            return _mock_response({"error_code": 0})
+    if command == "Draw/GetHttpGifId":
+        context._command_history.append(payload)
+        return _mock_response({"error_code": 0, "PicId": context._mock_pic_id})
 
-        if command == "Draw/SendHttpGif":
-            context._command_history.append(payload)
-            _decode_push_frame(payload, context._push_history)
-            return _mock_response({"error_code": 0})
-
-        if command == "Draw/CommandList":
-            context._command_history.append(payload)
-            for nested in payload.get("CommandList", []):
-                if nested.get("Command") == "Draw/SendHttpGif":
-                    _decode_push_frame(nested, context._push_history)
-            return _mock_response({"error_code": 0})
-
-        if command in (
-            "Draw/SendHttpText",
-            "Draw/ClearHttpText",
-            "Device/PlayTFGif",
-            "Channel/GetAllConf",
-        ):
-            context._command_history.append(payload)
-            return _mock_response({"error_code": 0})
-
+    if command == "Draw/ResetHttpGifId":
+        context._mock_pic_id = 1
+        context._command_history.append(payload)
         return _mock_response({"error_code": 0})
 
-    context._post_patcher = patch("pypixoo.pixoo.requests.post", side_effect=fake_post)
-    context._post_patcher.start()
+    if command == "Draw/SendHttpGif":
+        context._command_history.append(payload)
+        _decode_push_frame(payload, context._push_history)
+        return _mock_response({"error_code": 0})
+
+    if command == "Draw/CommandList":
+        context._command_history.append(payload)
+        for nested in payload.get("CommandList", []):
+            if nested.get("Command") == "Draw/SendHttpGif":
+                _decode_push_frame(nested, context._push_history)
+        return _mock_response({"error_code": 0})
+
+    if command in (
+        "Draw/SendHttpText",
+        "Draw/ClearHttpText",
+        "Device/PlayTFGif",
+        "Channel/GetAllConf",
+    ):
+        context._command_history.append(payload)
+        return _mock_response({"error_code": 0})
+
+    if command:
+        context._command_history.append(payload)
+        return _mock_response({"error_code": 0})
+
+    return _mock_response({"error_code": 0})
 
 
 def _fake_png_bytes(size=(32, 32)):
@@ -189,6 +204,13 @@ def before_scenario(context, scenario):
     elif "mock_push_fail" in scenario.tags:
         context.mock_mode = "push_fail"
 
+    if "real_device" not in scenario.tags:
+        context._post_patcher = patch(
+            "pypixoo.pixoo.requests.post",
+            side_effect=lambda url, data=None, **kwargs: _fake_post(context, url, data, **kwargs),
+        )
+        context._post_patcher.start()
+
     if "mock_browser" in scenario.tags:
         try:
             p1 = patch(
@@ -227,6 +249,9 @@ def before_scenario(context, scenario):
 
 def after_scenario(context, scenario):
     """Stop browser mocks after scenario."""
+    if context._post_patcher is not None:
+        context._post_patcher.stop()
+        context._post_patcher = None
     if "mock_browser" in scenario.tags:
         for p in _browser_patchers:
             p.stop()

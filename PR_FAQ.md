@@ -48,4 +48,4 @@ We test the library, not the device. Specs mock `requests.post` and assert paylo
 
 ### How do I run against a real device?
 
-Set `PIXOO_REAL_DEVICE=1` and run the CLI or `@real_device` scenarios.
+Run the CLI or `@real_device` scenarios against a real device.

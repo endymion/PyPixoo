@@ -7,3 +7,5 @@ dist/
 coverage.xml
 htmlcov/
 project/.cache/
+docs/_build/
+docs/api/showdoc/

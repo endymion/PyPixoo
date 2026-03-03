@@ -40,6 +40,8 @@ seq = renderer.precompute()
 
 The library appends `&t=<timestamp>` to the URL for each frame, so the Clock (or any component that uses the `t` arg) updates per frame.
 
+Note: Pixoo built-in fonts are rendered natively via `Draw/SendHttpText` overlays. If you want those fonts (and exact device text metrics), send overlays with `TextOverlay` while using Storybook frames as the background.
+
 ## Stories
 
 - **Pixoo/Clock** – Simple clock with a hand; `t` (0–1) sets the hand angle (one full rotation per cycle).

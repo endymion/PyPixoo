@@ -39,27 +39,52 @@ behave
 
 Specs mock the device HTTP layer, so no Pixoo is required.
 
+## Documentation
+
+Sphinx docs live in `docs/sphinx/`. Build them with:
+
+```bash
+pip install -e ".[dev]"
+sphinx-build -b html docs/sphinx docs/_build/html
+```
+
+Real-device demos live in `demos/` and are documented in `demos/README.md`.
+
 ### CLI
 
-A `pypixoo` command is installed with the package. Set `PIXOO_REAL_DEVICE=1` to send to a real device.
+A `pypixoo` command is installed with the package. Use a real device on your network to run commands.
+By default the CLI reads `PIXOO_DEVICE_IP` (or legacy `PIXOO_IP`) from the environment or a local `.env` file.
+Use `--ip` to override for a single command.
 
 ```bash
 # Fill the display with a color (hex or name)
-PIXOO_REAL_DEVICE=1 pypixoo fill FF00FF
+pypixoo fill FF00FF
 
 # Load an image (resized to 64×64) and push
-PIXOO_REAL_DEVICE=1 pypixoo load-image path/to/image.png
+pypixoo load-image path/to/image.png
 
 # Upload native sequence
-PIXOO_REAL_DEVICE=1 pypixoo upload-sequence frame1.png frame2.png --speed-ms 120 --mode command_list --chunk-size 40
+pypixoo upload-sequence frame1.png frame2.png --speed-ms 120 --mode command_list --chunk-size 40
 
 # Native GIF playback
-PIXOO_REAL_DEVICE=1 pypixoo play-gif-url https://example.com/anim.gif
-PIXOO_REAL_DEVICE=1 pypixoo play-gif-file divoom_gif/1.gif
-PIXOO_REAL_DEVICE=1 pypixoo play-gif-dir divoom_gif/
+pypixoo play-gif-url https://example.com/anim.gif
+pypixoo play-gif-file divoom_gif/1.gif
+pypixoo play-gif-dir divoom_gif/
 
 # Cycle ordered items
-PIXOO_REAL_DEVICE=1 pypixoo cycle --item 'sequence=120:frame1.png,frame2.png' --item 'url=https://example.com/anim.gif' --loop 2
+pypixoo cycle --item 'sequence=120:frame1.png,frame2.png' --item 'url=https://example.com/anim.gif' --loop 2
+
+# List built-in display list fonts (no device required)
+pypixoo list-fonts
+
+# Send a native text overlay (requires a prior animation upload)
+pypixoo text-overlay "hello" --x 0 --y 40 --font font_4 --width 56 --speed 10
+
+# Clear overlays
+pypixoo clear-text
+
+# Raw command passthrough
+pypixoo raw-command Device/SetHighLightMode Mode=1
 ```
 
 If the `pypixoo` script is not on your PATH, run `python -m pypixoo.cli` instead.
@@ -126,6 +151,34 @@ seq = renderer.precompute()
 pixoo = Pixoo("192.168.0.37")
 pixoo.connect()
 pixoo.upload_sequence(seq, mode=UploadMode.COMMAND_LIST)
+```
+
+### Native fonts + web backgrounds
+
+```python
+from pypixoo import BuiltinFont, FrameRenderer, Pixoo, TextOverlay, WebFrameSource
+
+renderer = FrameRenderer(
+    sources=[
+        WebFrameSource(
+            url="http://localhost:6006/iframe.html?id=pixoo-clock--default",
+            timestamps=[0.0, 0.5, 1.0],
+            duration_per_frame_ms=200,
+            browser_mode="persistent",
+        )
+    ]
+)
+seq = renderer.precompute()
+
+pixoo = Pixoo("192.168.0.37")
+pixoo.connect()
+pixoo.upload_sequence_with_overlays(
+    seq,
+    overlays=[
+        TextOverlay(text="ALERT", x=2, y=2, font=BuiltinFont.FONT_4, text_width=60, speed=8),
+    ],
+    clear_before=True,
+)
 ```
 
 ### Cycle orchestration

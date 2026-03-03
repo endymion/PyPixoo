@@ -6,7 +6,7 @@ Uses FrameRenderer with StaticFrameSource (solid buffers) and WebFrameSource
 callbacks, then plays the sequence on the device in a loop until Ctrl+C.
 
 Requires: pip install -e ".[browser]" (Playwright)
-Requires a Pixoo 64 at 192.168.0.37. Run from project root:
+Requires a Pixoo 64 (PIXOO_DEVICE_IP or 192.168.0.37). Run from project root:
 
   python demos/browser_mixed.py
 """
@@ -15,14 +15,15 @@ import os
 from pathlib import Path
 import time
 
-# Demos always use the real device
-os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
+from dotenv import load_dotenv
 
 from pypixoo import Pixoo, FrameRenderer, StaticFrameSource, WebFrameSource, AnimationPlayer
 from pypixoo.buffer import Buffer
 
+load_dotenv()
+
 SIZE = 64
-IP = "192.168.0.37"
+IP = os.environ.get("PIXOO_DEVICE_IP") or os.environ.get("PIXOO_IP") or "192.168.0.37"
 
 # Local HTML that changes color with query param ?t=0..1 (see demos/fixtures/web_frame.html)
 FIXTURE_HTML = (

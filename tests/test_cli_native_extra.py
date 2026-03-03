@@ -1,6 +1,5 @@
 """Extra CLI tests to cover environment and parser edge branches."""
 
-import os
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -8,26 +7,19 @@ import pytest
 from PIL import Image
 
 from pypixoo.cli import (
+    DEFAULT_IP,
     _buffer_from_image,
     _connect,
     _parse_sequence_spec,
-    _require_real_device,
+    _resolve_default_ip,
     cmd_cycle,
     cmd_upload_sequence,
 )
 from pypixoo.pixoo import DeviceInUseError
 
 
-class TestRequireRealDevice:
-    def test_require_real_device_exits_without_env(self, monkeypatch):
-        monkeypatch.delenv("PIXOO_REAL_DEVICE", raising=False)
-        with pytest.raises(SystemExit):
-            _require_real_device()
-
-
 class TestConnectBranches:
     def test_connect_exits_when_pixoo_connect_false(self, monkeypatch):
-        monkeypatch.setenv("PIXOO_REAL_DEVICE", "1")
         fake = MagicMock()
         fake.connect.return_value = False
         with patch("pypixoo.cli.Pixoo", return_value=fake):
@@ -35,7 +27,6 @@ class TestConnectBranches:
                 _connect("192.168.0.37")
 
     def test_connect_exits_on_device_in_use(self, monkeypatch):
-        monkeypatch.setenv("PIXOO_REAL_DEVICE", "1")
         fake = MagicMock()
         fake.connect.side_effect = DeviceInUseError("192.168.0.37")
         with patch("pypixoo.cli.Pixoo", return_value=fake):
@@ -123,3 +114,20 @@ class TestCommandBranches:
 
         fake_handle.stop.assert_called_once()
         fake_handle.wait.assert_called_once_with(2.0)
+
+
+class TestDefaultIpResolution:
+    def test_prefers_pixoo_device_ip(self, monkeypatch):
+        monkeypatch.setenv("PIXOO_DEVICE_IP", "10.0.0.5")
+        monkeypatch.delenv("PIXOO_IP", raising=False)
+        assert _resolve_default_ip() == "10.0.0.5"
+
+    def test_falls_back_to_pixoo_ip(self, monkeypatch):
+        monkeypatch.delenv("PIXOO_DEVICE_IP", raising=False)
+        monkeypatch.setenv("PIXOO_IP", "10.0.0.6")
+        assert _resolve_default_ip() == "10.0.0.6"
+
+    def test_falls_back_to_default(self, monkeypatch):
+        monkeypatch.delenv("PIXOO_DEVICE_IP", raising=False)
+        monkeypatch.delenv("PIXOO_IP", raising=False)
+        assert _resolve_default_ip() == DEFAULT_IP

@@ -16,7 +16,7 @@ import os
 import sys
 from pathlib import Path
 
-os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
+from dotenv import load_dotenv
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from PIL import Image
@@ -25,7 +25,8 @@ from pypixoo import Pixoo
 
 SIZE = 64
 FIXTURE_PATH = Path(__file__).resolve().parent / "fixtures" / "letter_a_rendered.png"
-IP_DEFAULT = "192.168.0.37"
+load_dotenv()
+IP_DEFAULT = os.environ.get("PIXOO_DEVICE_IP") or os.environ.get("PIXOO_IP") or "192.168.0.37"
 
 
 def build_letter_a_buffer():

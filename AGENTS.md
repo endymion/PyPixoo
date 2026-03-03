@@ -62,7 +62,7 @@ Outside-in, behavior-first:
 
 - **Run specs:** `behave --tags '~real_device'` (CI excludes @real_device)
 - **Run specs with coverage (must be 100%):** `coverage run -m behave --tags '~real_device' && coverage report --fail-under=100`
-- **Run against real device:** `PIXOO_REAL_DEVICE=1 behave --tags real_device` (device plugged in, edit IP in feature file if needed)
+- **Run against real device:** `behave --tags real_device` (device plugged in, edit IP in feature file if needed)
 - **Install:** `pip install -e ".[dev]"` (includes Playwright for browser feature)
 - **Device IP:** Specs use hardcoded IP in feature file (e.g. `192.168.0.37`). The device is mocked; no real Pixoo required for CI.
 

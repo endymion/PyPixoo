@@ -1,22 +1,23 @@
 #!/usr/bin/env python3
 """Demo: Black vertical band animating left-to-right with transparency over gradient background.
 
-Requires a Pixoo 64 at 192.168.0.37. Run from project root:
+Requires a Pixoo 64 (PIXOO_DEVICE_IP or 192.168.0.37). Run from project root:
   python demos/black_band_transparent.py
 """
 
 import os
 from pathlib import Path
 
-# Demos always use the real device
-os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
+from dotenv import load_dotenv
 
 from pypixoo import Pixoo
 from pypixoo.animation import AnimationPlayer, AnimationSequence, Frame
 from pypixoo.buffer import Buffer
 
+load_dotenv()
+
 SIZE = 64
-IP = "192.168.0.37"
+IP = os.environ.get("PIXOO_DEVICE_IP") or os.environ.get("PIXOO_IP") or "192.168.0.37"
 GRADIENT_PATH = Path(__file__).resolve().parent.parent / "features" / "fixtures" / "gradient_magenta_to_black.png"
 
 

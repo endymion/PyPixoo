@@ -16,15 +16,14 @@ import sys
 import time
 from pathlib import Path
 
-# Demos always use the real device
-os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
-
+from dotenv import load_dotenv
 # Ensure we can import pypixoo (run from project root)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pypixoo import FrameRenderer, Pixoo, UploadMode, WebFrameSource
 
-IP_DEFAULT = "192.168.0.37"
+load_dotenv()
+IP_DEFAULT = os.environ.get("PIXOO_DEVICE_IP") or os.environ.get("PIXOO_IP") or "192.168.0.37"
 # Clock story iframe URL (t is appended per frame)
 CLOCK_URL_DEFAULT = "http://localhost:6006/iframe.html?id=pixoo-clock--default"
 

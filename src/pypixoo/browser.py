@@ -1,4 +1,9 @@
-"""Headless browser rendering for Pixoo 64 frame generation."""
+"""Headless browser rendering for Pixoo 64 frame generation.
+
+This path renders web content (including Google Fonts) via Playwright,
+captures frames, and uploads them to the device as raw pixels. Font load
+timing affects glyph accuracy; see docs/bugs/web-font-3px-height.md.
+"""
 
 import io
 from pathlib import Path

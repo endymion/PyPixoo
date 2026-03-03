@@ -1,6 +1,8 @@
 # PyPixoo Demos
 
-Demos require a Pixoo 64 on the network. Edit the IP in each script if needed (default: 192.168.0.37). **Demos use the real device by default** (no environment variable needed).
+Demos require a Pixoo 64 on the network. By default they read `PIXOO_DEVICE_IP` (or legacy `PIXOO_IP`)
+from the environment or a local `.env` file, falling back to `192.168.0.37`. You can also pass `--ip`
+when the script supports it.
 
 **Device lock:** Only one process can use a given device IP at a time. The library acquires an exclusive lock (under `~/.pypixoo/` or `$PYPIXOO_LOCK_DIR`) so running a second demo against the same IP fails with `DeviceInUseError` until the first exits or calls `pixoo.close()`.
 
@@ -44,4 +46,29 @@ python demos/clock_realtime.py --delivery upload --fps 6 --window-seconds 3
 # Uses local 192x192 fixture + 3x downsample (no Storybook required)
 python demos/font_showcase.py
 python demos/font_showcase.py --duration 3
+
+# Upload a short sequence (client pushes frames)
+python demos/demo_upload_sequence.py
+
+# Device fetches and plays a GIF from a URL
+python demos/demo_play_url_gif.py --url https://example.com/anim.gif
+
+# Upload then overlay text (device renders text on top)
+python demos/demo_text_overlay.py --text HELLO
+
+# Send a display list item
+python demos/demo_display_list.py
+
+# Exercise built-in tools (timer, stopwatch, scoreboard, noise, buzzer)
+python demos/demo_tools.py
+
+# Exercise device settings (brightness, rotation, mirror, 24h)
+python demos/demo_device_settings.py
+
+# Set weather location and read device weather info
+python demos/demo_weather.py --longitude -73.9857 --latitude 40.7484
+
+# Render web fonts in Playwright then upload to device
+# Requires: pip install -e ".[browser]"
+python demos/demo_web_fonts.py
 ```

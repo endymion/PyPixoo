@@ -9,6 +9,7 @@ from typing import Callable, List, Literal, Optional, Sequence
 from pydantic import BaseModel, Field, model_validator
 
 from pypixoo.buffer import Buffer
+from pypixoo.fonts import BuiltinFont
 
 
 class UploadMode(str, Enum):
@@ -52,18 +53,84 @@ class GifSource(BaseModel):
 
 
 class TextOverlay(BaseModel):
-    """Payload model for Draw/SendHttpText."""
+    """Payload model for Draw/SendHttpText.
+
+    The device renders this text on top of the last uploaded animation.
+    Built-in animation fonts are limited to IDs 0-7.
+    """
 
     text_id: int = Field(default=1, ge=0)
     x: int = 0
     y: int = 0
     direction: int = Field(default=0, ge=0)
-    font: int = Field(default=4, ge=0)
+    font: int | BuiltinFont = Field(default=BuiltinFont.FONT_4)
     text_width: int = Field(default=64, ge=0)
     speed: int = Field(default=10, ge=0)
     text: str
     color: str = "#FFFF00"
     align: int = Field(default=1, ge=0)
+
+    @model_validator(mode="after")
+    def _validate_font_range(self) -> "TextOverlay":
+        font_value = int(self.font)
+        if font_value < 0 or font_value > 7:
+            raise ValueError("TextOverlay font must be between 0 and 7 for Draw/SendHttpText")
+        return self
+
+
+class DisplayItem(BaseModel):
+    """Item entry for Draw/SendHttpItemList display lists.
+
+    Display list fonts are separate from overlay fonts and come from the
+    Divoom font list services.
+    """
+
+    text_id: int = Field(default=1, ge=0)
+    item_type: int = Field(..., ge=0)
+    x: int = 0
+    y: int = 0
+    direction: int = Field(default=0, ge=0)
+    font: int = Field(default=0, ge=0)
+    text_width: int = Field(default=16, ge=0)
+    text_height: int = Field(default=16, ge=0)
+    text: Optional[str] = None
+    speed: int = Field(default=10, ge=0)
+    color: str = "#FFFF00"
+
+
+class TimerTool(BaseModel):
+    """Payload model for Tools/SetTimer (device countdown tool)."""
+
+    minute: int = Field(ge=0)
+    second: int = Field(ge=0)
+    status: int = Field(ge=0)
+
+
+class StopWatchTool(BaseModel):
+    """Payload model for Tools/SetStopWatch (device stopwatch)."""
+
+    status: int = Field(ge=0)
+
+
+class ScoreBoardTool(BaseModel):
+    """Payload model for Tools/SetScoreBoard (device scoreboard)."""
+
+    blue_score: int = Field(ge=0)
+    red_score: int = Field(ge=0)
+
+
+class NoiseTool(BaseModel):
+    """Payload model for Tools/SetNoiseStatus (device noise tool)."""
+
+    noise_status: int = Field(ge=0)
+
+
+class WhiteBalance(BaseModel):
+    """Payload model for Device/SetWhiteBalance."""
+
+    r: int = Field(ge=0)
+    g: int = Field(ge=0)
+    b: int = Field(ge=0)
 
 
 class CycleItem(BaseModel):

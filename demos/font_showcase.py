@@ -19,14 +19,16 @@ import time
 from pathlib import Path
 from urllib.parse import urlencode
 
-os.environ.setdefault("PIXOO_REAL_DEVICE", "1")
+from dotenv import load_dotenv
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pypixoo import GifFrame, GifSequence, Pixoo, FrameRenderer, UploadMode, WebFrameSource
 from pypixoo.buffer import Buffer
 from PIL import Image
 
-IP_DEFAULT = "192.168.0.37"
+load_dotenv()
+IP_DEFAULT = os.environ.get("PIXOO_DEVICE_IP") or os.environ.get("PIXOO_IP") or "192.168.0.37"
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures"
 TINYTEXT_FIXTURE = FIXTURES_DIR / "tinytext_192.html"
 TRACKING_PX = 0

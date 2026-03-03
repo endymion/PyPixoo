@@ -14,16 +14,23 @@ import requests
 from PIL import Image
 
 from pypixoo.buffer import Buffer
+from pypixoo.fonts import DEFAULT_FONT_LIST_URL, FontRegistry, fetch_font_registry
 from pypixoo.native import (
     CycleHandle,
     CycleItem,
+    DisplayItem,
     GifFrame,
     GifSequence,
     GifSource,
+    NoiseTool,
     OnItemCallback,
     OnLoopCallback,
+    ScoreBoardTool,
+    StopWatchTool,
+    TimerTool,
     TextOverlay,
     UploadMode,
+    WhiteBalance,
 )
 
 try:
@@ -58,10 +65,7 @@ def _acquire_device_lock(ip_address: str):
     """
     Acquire an exclusive lock for this device IP. Returns an open file object.
     Raises DeviceInUseError if the device is already locked by another process.
-    Only runs when PIXOO_REAL_DEVICE=1; otherwise returns None (no lock).
     """
-    if os.environ.get("PIXOO_REAL_DEVICE") != "1":
-        return None
     if fcntl is None:
         return None
     path = _device_lock_path(ip_address)
@@ -93,8 +97,8 @@ class Pixoo:
 
     def connect(self) -> bool:
         """Test connection and load GIF counter. Returns True if connected.
-        When PIXOO_REAL_DEVICE=1, acquires an exclusive lock for this device IP;
-        raises DeviceInUseError if another process holds the lock."""
+        Acquires an exclusive lock for this device IP when available; raises
+        DeviceInUseError if another process holds the lock."""
         if self._lock_file is None:
             lock_file = _acquire_device_lock(self.ip_address)
             if lock_file is not None:
@@ -167,7 +171,11 @@ class Pixoo:
         mode: UploadMode = UploadMode.FRAME_BY_FRAME,
         chunk_size: int = 40,
     ) -> int:
-        """Upload a native HttpGif sequence and return the PicID used."""
+        """Upload a native HttpGif sequence and return the PicID used.
+
+        This pushes raw frame data from the client to the device. The device
+        does not fetch anything from the network in this path.
+        """
         if not sequence.frames:
             raise ValueError("GifSequence requires at least one frame")
 
@@ -208,7 +216,10 @@ class Pixoo:
         return pic_id
 
     def play_gif(self, source: GifSource) -> None:
-        """Play a GIF from URL, TF file, or TF directory via Device/PlayTFGif."""
+        """Play a GIF from URL, TF file, or TF directory via Device/PlayTFGif.
+
+        For URL sources, the device performs the download and playback.
+        """
         file_type = {
             "tf_file": 0,
             "tf_directory": 1,
@@ -224,7 +235,10 @@ class Pixoo:
         self._last_playback_mode = "playtfgif"
 
     def send_text_overlay(self, overlay: TextOverlay) -> None:
-        """Send overlay text for HttpGif playback context."""
+        """Send overlay text for an uploaded HttpGif sequence.
+
+        The device renders the text on top of the last uploaded animation.
+        """
         if self._last_playback_mode == "playtfgif":
             raise ValueError("Text overlay is only supported with uploaded HttpGif playback")
         self._post_command(
@@ -234,7 +248,7 @@ class Pixoo:
                 "x": overlay.x,
                 "y": overlay.y,
                 "dir": overlay.direction,
-                "font": overlay.font,
+                "font": int(overlay.font),
                 "TextWidth": overlay.text_width,
                 "speed": overlay.speed,
                 "TextString": overlay.text,
@@ -247,6 +261,243 @@ class Pixoo:
         """Clear any Draw/SendHttpText overlays."""
         self._post_command({"Command": "Draw/ClearHttpText"})
 
+    def upload_sequence_with_overlays(
+        self,
+        sequence: GifSequence,
+        overlays: Sequence[TextOverlay],
+        *,
+        clear_before: bool = True,
+        mode: UploadMode = UploadMode.COMMAND_LIST,
+        chunk_size: int = 40,
+    ) -> int:
+        """Upload a sequence and then send overlays in order.
+
+        This is a convenience wrapper for device-side overlays after upload.
+        """
+        pic_id = self.upload_sequence(sequence, mode=mode, chunk_size=chunk_size)
+        if clear_before:
+            self.clear_text_overlay()
+        for overlay in overlays:
+            self.send_text_overlay(overlay)
+        return pic_id
+
+    def list_fonts(self, url: str = DEFAULT_FONT_LIST_URL) -> FontRegistry:
+        """Fetch the official display list font registry (external service)."""
+        return fetch_font_registry(url=url).registry
+
+    def command(self, command: str, payload: Optional[dict] = None) -> dict:
+        """Send a raw command payload with a Command string."""
+        body = {"Command": command}
+        if payload:
+            body.update(payload)
+        return self._post_command(body)
+
+    def set_brightness(self, brightness: int) -> None:
+        """Set device brightness (0-100)."""
+        self._post_command({"Command": "Channel/SetBrightness", "Brightness": brightness})
+
+    def set_channel_index(self, index: int) -> None:
+        """Select the device channel by index."""
+        self._post_command({"Command": "Channel/SetIndex", "SelectIndex": index})
+
+    def set_custom_page_index(self, index: int) -> None:
+        """Select custom channel page index."""
+        self._post_command({"Command": "Channel/SetCustomPageIndex", "CustomPageIndex": index})
+
+    def set_eq_position(self, index: int) -> None:
+        """Select visualizer EQ position index."""
+        self._post_command({"Command": "Channel/SetEqPosition", "EqPosition": index})
+
+    def set_cloud_index(self, index: int) -> None:
+        """Select cloud gallery index."""
+        self._post_command({"Command": "Channel/CloudIndex", "Index": index})
+
+    def get_channel_index(self) -> int:
+        """Get current channel index."""
+        data = self._post_command({"Command": "Channel/GetIndex"})
+        return int(data.get("SelectIndex", 0))
+
+    def get_all_conf(self) -> dict:
+        """Get all device configuration (Channel/GetAllConf)."""
+        return self._post_command({"Command": "Channel/GetAllConf"})
+
+    def set_time_zone(self, value: str) -> None:
+        """Set device time zone (e.g. GMT-5)."""
+        self._post_command({"Command": "Sys/TimeZone", "TimeZoneValue": value})
+
+    def set_weather_location(self, longitude: str, latitude: str) -> None:
+        """Set device longitude/latitude for weather data."""
+        self._post_command({"Command": "Sys/LogAndLat", "Longitude": longitude, "Latitude": latitude})
+
+    def set_utc_time(self, utc_seconds: int) -> None:
+        """Set device UTC time (seconds since epoch)."""
+        self._post_command({"Command": "Device/SetUTC", "Utc": utc_seconds})
+
+    def set_screen_on(self, on: bool) -> None:
+        """Turn the screen on or off."""
+        self._post_command({"Command": "Channel/OnOffScreen", "OnOff": 1 if on else 0})
+
+    def get_device_time(self) -> dict:
+        """Get device time info."""
+        return self._post_command({"Command": "Device/GetDeviceTime"})
+
+    def set_temperature_mode(self, mode: int) -> None:
+        """Set temperature display mode (0=C, 1=F)."""
+        self._post_command({"Command": "Device/SetDisTempMode", "Mode": mode})
+
+    def set_screen_rotation(self, mode: int) -> None:
+        """Set screen rotation angle mode."""
+        self._post_command({"Command": "Device/SetScreenRotationAngle", "Mode": mode})
+
+    def set_mirror_mode(self, mode: int) -> None:
+        """Set mirror mode."""
+        self._post_command({"Command": "Device/SetMirrorMode", "Mode": mode})
+
+    def set_time_24_flag(self, mode: int) -> None:
+        """Set 24-hour flag (1=24h, 0=12h)."""
+        self._post_command({"Command": "Device/SetTime24Flag", "Mode": mode})
+
+    def set_high_light_mode(self, mode: int) -> None:
+        """Set highlight mode."""
+        self._post_command({"Command": "Device/SetHighLightMode", "Mode": mode})
+
+    def set_white_balance(self, balance: WhiteBalance | tuple[int, int, int]) -> None:
+        """Set screen white balance (R,G,B)."""
+        if isinstance(balance, tuple):
+            balance = WhiteBalance(r=balance[0], g=balance[1], b=balance[2])
+        self._post_command(
+            {
+                "Command": "Device/SetWhiteBalance",
+                "RValue": balance.r,
+                "GValue": balance.g,
+                "BValue": balance.b,
+            }
+        )
+
+    def get_weather_info(self) -> dict:
+        """Get device weather info (device-side weather mode data)."""
+        return self._post_command({"Command": "Device/GetWeatherInfo"})
+
+    def reboot(self) -> None:
+        """Reboot the device."""
+        self._post_command({"Command": "Device/SysReboot"})
+
+    def set_clock_select_id(self, clock_id: int) -> None:
+        """Select clock face ID."""
+        self._post_command({"Command": "Channel/SetClockSelectId", "ClockId": clock_id})
+
+    def get_clock_info(self) -> dict:
+        """Get current clock info."""
+        return self._post_command({"Command": "Channel/GetClockInfo"})
+
+    def send_display_list(self, items: Sequence[DisplayItem]) -> None:
+        """Send a display item list (Draw/SendHttpItemList).
+
+        This uses dial/display-list fonts from the Divoom font list service.
+        """
+        payload_items = []
+        for item in items:
+            payload_items.append(
+                {
+                    "TextId": item.text_id,
+                    "type": item.item_type,
+                    "x": item.x,
+                    "y": item.y,
+                    "dir": item.direction,
+                    "font": item.font,
+                    "TextWidth": item.text_width,
+                    "Textheight": item.text_height,
+                    "TextString": item.text or "",
+                    "speed": item.speed,
+                    "color": item.color,
+                }
+            )
+        self._post_command({"Command": "Draw/SendHttpItemList", "ItemList": payload_items})
+
+    def play_buzzer(self, active_ms: int, off_ms: int, total_ms: int) -> None:
+        """Play device buzzer for a duration."""
+        self._post_command(
+            {
+                "Command": "Device/PlayBuzzer",
+                "ActiveTimeInCycle": active_ms,
+                "OffTimeInCycle": off_ms,
+                "PlayTotalTime": total_ms,
+            }
+        )
+
+    def play_remote_gif(self, file_id: str) -> None:
+        """Play a remote GIF by FileId (Draw/SendRemote)."""
+        self._post_command({"Command": "Draw/SendRemote", "FileId": file_id})
+
+    def use_http_command_source(self, url: str) -> None:
+        """Use a remote HTTP command list file (Draw/UseHTTPCommandSource)."""
+        self._post_command({"Command": "Draw/UseHTTPCommandSource", "Url": url})
+
+    def set_countdown_timer(self, tool: TimerTool | tuple[int, int, int]) -> None:
+        """Control countdown timer tool."""
+        if isinstance(tool, tuple):
+            tool = TimerTool(minute=tool[0], second=tool[1], status=tool[2])
+        self._post_command(
+            {
+                "Command": "Tools/SetTimer",
+                "Minute": tool.minute,
+                "Second": tool.second,
+                "Status": tool.status,
+            }
+        )
+
+    def set_stopwatch(self, tool: StopWatchTool | int) -> None:
+        """Control stopwatch tool."""
+        if isinstance(tool, int):
+            tool = StopWatchTool(status=tool)
+        self._post_command({"Command": "Tools/SetStopWatch", "Status": tool.status})
+
+    def set_scoreboard(self, tool: ScoreBoardTool | tuple[int, int]) -> None:
+        """Control scoreboard tool."""
+        if isinstance(tool, tuple):
+            tool = ScoreBoardTool(blue_score=tool[0], red_score=tool[1])
+        self._post_command(
+            {
+                "Command": "Tools/SetScoreBoard",
+                "BlueScore": tool.blue_score,
+                "RedScore": tool.red_score,
+            }
+        )
+
+    def set_noise_status(self, tool: NoiseTool | int) -> None:
+        """Control noise tool."""
+        if isinstance(tool, int):
+            tool = NoiseTool(noise_status=tool)
+        self._post_command({"Command": "Tools/SetNoiseStatus", "NoiseStatus": tool.noise_status})
+
+    @staticmethod
+    def find_devices(timeout: int = 8) -> dict:
+        """Find devices on local network via official service."""
+        url = "https://app.divoom-gz.com/Device/ReturnSameLANDevice"
+        response = requests.post(url, timeout=timeout)
+        return response.json()
+
+    @staticmethod
+    def get_img_upload_list(device_id: int, device_mac: str, page: int = 1) -> dict:
+        """Fetch uploaded image list from official service."""
+        url = "https://app.divoom-gz.com/Device/GetImgUploadList"
+        response = requests.post(
+            url,
+            json={"DeviceId": device_id, "DeviceMac": device_mac, "Page": page},
+            timeout=8,
+        )
+        return response.json()
+
+    @staticmethod
+    def get_img_like_list(device_id: int, device_mac: str, page: int = 1) -> dict:
+        """Fetch liked image list from official service."""
+        url = "https://app.divoom-gz.com/Device/GetImgLikeList"
+        response = requests.post(
+            url,
+            json={"DeviceId": device_id, "DeviceMac": device_mac, "Page": page},
+            timeout=8,
+        )
+        return response.json()
     def start_cycle(
         self,
         items: Sequence[CycleItem],
