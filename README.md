@@ -49,6 +49,7 @@ sphinx-build -b html docs/sphinx docs/_build/html
 ```
 
 Real-device demos live in `demos/` and are documented in `demos/README.md`.
+The unified smooth clock demo is `demos/pixooclock.py` (with `--demo` comparison mode).
 
 ### CLI
 

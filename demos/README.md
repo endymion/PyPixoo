@@ -54,19 +54,31 @@ python demos/demo_upload_sequence.py
 python demos/demo_sequence_switching.py --mode stitched
 python demos/demo_sequence_switching.py --mode live
 
-# Three-hand analog clock via stitched native uploads (phase-locked segments)
-# Default delivery is push to avoid device "Loading..." overlays between segments
-python demos/demo_three_hand_clock.py
-python demos/demo_three_hand_clock.py --once --fps 4 --segment-seconds 10
-python demos/demo_three_hand_clock.py --fps 6 --segment-seconds 12
-python demos/demo_three_hand_clock.py --delivery stitched --fps 4 --segment-seconds 10
-python demos/demo_three_hand_clock.py --hour-hand-color gray11 --minute-hand-color dark.gray11 --second-hand-color grayDark11
+# Unified smooth clock demo
+# `pixooclock` is the canonical clock script; demo_three_hand_clock.py is a compatibility wrapper.
+# Default preset is user-validated: face=dot12, band=sand, hand AA on, dot AA on, second hand off.
+python demos/pixooclock.py
+python demos/pixooclock.py --face default --second-hand --no-anti-aliasing
+python demos/pixooclock.py --band tomato
+python demos/pixooclock.py --face ticks_all_thick_quarters --anti-aliasing
+python demos/pixooclock.py --face dot12 --band sand --dot-anti-aliasing
+python demos/pixooclock.py --once --fps 4 --segment-seconds 10
+python demos/pixooclock.py --delivery stitched --fps 4 --segment-seconds 10
+
+# Visual comparison mode: cycle every 5s through all combinations:
+# color band x face x second-hand(on/off) x anti-aliasing(on/off)
+python demos/pixooclock.py --demo --demo-interval-seconds 5
+
+# Optional: reduce demo sweep to a subset of color bands
+python demos/pixooclock.py --demo --demo-bands tomato,purple,blue
 
 # Troubleshooting:
 # - If you only see a static/default channel, run with --once and lower fps first.
 # - If you see periodic "Loading..." flashes, use/keep --delivery push (default).
 # - If hands appear truncated or updates stall, lower --fps or --segment-seconds.
 # - Color args support hex/rgb/name and Radix tokens (gray11, dark.gray11, grayDark11).
+# - `--band tomato` remaps the default intensity slots: top=10, markers/minute=7, hour=9, second/center=5.
+# - `--dot-anti-aliasing` smooths marker/center dots independently from hand anti-aliasing.
 
 # Device fetches and plays a GIF from a URL
 python demos/demo_play_url_gif.py --url https://example.com/anim.gif

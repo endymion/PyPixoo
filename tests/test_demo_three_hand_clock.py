@@ -1,4 +1,4 @@
-"""Unit tests for demos/demo_three_hand_clock.py helper logic."""
+"""Unit tests for demos/pixooclock.py helper logic."""
 
 from __future__ import annotations
 
@@ -14,8 +14,8 @@ from pypixoo.buffer import Buffer
 
 
 def _load_demo_module():
-    path = Path(__file__).resolve().parents[1] / "demos" / "demo_three_hand_clock.py"
-    spec = importlib.util.spec_from_file_location("demo_three_hand_clock", path)
+    path = Path(__file__).resolve().parents[1] / "demos" / "pixooclock.py"
+    spec = importlib.util.spec_from_file_location("pixooclock", path)
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -60,10 +60,16 @@ def test_build_segment_sequence_respects_max_frames():
         marker_outer_radius=30,
         marker_thickness=1,
         top_marker_thickness=2,
+        quarter_marker_thickness=2,
         hour_thickness=2,
         minute_thickness=2,
         second_thickness=1,
         center_radius=1,
+        face="default",
+        band="custom",
+        second_hand=True,
+        anti_aliasing=False,
+        dot_anti_aliasing=False,
     )
     sequence = clock_demo.build_segment_sequence(
         segment_start=0.0,
@@ -74,6 +80,38 @@ def test_build_segment_sequence_respects_max_frames():
     )
     assert len(sequence.frames) <= 88
     assert sequence.speed_ms >= 20
+
+
+def test_minute_hand_changes_between_adjacent_seconds_with_tip_accent():
+    style = clock_demo.ClockStyle(
+        dial_color=(0, 0, 0),
+        marker_color=(0, 0, 0),
+        top_marker_color=(0, 0, 0),
+        hour_hand_color=(0, 0, 0),
+        minute_hand_color=(200, 200, 200),
+        second_hand_color=(0, 0, 0),
+        center_color=(0, 0, 0),
+        hour_length=0,
+        minute_length=28,
+        second_length=0,
+        marker_inner_radius=26,
+        marker_outer_radius=30,
+        marker_thickness=1,
+        top_marker_thickness=1,
+        quarter_marker_thickness=1,
+        hour_thickness=1,
+        minute_thickness=2,
+        second_thickness=1,
+        center_radius=0,
+        face="default",
+        band="custom",
+        second_hand=False,
+        anti_aliasing=True,
+        dot_anti_aliasing=False,
+    )
+    frame_a = clock_demo.render_clock_frame(1_700_000_000.0, style)
+    frame_b = clock_demo.render_clock_frame(1_700_000_001.0, style)
+    assert frame_a.data != frame_b.data
 
 
 def test_aligned_segment_start_rounds_up():
@@ -141,12 +179,20 @@ def test_parser_rejects_invalid_numeric_values():
     parser = clock_demo.build_parser(ip_default="192.168.0.37")
     args = parser.parse_args([])
     assert args.delivery == "push"
+    assert args.face == "dot12"
+    assert args.band == "sand"
+    assert args.second_hand is False
+    assert args.anti_aliasing is True
+    assert args.dot_anti_aliasing is True
+    assert args.fps == 3
     with pytest.raises(SystemExit):
         parser.parse_args(["--fps", "0"])
     with pytest.raises(SystemExit):
         parser.parse_args(["--segment-seconds", "0"])
     with pytest.raises(SystemExit):
         parser.parse_args(["--max-frames", "0"])
+    with pytest.raises(SystemExit):
+        parser.parse_args(["--demo-interval-seconds", "0"])
 
 
 def test_parser_accepts_radix_color_tokens():
@@ -164,3 +210,68 @@ def test_parser_accepts_radix_color_tokens():
     assert args.hour_hand_color == clock_demo.parse_color("gray11")
     assert args.minute_hand_color == clock_demo.parse_color("dark.gray11")
     assert args.second_hand_color == clock_demo.parse_color("grayDark11")
+
+
+def test_parser_accepts_band_and_demo_bands():
+    parser = clock_demo.build_parser(ip_default="192.168.0.37")
+    args = parser.parse_args(
+        ["--band", "tomato", "--demo-bands", "tomato,purple", "--dot-anti-aliasing"]
+    )
+    assert args.band == "tomato"
+    assert args.demo_bands == ("tomato", "purple")
+    assert args.dot_anti_aliasing is True
+
+
+def test_band_defaults_apply_expected_intensity_slots():
+    parser = clock_demo.build_parser(ip_default="192.168.0.37")
+    args = parser.parse_args(["--band", "tomato"])
+    style = clock_demo._style_from_args(args)
+    assert style.marker_color == clock_demo.parse_color("dark.tomato7")
+    assert style.top_marker_color == clock_demo.parse_color("dark.tomato10")
+    assert style.hour_hand_color == clock_demo.parse_color("dark.tomato9")
+    assert style.minute_hand_color == clock_demo.parse_color("dark.tomato7")
+    assert style.second_hand_color == clock_demo.parse_color("dark.tomato5")
+    assert style.center_color == clock_demo.parse_color("dark.tomato5")
+
+
+def test_demo_variants_cover_bands_faces_and_toggles():
+    parser = clock_demo.build_parser(ip_default="192.168.0.37")
+    args = parser.parse_args(["--demo-bands", "tomato,purple"])
+    base_style = clock_demo._style_from_args(args)
+    variants = clock_demo._demo_variants(base_style, bands=args.demo_bands)
+    assert len(variants) == 2 * len(clock_demo.FACE_NAMES) * 2 * 2
+    assert any(v.band == "tomato" and v.face == "default" for v in variants)
+    assert any(v.band == "purple" and v.face == "ticks_all" for v in variants)
+
+
+def test_dot_anti_aliasing_changes_dot_rendering():
+    base = clock_demo.ClockStyle(
+        dial_color=(0, 0, 0),
+        marker_color=(120, 80, 140),
+        top_marker_color=(200, 160, 240),
+        hour_hand_color=(0, 0, 0),
+        minute_hand_color=(0, 0, 0),
+        second_hand_color=(0, 0, 0),
+        center_color=(200, 160, 240),
+        hour_length=0,
+        minute_length=0,
+        second_length=0,
+        marker_inner_radius=26,
+        marker_outer_radius=30,
+        marker_thickness=1,
+        top_marker_thickness=2,
+        quarter_marker_thickness=2,
+        hour_thickness=1,
+        minute_thickness=1,
+        second_thickness=1,
+        center_radius=2,
+        face="dot12",
+        band="custom",
+        second_hand=False,
+        anti_aliasing=False,
+        dot_anti_aliasing=False,
+    )
+    aa = clock_demo.ClockStyle(**{**base.__dict__, "dot_anti_aliasing": True})
+    frame_a = clock_demo.render_clock_frame(1_700_000_000.0, base)
+    frame_b = clock_demo.render_clock_frame(1_700_000_000.0, aa)
+    assert frame_a.data != frame_b.data
