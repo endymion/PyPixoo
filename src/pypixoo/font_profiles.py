@@ -17,6 +17,7 @@ class FontProfile:
     ttf_path: Path
     pixel_size_web: int
     y_offset_px_web: int
+    sample_height_web: int
     pixel_size_host: int
     y_offset_px_host: int
     letter_spacing_px: int
@@ -45,6 +46,7 @@ def _load_profiles() -> Dict[str, FontProfile]:
             ttf_path=(_FONTS_DIR / ttf_file).resolve(),
             pixel_size_web=int(payload["pixel_size_web"]),
             y_offset_px_web=int(payload["y_offset_px_web"]),
+            sample_height_web=int(payload.get("sample_height_web", 8)),
             pixel_size_host=int(payload["pixel_size_host"]),
             y_offset_px_host=int(payload["y_offset_px_host"]),
             letter_spacing_px=int(payload["letter_spacing_px"]),
@@ -95,6 +97,7 @@ def register_runtime_font_profile(
         ttf_path=(ttf_path or default_profile.ttf_path).resolve(),
         pixel_size_web=max(1, int(pixel_size)),
         y_offset_px_web=int(y_offset_px),
+        sample_height_web=max(8, int(default_profile.sample_height_web)),
         pixel_size_host=max(1, int(pixel_size)),
         y_offset_px_host=int(y_offset_px),
         letter_spacing_px=max(0, int(letter_spacing_px)),
