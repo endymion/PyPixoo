@@ -13,6 +13,7 @@ Press Ctrl+C to stop.
 """
 
 import argparse
+import json
 import os
 import sys
 import time
@@ -25,6 +26,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pypixoo import GifFrame, GifSequence, Pixoo, FrameRenderer, UploadMode, WebFrameSource
 from pypixoo.buffer import Buffer
+from pypixoo.color import parse_color
+from pypixoo.font_profiles import list_font_profiles
 from PIL import Image
 
 load_dotenv()
@@ -33,13 +36,21 @@ FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures"
 TINYTEXT_FIXTURE = FIXTURES_DIR / "tinytext_192.html"
 TRACKING_PX = 0
 
-FONT_REGISTRY = {
-    "tiny5": {"display_name": "Tiny5", "height_px": 5},
-    "micro5": {"display_name": "Micro5", "height_px": 5},
-    "bytesized": {"display_name": "Bytesized", "height_px": 4},
-    "jersey10": {"display_name": "Jersey10", "height_px": 10},
-    "jersey15": {"display_name": "Jersey15", "height_px": 15},
-}
+_ORDERED_FONT_KEYS = ["bytesized", "micro5", "tiny5", "jersey10", "jersey15"]
+
+
+def _font_registry() -> dict[str, dict[str, int | str]]:
+    by_key = {p.key: p for p in list_font_profiles()}
+    ordered: dict[str, dict[str, int | str]] = {}
+    for key in _ORDERED_FONT_KEYS:
+        p = by_key.get(key)
+        if p is None:
+            continue
+        ordered[key] = {
+            "display_name": p.display_name,
+            "height_px": 5 if key in ("tiny5", "micro5") else (4 if key == "bytesized" else (10 if key == "jersey10" else 15)),
+        }
+    return ordered
 
 FONT_ALPHABET_SCREENS = [
     {"name": "tiny5_alphabet", "variant": "alphabet", "font": "tiny5"},
@@ -51,16 +62,15 @@ FONT_ALPHABET_SCREENS = [
 BASE_SHOWCASE_SCREENS: list[dict[str, str | int]] = []
 
 DEFAULT_BG_COLOR = "#000"
-DEFAULT_TEXT_COLOR = "#6af"
+DEFAULT_TEXT_COLOR = "sand6"
 
 
-def _hex_to_rgb(value: str) -> tuple[int, int, int]:
-    value = value.strip().lstrip("#")
-    if len(value) == 3:
-        value = "".join(ch * 2 for ch in value)
-    if len(value) != 6:
-        raise ValueError(f"Unsupported color format: {value}")
-    return (int(value[0:2], 16), int(value[2:4], 16), int(value[4:6], 16))
+def _parse_color_any(value: str) -> tuple[int, int, int]:
+    return parse_color(value)
+
+
+def _rgb_to_hex(rgb: tuple[int, int, int]) -> str:
+    return f"#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}"
 
 
 def _has_foreground(buf: Buffer, bg_rgb: tuple[int, int, int]) -> bool:
@@ -73,16 +83,34 @@ def _has_foreground(buf: Buffer, bg_rgb: tuple[int, int, int]) -> bool:
 
 
 def _build_font_list_param() -> str:
+    registry = _font_registry()
     parts = []
-    for font_key, meta in FONT_REGISTRY.items():
+    for font_key, meta in registry.items():
         parts.append(f"{font_key}:{meta['display_name']}:{meta['height_px']}")
     return ",".join(parts)
+
+
+def _build_font_profiles_param() -> str:
+    payload = {}
+    by_key = {p.key: p for p in list_font_profiles()}
+    for key in _ORDERED_FONT_KEYS:
+        p = by_key.get(key)
+        if p is None:
+            continue
+        payload[key] = {
+            "display_name": p.display_name,
+            "sizePx": p.pixel_size_web,
+            "yOffsetHi": p.y_offset_px_web,
+            "maskAlphaThreshold": p.alpha_threshold,
+        }
+    return json.dumps(payload, separators=(",", ":"))
 
 
 def _build_showcase_screens() -> list[dict[str, str | int]]:
     screens: list[dict[str, str | int]] = []
     screens.extend(FONT_ALPHABET_SCREENS)
-    font_list_pages = min(1, (len(FONT_REGISTRY) + 3) // 4)
+    registry = _font_registry()
+    font_list_pages = min(1, (len(registry) + 4) // 5)
     for page in range(font_list_pages):
         screens.append(
             {
@@ -106,6 +134,7 @@ def build_variant_url(screen: dict[str, str | int], text_color: str, bg_color: s
         "font": screen["font"],
         "fg": text_color,
         "bg": bg_color,
+        "font_profiles": _build_font_profiles_param(),
     }
     if screen["variant"] == "font_list":
         query["font_list"] = _build_font_list_param()
@@ -151,17 +180,20 @@ def main():
     parser.add_argument(
         "--text-color",
         default=DEFAULT_TEXT_COLOR,
-        help=f"Text hex color (#RGB or #RRGGBB). Default: {DEFAULT_TEXT_COLOR}",
+        help=f"Text color (hex/name/Radix token). Default: {DEFAULT_TEXT_COLOR}",
     )
     parser.add_argument(
         "--bg-color",
         default=DEFAULT_BG_COLOR,
-        help=f"Background hex color (#RGB or #RRGGBB). Default: {DEFAULT_BG_COLOR}",
+        help=f"Background color (hex/name/Radix token). Default: {DEFAULT_BG_COLOR}",
     )
     args = parser.parse_args()
 
     duration_ms = int(args.duration * 1000)
-    bg_rgb = _hex_to_rgb(args.bg_color)
+    fg_rgb = _parse_color_any(args.text_color)
+    bg_rgb = _parse_color_any(args.bg_color)
+    fg_hex = _rgb_to_hex(fg_rgb)
+    bg_hex = _rgb_to_hex(bg_rgb)
     if not TINYTEXT_FIXTURE.exists():
         print(f"error: Fixture not found: {TINYTEXT_FIXTURE}", file=sys.stderr)
         sys.exit(1)
@@ -170,7 +202,7 @@ def main():
 
     sources = [
         WebFrameSource(
-            url=build_variant_url(screen, args.text_color, args.bg_color),
+            url=build_variant_url(screen, fg_hex, bg_hex),
             timestamps=[0],
             duration_per_frame_ms=duration_ms,
             browser_mode="per_frame",

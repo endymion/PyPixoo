@@ -1,0 +1,52 @@
+{
+  "tiny5": {
+    "display_name": "Tiny5",
+    "ttf_file": "Tiny5-Regular.ttf",
+    "pixel_size_web": 23,
+    "y_offset_px_web": -3,
+    "pixel_size_host": 7,
+    "y_offset_px_host": -1,
+    "letter_spacing_px": 1,
+    "alpha_threshold": 64
+  },
+  "micro5": {
+    "display_name": "Micro5",
+    "ttf_file": "Micro5-Regular.ttf",
+    "pixel_size_web": 34,
+    "y_offset_px_web": 0,
+    "pixel_size_host": 6,
+    "y_offset_px_host": 0,
+    "letter_spacing_px": 1,
+    "alpha_threshold": 64
+  },
+  "bytesized": {
+    "display_name": "Bytesized",
+    "ttf_file": "Bytesized-Regular.ttf",
+    "pixel_size_web": 23,
+    "y_offset_px_web": -2,
+    "pixel_size_host": 6,
+    "y_offset_px_host": -1,
+    "letter_spacing_px": 1,
+    "alpha_threshold": 64
+  },
+  "jersey10": {
+    "display_name": "Jersey10",
+    "ttf_file": "Jersey10-Regular.ttf",
+    "pixel_size_web": 56,
+    "y_offset_px_web": -9,
+    "pixel_size_host": 16,
+    "y_offset_px_host": -5,
+    "letter_spacing_px": 1,
+    "alpha_threshold": 128
+  },
+  "jersey15": {
+    "display_name": "Jersey15",
+    "ttf_file": "Jersey15-Regular.ttf",
+    "pixel_size_web": 83,
+    "y_offset_px_web": -20,
+    "pixel_size_host": 24,
+    "y_offset_px_host": -6,
+    "letter_spacing_px": 1,
+    "alpha_threshold": 128
+  }
+}

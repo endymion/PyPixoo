@@ -13,11 +13,10 @@ A Python library for the [Divoom Pixoo 64](https://www.divoom.com/products/pixoo
 
 PyPixoo is a reimplementation of Pixoo control logic, inspired by [pixoo](https://github.com/SomethingWithComputers/pixoo) but built with BDD from the ground up.
 
-V2 is a breaking redesign that aligns with native Pixoo command behavior:
-- Native sequence upload via `Draw/SendHttpGif` and `Draw/CommandList`
-- Native GIF playback via `Device/PlayTFGif`
-- Native text overlays via `Draw/SendHttpText` / `Draw/ClearHttpText`
-- Native cycle orchestration across uploaded sequences and GIF sources
+V3 is a breaking redesign with a layered model:
+- **L0 transport**: `Pixoo` direct command + frame APIs
+- **L1 raster**: `RasterClient` / `AsyncRasterClient` for paced frame pushing
+- **L2 scene**: `ScenePlayer` with layer graphs and transitions
 
 ## Requirements
 
@@ -72,8 +71,16 @@ pixoo play-gif-url https://example.com/anim.gif
 pixoo play-gif-file divoom_gif/1.gif
 pixoo play-gif-dir divoom_gif/
 
-# Cycle ordered items
-pixoo cycle --item 'sequence=120:frame1.png,frame2.png' --item 'url=https://example.com/anim.gif' --loop 2
+# First-class low-level raster operations
+pixoo raster push --color dark.amber10
+pixoo raster stream --fps 2 --duration 5 --primary-color black --secondary-color dark.gray8
+
+# High-level scene runtime
+pixoo scene run --scene clock --duration 15
+pixoo scene run --scene info --info-title STATUS --info-font tiny5 --info-header-height 12
+pixoo scene run --scene info --info-layout-json '{"rows":[{"kind":"text","content":"STATUS"},{"kind":"table","column_align":["left","right"],"cells":[{"value":"CPU"},{"value":"42%"}]}]}'
+pixoo scene enqueue --from-scene clock --to-scene info --transition push-left --duration-ms 600
+pixoo scene demo --all-transitions --run-seconds 30
 
 # List built-in display list fonts (no device required)
 pixoo list-fonts
@@ -91,6 +98,63 @@ pixoo raw-command Device/SetHighLightMode Mode=1
 If the `pixoo` script is not on your PATH, run `python -m pypixoo.cli` instead.
 
 ## Usage
+
+### L1 Raster streaming
+
+```python
+from pypixoo import AsyncRasterClient, Pixoo, PixooFrameSink
+from pypixoo.buffer import Buffer
+
+pixoo = Pixoo("192.168.0.37")
+pixoo.connect()
+
+sink = PixooFrameSink(pixoo, reconnect=True)
+raster = AsyncRasterClient(sink)
+
+frame = Buffer.from_flat_list([40] * (64 * 64 * 3))
+```
+
+### L2 Scene runtime
+
+```python
+import asyncio
+from pypixoo import AsyncRasterClient, LayerNode, Pixoo, PixooFrameSink, QueueItem, RenderContext, ScenePlayer, TransitionSpec
+from pypixoo.buffer import Buffer
+
+class SolidLayer:
+    name = "solid"
+    def __init__(self, color):
+        self.color = color
+    def render(self, ctx: RenderContext) -> Buffer:
+        return Buffer.from_flat_list([c for _ in range(64 * 64) for c in self.color])
+
+class SolidScene:
+    def __init__(self, name, color):
+        self.name = name
+        self.layer = SolidLayer(color)
+    def layers(self, ctx):
+        return [LayerNode(id=f"{self.name}-layer", layer=self.layer)]
+    def on_enter(self): pass
+    def on_exit(self): pass
+
+async def main():
+    pixoo = Pixoo("192.168.0.37")
+    pixoo.connect()
+    player = ScenePlayer(AsyncRasterClient(PixooFrameSink(pixoo)), fps=3)
+    await player.set_scene(SolidScene("a", (0, 0, 0)))
+    await player.enqueue(
+        QueueItem(
+            scene=SolidScene("b", (120, 120, 120)),
+            transition=TransitionSpec(kind="push_left", duration_ms=600),
+        )
+    )
+    task = asyncio.create_task(player.run())
+    await asyncio.sleep(5)
+    await player.stop()
+    await task
+
+asyncio.run(main())
+```
 
 ### Basic display
 
@@ -180,22 +244,6 @@ pixoo.upload_sequence_with_overlays(
     ],
     clear_before=True,
 )
-```
-
-### Cycle orchestration
-
-```python
-from pypixoo import CycleItem, GifSource, Pixoo
-
-pixoo = Pixoo("192.168.0.37")
-pixoo.connect()
-
-items = [
-    CycleItem(source=GifSource.url("https://example.com/a.gif")),
-    CycleItem(source=GifSource.tf_file("divoom_gif/1.gif")),
-]
-handle = pixoo.start_cycle(items, loop=2)
-handle.wait()
 ```
 
 ## Project structure

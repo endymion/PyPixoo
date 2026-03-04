@@ -187,6 +187,8 @@ def test_parser_rejects_invalid_numeric_values():
     assert args.second_hand is False
     assert args.anti_aliasing is True
     assert args.dot_anti_aliasing is True
+    assert args.screen_rotation is None
+    assert args.mirror_mode is None
     assert args.fps == 3
     with pytest.raises(SystemExit):
         parser.parse_args(["--fps", "0"])
@@ -225,6 +227,13 @@ def test_parser_accepts_band_and_demo_bands():
     assert args.dot_anti_aliasing is True
 
 
+def test_parser_accepts_device_rotation_and_mirror_modes():
+    parser = clock_demo.build_parser(ip_default="192.168.0.37")
+    args = parser.parse_args(["--screen-rotation", "1", "--mirror-mode", "1"])
+    assert args.screen_rotation == 1
+    assert args.mirror_mode == 1
+
+
 def test_band_defaults_apply_expected_intensity_slots():
     parser = clock_demo.build_parser(ip_default="192.168.0.37")
     args = parser.parse_args(["--band", "tomato"])
@@ -232,7 +241,7 @@ def test_band_defaults_apply_expected_intensity_slots():
     assert style.marker_color == clock_demo.parse_color("dark.tomato7")
     assert style.top_marker_color == clock_demo.parse_color("dark.tomato10")
     assert style.hour_hand_color == clock_demo.parse_color("dark.tomato9")
-    assert style.minute_hand_color == clock_demo.parse_color("dark.tomato7")
+    assert style.minute_hand_color == clock_demo.parse_color("dark.tomato10")
     assert style.second_hand_color == clock_demo.parse_color("dark.tomato5")
     assert style.center_color == clock_demo.parse_color("dark.tomato5")
 

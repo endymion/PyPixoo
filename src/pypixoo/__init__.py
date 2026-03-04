@@ -2,10 +2,35 @@
 
 from pypixoo.browser import FrameRenderer, StaticFrameSource, WebFrameSource
 from pypixoo.buffer import Buffer
+from pypixoo.compositor import RenderedLayer, compose_layers
 from pypixoo.fonts import (
     BuiltinFont,
     FontInfo,
     FontRegistry,
+)
+from pypixoo.font_profiles import (
+    FontProfile,
+    get_font_profile,
+    list_font_profiles,
+    normalize_font_key,
+)
+from pypixoo.font_render import (
+    GlyphRun,
+    draw_text_clipped,
+    measure_text as measure_text_mask,
+    render_text_mask,
+)
+from pypixoo.info_dsl import (
+    BorderConfig as InfoBorderConfig,
+    InfoLayout,
+    TableCell,
+    TableRow,
+    TextRow,
+    TextSpan,
+    TextStyle,
+    info_layout_from_dict,
+    info_layout_from_json,
+    info_layout_to_dict,
 )
 from pypixoo.native import (
     CycleHandle,
@@ -23,28 +48,102 @@ from pypixoo.native import (
     WhiteBalance,
 )
 from pypixoo.pixoo import DeviceInUseError, Pixoo
+from pypixoo.raster import (
+    AsyncRasterClient,
+    FrameSink,
+    PixooFrameSink,
+    RasterClient,
+    StreamStats,
+)
+from pypixoo.scene import (
+    Layer,
+    LayerNode,
+    QueueItem,
+    RenderContext,
+    Scene,
+    ScenePlayer,
+)
+from pypixoo.scene_components import (
+    BorderConfig,
+    HeaderConfig,
+    RowConfig,
+    list_scene_fonts,
+    register_scene_font,
+)
+from pypixoo.scenes import ClockScene, InfoScene, header_layout
+from pypixoo.transitions import (
+    CustomCompositor,
+    EasingKind,
+    TransitionContext,
+    TransitionKind,
+    TransitionSpec,
+)
 
 __all__ = [
+    "AsyncRasterClient",
     "Buffer",
+    "BorderConfig",
     "BuiltinFont",
+    "ClockScene",
+    "CustomCompositor",
     "CycleHandle",
     "CycleItem",
     "DeviceInUseError",
     "DisplayItem",
+    "EasingKind",
+    "FrameSink",
     "FontInfo",
+    "FontProfile",
     "FontRegistry",
     "FrameRenderer",
     "GifFrame",
     "GifSequence",
     "GifSource",
+    "HeaderConfig",
+    "InfoScene",
+    "InfoLayout",
+    "InfoBorderConfig",
+    "TextStyle",
+    "TextSpan",
+    "TextRow",
+    "TableCell",
+    "TableRow",
+    "Layer",
+    "LayerNode",
     "NoiseTool",
     "Pixoo",
+    "PixooFrameSink",
+    "RenderedLayer",
+    "compose_layers",
+    "QueueItem",
+    "GlyphRun",
+    "RasterClient",
+    "RenderContext",
+    "RowConfig",
     "ScoreBoardTool",
+    "Scene",
+    "ScenePlayer",
     "StaticFrameSource",
     "StopWatchTool",
+    "StreamStats",
     "TimerTool",
     "TextOverlay",
+    "TransitionContext",
+    "TransitionKind",
+    "TransitionSpec",
     "UploadMode",
     "WebFrameSource",
     "WhiteBalance",
+    "draw_text_clipped",
+    "get_font_profile",
+    "header_layout",
+    "info_layout_from_dict",
+    "info_layout_from_json",
+    "info_layout_to_dict",
+    "list_font_profiles",
+    "list_scene_fonts",
+    "measure_text_mask",
+    "normalize_font_key",
+    "render_text_mask",
+    "register_scene_font",
 ]

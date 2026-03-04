@@ -14,6 +14,7 @@ Key options:
 
 from __future__ import annotations
 
+import asyncio
 import argparse
 import math
 import os
@@ -36,6 +37,8 @@ from pypixoo.clock_palette import (
     resolve_location,
 )
 from pypixoo.color import list_radix_tokens, parse_color
+from pypixoo.raster import AsyncRasterClient, PixooFrameSink
+from pypixoo.scene import LayerNode, RenderContext, ScenePlayer
 
 load_dotenv()
 SIZE = 64
@@ -56,7 +59,7 @@ DEFAULT_DIAL_COLOR = (0, 0, 0)
 DEFAULT_MARKER_COLOR = parse_color("dark.purple7")
 DEFAULT_TOP_MARKER_COLOR = parse_color("dark.purple10")
 DEFAULT_HOUR_HAND_COLOR = parse_color("dark.purple9")
-DEFAULT_MINUTE_HAND_COLOR = parse_color("dark.purple7")
+DEFAULT_MINUTE_HAND_COLOR = parse_color("dark.purple10")
 DEFAULT_SECOND_HAND_COLOR = parse_color("dark.purple5")
 DEFAULT_CENTER_COLOR = parse_color("dark.purple5")
 
@@ -293,6 +296,20 @@ def build_parser(ip_default: str = DEFAULT_IP) -> argparse.ArgumentParser:
         default=True,
         help="Enable anti-aliased rendering for marker/center dots",
     )
+    parser.add_argument(
+        "--screen-rotation",
+        type=int,
+        choices=[0, 1, 2, 3],
+        default=None,
+        help="Optional device-side rotation mode via Device/SetScreenRotationAngle",
+    )
+    parser.add_argument(
+        "--mirror-mode",
+        type=int,
+        choices=[0, 1],
+        default=None,
+        help="Optional device-side mirror mode via Device/SetMirrorMode",
+    )
 
     # Colors
     parser.add_argument("--dial-color", type=_parse_color_arg, default=DEFAULT_DIAL_COLOR)
@@ -337,7 +354,7 @@ def _resolved_band_colors(
         ("marker_color", DEFAULT_MARKER_COLOR, 7),
         ("top_marker_color", DEFAULT_TOP_MARKER_COLOR, 10),
         ("hour_hand_color", DEFAULT_HOUR_HAND_COLOR, 9),
-        ("minute_hand_color", DEFAULT_MINUTE_HAND_COLOR, 7),
+        ("minute_hand_color", DEFAULT_MINUTE_HAND_COLOR, 10),
         ("second_hand_color", DEFAULT_SECOND_HAND_COLOR, 5),
         ("center_color", DEFAULT_CENTER_COLOR, 5),
     )
@@ -765,6 +782,103 @@ def render_clock_frame(ts: float, style: ClockStyle) -> Buffer:
     return Buffer.from_flat_list(data)
 
 
+class _ClockLayer:
+    name = "clock"
+
+    def __init__(
+        self,
+        args: argparse.Namespace,
+        style: ClockStyle,
+        adaptive_state: Optional[AdaptivePaletteState],
+    ):
+        self._args = args
+        self._style = style
+        self._adaptive_state = adaptive_state
+
+    def render(self, ctx: RenderContext) -> Buffer:
+        self._style = _maybe_refresh_adaptive_style(
+            self._args,
+            self._style,
+            self._adaptive_state,
+        )
+        return render_clock_frame(ctx.epoch_s, self._style)
+
+
+class _SimpleScene:
+    def __init__(self, name: str, layer):
+        self.name = name
+        self._layer = layer
+
+    def layers(self, ctx: RenderContext) -> list[LayerNode]:
+        return [LayerNode(id=f"{self.name}-layer", layer=self._layer, z=0)]
+
+    def on_enter(self) -> None:
+        return
+
+    def on_exit(self) -> None:
+        return
+
+
+async def _run_scene_player_for_duration(player: ScenePlayer, duration_s: float) -> None:
+    runner = asyncio.create_task(player.run())
+    try:
+        await asyncio.sleep(duration_s)
+    finally:
+        await player.stop()
+        await runner
+
+
+async def _periodic_utc_sync(pixoo: Pixoo, period_s: float) -> None:
+    period = max(1.0, period_s)
+    while True:
+        await asyncio.sleep(period)
+        try:
+            pixoo.set_utc_time(int(time.time()))
+        except Exception as exc:  # pragma: no cover - depends on device timing
+            _log(f"Periodic UTC sync skipped: {exc}")
+
+
+def _run_push_clock_scene(
+    pixoo: Pixoo,
+    args: argparse.Namespace,
+    style: ClockStyle,
+    requested_fps: int,
+    adaptive_state: Optional[AdaptivePaletteState],
+) -> None:
+    async def _run() -> None:
+        sink = PixooFrameSink(pixoo, reconnect=True)
+        raster = AsyncRasterClient(sink)
+        player = ScenePlayer(raster, fps=max(1, requested_fps))
+        clock_scene = _SimpleScene("clock", _ClockLayer(args, style, adaptive_state))
+        await player.set_scene(clock_scene)
+
+        _log("delivery=push via ScenePlayer (scene-first runtime).")
+
+        utc_task: Optional[asyncio.Task] = None
+        if args.sync_utc:
+            utc_task = asyncio.create_task(
+                _periodic_utc_sync(
+                    pixoo,
+                    period_s=max(1, args.utc_resync_segments) * args.segment_seconds,
+                )
+            )
+
+        try:
+            if args.once:
+                await _run_scene_player_for_duration(player, max(1.0, args.segment_seconds))
+            else:
+                await player.run()
+        finally:
+            if utc_task is not None:
+                utc_task.cancel()
+                try:
+                    await utc_task
+                except asyncio.CancelledError:
+                    pass
+
+    asyncio.run(_run())
+
+
 def _downsample_frames(frames: Sequence[GifFrame], max_frames: int) -> list[GifFrame]:
     if len(frames) <= max_frames:
         return list(frames)
@@ -989,7 +1103,7 @@ def _band_palette(band: str) -> tuple[tuple[int, int, int], tuple[int, int, int]
         parse_color(f"dark.{band}7"),
         parse_color(f"dark.{band}10"),
         parse_color(f"dark.{band}9"),
-        parse_color(f"dark.{band}7"),
+        parse_color(f"dark.{band}10"),
         parse_color(f"dark.{band}5"),
     )
 
@@ -1073,6 +1187,21 @@ def run(args: argparse.Namespace) -> None:
         _reconnect_until_ready(pixoo, sync_utc=args.sync_utc)
 
     try:
+        if args.screen_rotation is not None:
+            _call_with_recovery(
+                pixoo,
+                sync_utc=args.sync_utc,
+                operation_name="Set screen rotation",
+                fn=lambda: pixoo.set_screen_rotation(args.screen_rotation),
+            )
+        if args.mirror_mode is not None:
+            _call_with_recovery(
+                pixoo,
+                sync_utc=args.sync_utc,
+                operation_name="Set mirror mode",
+                fn=lambda: pixoo.set_mirror_mode(args.mirror_mode),
+            )
+
         if args.sync_utc:
             _call_with_recovery(
                 pixoo,
@@ -1096,7 +1225,7 @@ def run(args: argparse.Namespace) -> None:
             return
 
         if args.delivery == "push":
-            _run_push_clock(pixoo, args, style, requested_fps, adaptive_state)
+            _run_push_clock_scene(pixoo, args, style, requested_fps, adaptive_state)
             return
 
         segment_index = 0

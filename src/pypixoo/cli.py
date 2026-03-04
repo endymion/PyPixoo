@@ -1,30 +1,45 @@
-"""CLI for PyPixoo native V2 workflows."""
+"""CLI for PyPixoo layered v3 workflows."""
 
 from __future__ import annotations
 
+import asyncio
 import argparse
 import os
 import sys
 import time
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from PIL import Image
 from dotenv import load_dotenv
 
 from pypixoo import (
     CycleItem,
+    InfoScene,
+    ClockScene,
     GifFrame,
     GifSequence,
     GifSource,
     Pixoo,
     UploadMode,
     DeviceInUseError,
+    InfoLayout,
+    TableCell,
+    TableRow,
     TextOverlay,
+    TextRow,
+    TextStyle,
+    header_layout,
+    info_layout_from_json,
+    list_scene_fonts,
 )
 from pypixoo.fonts import BuiltinFont
+from pypixoo.info_dsl import BorderConfig as InfoBorderConfig
 from pypixoo.buffer import Buffer
 from pypixoo.color import parse_color
+from pypixoo.raster import AsyncRasterClient, PixooFrameSink, RasterClient
+from pypixoo.scene import QueueItem, RenderContext, ScenePlayer
+from pypixoo.transitions import TransitionSpec
 
 
 DEFAULT_IP = "192.168.0.37"
@@ -32,6 +47,143 @@ DEFAULT_IP = "192.168.0.37"
 
 def _resolve_default_ip() -> str:
     return os.environ.get("PIXOO_DEVICE_IP") or os.environ.get("PIXOO_IP") or DEFAULT_IP
+
+
+def _buffer_from_color(color: tuple[int, int, int]) -> Buffer:
+    return Buffer.from_flat_list([component for _ in range(64 * 64) for component in color])
+
+
+def _dynamic_uptime(ctx: RenderContext) -> str:
+    return f"UP {int(ctx.monotonic_s) % 100:02d}s"
+
+
+def _dynamic_clock(ctx: RenderContext) -> str:
+    return time.strftime("%H:%M:%S", time.localtime(ctx.epoch_s))
+
+
+def _default_info_layout(
+    *,
+    title: str,
+    font: str,
+    header_height: int,
+    header_border: bool,
+    header_border_thickness: int,
+    header_border_color: tuple[int, int, int],
+) -> InfoLayout:
+    body_rows = [
+        TextRow(
+            height=10,
+            style=TextStyle(font=font, color=(150, 150, 150)),
+            content="Scene runtime: host-raster",
+        ),
+        TextRow(
+            height=10,
+            align="center",
+            style=TextStyle(font=font, color=(120, 120, 120)),
+            content=_dynamic_clock,
+        ),
+        TableRow(
+            height=10,
+            default_style=TextStyle(font=font, color=(120, 120, 120)),
+            cells=[TableCell("NET"), TableCell("OK", color=(150, 150, 150))],
+            column_align=["left", "right"],
+            block_align="center",
+        ),
+        TableRow(
+            height=10,
+            default_style=TextStyle(font=font, color=(120, 120, 120)),
+            cells=[TableCell("UP"), TableCell(_dynamic_uptime, color=(150, 150, 150))],
+            column_align=["left", "right"],
+            block_align="center",
+        ),
+    ]
+    return header_layout(
+        title=title,
+        font=font,
+        height=header_height,
+        border=InfoBorderConfig(
+            enabled=header_border,
+            thickness=max(1, header_border_thickness),
+            color=header_border_color,
+        ),
+        body_rows=body_rows,
+        body_background_color=(0, 0, 0),
+    )
+
+
+def _load_info_layout_json(raw: str) -> InfoLayout:
+    candidate = Path(raw)
+    if candidate.exists():
+        return info_layout_from_json(candidate.read_text(encoding="utf-8"))
+    return info_layout_from_json(raw)
+
+
+def _build_clock_scene():
+    from demos import pixooclock as pixooclock_demo
+
+    parser = pixooclock_demo.build_parser(ip_default=_resolve_default_ip())
+    style = pixooclock_demo._style_from_args(parser.parse_args([]))
+    return ClockScene(
+        name="clock",
+        render_frame=lambda ts: pixooclock_demo.render_clock_frame(ts, style),
+    )
+
+
+def _build_info_scene(
+    *,
+    title: str,
+    font: str,
+    header_height: int,
+    header_border: bool,
+    header_border_thickness: int,
+    header_border_color: tuple[int, int, int],
+    info_layout_json: Optional[str] = None,
+) -> InfoScene:
+    layout = (
+        _load_info_layout_json(info_layout_json)
+        if info_layout_json
+        else _default_info_layout(
+            title=title,
+            font=font,
+            header_height=header_height,
+            header_border=header_border,
+            header_border_thickness=header_border_thickness,
+            header_border_color=header_border_color,
+        )
+    )
+    return InfoScene(name="info", layout=layout)
+
+
+def _build_scene(
+    scene_name: str,
+    accent: tuple[int, int, int],
+    *,
+    info_title: str = "INFO",
+    info_font: str = "tiny5",
+    info_header_height: int = 12,
+    info_header_border: bool = True,
+    info_header_border_thickness: int = 1,
+    info_header_border_color: tuple[int, int, int] = (60, 60, 60),
+    info_layout_json: Optional[str] = None,
+):
+    if scene_name == "clock":
+        return _build_clock_scene()
+    if scene_name == "info":
+        return _build_info_scene(
+            title=info_title,
+            font=info_font,
+            header_height=info_header_height,
+            header_border=info_header_border,
+            header_border_thickness=info_header_border_thickness,
+            header_border_color=info_header_border_color,
+            info_layout_json=info_layout_json,
+        )
+    if scene_name == "solid":
+        return InfoScene(
+            name="solid",
+            layout=InfoLayout(rows=[], background_color=accent),
+        )
+    raise ValueError(f"unsupported scene name: {scene_name}")
 
 
 def _connect(ip: str) -> Pixoo:
@@ -276,12 +428,260 @@ def cmd_cycle(
         pixoo.close()
 
 
+def cmd_raster_push(ip: str, color: str) -> None:
+    rgb = parse_color(color)
+    pixoo = _connect(ip)
+    try:
+        sink = PixooFrameSink(pixoo, reconnect=True)
+        client = RasterClient(sink)
+        client.push_frame(_buffer_from_color(rgb))
+    finally:
+        pixoo.close()
+
+
+def cmd_raster_stream(
+    ip: str,
+    fps: int,
+    duration_s: float,
+    primary_color: str,
+    secondary_color: str,
+) -> None:
+    if duration_s <= 0:
+        print("error: --duration must be > 0", file=sys.stderr)
+        sys.exit(1)
+    a = parse_color(primary_color)
+    b = parse_color(secondary_color)
+    frames = [_buffer_from_color(a), _buffer_from_color(b)]
+    state = {"i": 0}
+
+    def _next() -> Buffer:
+        idx = state["i"] % len(frames)
+        state["i"] += 1
+        return frames[idx]
+
+    pixoo = _connect(ip)
+    try:
+        sink = PixooFrameSink(pixoo, reconnect=True)
+        client = RasterClient(sink)
+        stats = client.stream_frames(_next, fps=fps, duration_s=duration_s)
+        print(
+            f"frames={stats.frames_sent} late={stats.late_frames} "
+            f"avg_push_ms={stats.avg_push_ms:.2f}"
+        )
+    finally:
+        pixoo.close()
+
+
+async def _run_scene_player_for_duration(player: ScenePlayer, duration_s: float) -> None:
+    runner = asyncio.create_task(player.run())
+    try:
+        await asyncio.sleep(duration_s)
+    finally:
+        await player.stop()
+        await runner
+
+
+def cmd_scene_run(
+    ip: str,
+    scene_name: str,
+    fps: int,
+    duration_s: float,
+    accent_color: str,
+    info_title: str,
+    info_font: str,
+    info_header_height: int,
+    info_header_border: bool,
+    info_header_border_thickness: int,
+    info_header_border_color: str,
+    info_layout_json: Optional[str],
+) -> None:
+    if duration_s <= 0:
+        print("error: --duration must be > 0", file=sys.stderr)
+        sys.exit(1)
+
+    accent = parse_color(accent_color)
+    border_color = parse_color(info_header_border_color)
+    pixoo = _connect(ip)
+    try:
+        sink = PixooFrameSink(pixoo, reconnect=True)
+        raster = AsyncRasterClient(sink)
+        player = ScenePlayer(raster, fps=fps)
+        try:
+            scene = _build_scene(
+                scene_name,
+                accent,
+                info_title=info_title,
+                info_font=info_font,
+                info_header_height=info_header_height,
+                info_header_border=info_header_border,
+                info_header_border_thickness=info_header_border_thickness,
+                info_header_border_color=border_color,
+                info_layout_json=info_layout_json,
+            )
+        except ValueError as e:
+            print(f"error: {e}", file=sys.stderr)
+            sys.exit(1)
+        asyncio.run(player.set_scene(scene))
+        asyncio.run(_run_scene_player_for_duration(player, duration_s))
+    finally:
+        pixoo.close()
+
+
+def cmd_scene_enqueue(
+    ip: str,
+    from_scene: str,
+    to_scene: str,
+    transition: str,
+    duration_ms: int,
+    hold_ms: int,
+    fps: int,
+    run_seconds: float,
+    accent_color: str,
+    info_title: str,
+    info_font: str,
+    info_header_height: int,
+    info_header_border: bool,
+    info_header_border_thickness: int,
+    info_header_border_color: str,
+    info_layout_json: Optional[str],
+) -> None:
+    if run_seconds <= 0:
+        print("error: --run-seconds must be > 0", file=sys.stderr)
+        sys.exit(1)
+    accent = parse_color(accent_color)
+    border_color = parse_color(info_header_border_color)
+    pixoo = _connect(ip)
+    try:
+        sink = PixooFrameSink(pixoo, reconnect=True)
+        raster = AsyncRasterClient(sink)
+        player = ScenePlayer(raster, fps=fps)
+
+        try:
+            base_scene = _build_scene(
+                from_scene,
+                accent,
+                info_title=info_title,
+                info_font=info_font,
+                info_header_height=info_header_height,
+                info_header_border=info_header_border,
+                info_header_border_thickness=info_header_border_thickness,
+                info_header_border_color=border_color,
+                info_layout_json=info_layout_json,
+            )
+            target_scene = _build_scene(
+                to_scene,
+                accent,
+                info_title=info_title,
+                info_font=info_font,
+                info_header_height=info_header_height,
+                info_header_border=info_header_border,
+                info_header_border_thickness=info_header_border_thickness,
+                info_header_border_color=border_color,
+                info_layout_json=info_layout_json,
+            )
+        except ValueError as e:
+            print(f"error: {e}", file=sys.stderr)
+            sys.exit(1)
+        spec = TransitionSpec(kind=transition, duration_ms=duration_ms)
+        queue_item = QueueItem(scene=target_scene, transition=spec, hold_ms=hold_ms)
+
+        async def _run() -> None:
+            await player.set_scene(base_scene)
+            await player.enqueue(queue_item)
+            await _run_scene_player_for_duration(player, run_seconds)
+
+        asyncio.run(_run())
+    finally:
+        pixoo.close()
+
+
+def cmd_scene_demo(
+    ip: str,
+    fps: int,
+    duration_ms: int,
+    hold_ms: int,
+    all_transitions: bool,
+    run_seconds: float,
+    accent_color: str,
+    info_title: str,
+    info_font: str,
+    info_header_height: int,
+    info_header_border: bool,
+    info_header_border_thickness: int,
+    info_header_border_color: str,
+    info_layout_json: Optional[str],
+) -> None:
+    if run_seconds <= 0:
+        print("error: --run-seconds must be > 0", file=sys.stderr)
+        sys.exit(1)
+    accent = parse_color(accent_color)
+    border_color = parse_color(info_header_border_color)
+    transition_kinds = [
+        "cut",
+        "cross_fade",
+        "push_left",
+        "push_right",
+        "push_up",
+        "push_down",
+        "slide_over_left",
+        "slide_over_right",
+        "slide_over_up",
+        "slide_over_down",
+        "wipe_left",
+        "wipe_right",
+        "wipe_up",
+        "wipe_down",
+    ]
+    if not all_transitions:
+        transition_kinds = ["cross_fade", "push_left", "slide_over_left", "wipe_left"]
+
+    pixoo = _connect(ip)
+    try:
+        sink = PixooFrameSink(pixoo, reconnect=True)
+        raster = AsyncRasterClient(sink)
+        player = ScenePlayer(raster, fps=fps)
+        scene_a = _build_scene("clock", accent)
+        try:
+            scene_b = _build_scene(
+                "info",
+                accent,
+                info_title=info_title,
+                info_font=info_font,
+                info_header_height=info_header_height,
+                info_header_border=info_header_border,
+                info_header_border_thickness=info_header_border_thickness,
+                info_header_border_color=border_color,
+                info_layout_json=info_layout_json,
+            )
+        except ValueError as e:
+            print(f"error: {e}", file=sys.stderr)
+            sys.exit(1)
+
+        async def _run() -> None:
+            await player.set_scene(scene_a)
+            current = scene_b
+            for kind in transition_kinds:
+                await player.enqueue(
+                    QueueItem(
+                        scene=current,
+                        transition=TransitionSpec(kind=kind, duration_ms=duration_ms),
+                        hold_ms=hold_ms,
+                    )
+                )
+                current = scene_a if current is scene_b else scene_b
+            await _run_scene_player_for_duration(player, run_seconds)
+
+        asyncio.run(_run())
+    finally:
+        pixoo.close()
+
+
 def main() -> None:
     load_dotenv()
     default_ip = _resolve_default_ip()
     parser = argparse.ArgumentParser(
         prog="pixoo",
-        description="PyPixoo CLI for Divoom Pixoo 64.",
+        description="PyPixoo CLI (L0 transport, L1 raster, L2 scene) for Divoom Pixoo 64.",
     )
     parser.add_argument(
         "--ip",
@@ -388,6 +788,157 @@ def main() -> None:
     cycle_p.add_argument("--speed-ms", type=int, default=100, help="Default speed for sequence items")
     cycle_p.set_defaults(
         func=lambda ns: cmd_cycle(ns.ip, ns.item, ns.loop, ns.mode, ns.chunk_size, ns.speed_ms)
+    )
+
+    raster_p = subparsers.add_parser("raster", help="Low-level raster operations")
+    raster_sub = raster_p.add_subparsers(dest="raster_command", required=True)
+
+    raster_push_p = raster_sub.add_parser("push", help="Push a single solid-color frame")
+    raster_push_p.add_argument(
+        "--color",
+        default="black",
+        help="Frame color: hex/rgb/name or Radix token",
+    )
+    raster_push_p.set_defaults(func=lambda ns: cmd_raster_push(ns.ip, ns.color))
+
+    raster_stream_p = raster_sub.add_parser("stream", help="Stream alternating color frames")
+    raster_stream_p.add_argument("--fps", type=int, default=2, help="Stream frames per second")
+    raster_stream_p.add_argument("--duration", type=float, default=5.0, help="Stream duration seconds")
+    raster_stream_p.add_argument("--primary-color", default="black", help="Primary frame color")
+    raster_stream_p.add_argument("--secondary-color", default="dark.gray8", help="Secondary frame color")
+    raster_stream_p.set_defaults(
+        func=lambda ns: cmd_raster_stream(
+            ns.ip,
+            ns.fps,
+            ns.duration,
+            ns.primary_color,
+            ns.secondary_color,
+        )
+    )
+
+    scene_p = subparsers.add_parser("scene", help="High-level scene runtime commands")
+    scene_sub = scene_p.add_subparsers(dest="scene_command", required=True)
+
+    def _add_info_scene_args(parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("--info-title", default="INFO")
+        parser.add_argument(
+            "--info-font",
+            default="tiny5",
+            choices=list_scene_fonts(),
+            help="Scene-render font for InfoScene header title",
+        )
+        parser.add_argument("--info-header-height", type=int, default=12)
+        parser.add_argument(
+            "--info-header-border",
+            action=argparse.BooleanOptionalAction,
+            default=True,
+        )
+        parser.add_argument("--info-header-border-thickness", type=int, default=1)
+        parser.add_argument("--info-header-border-color", default="#3c3c3c")
+        parser.add_argument(
+            "--info-layout-json",
+            default=None,
+            help="Info layout JSON string or path to JSON file. Overrides --info-title/* layout sugar.",
+        )
+
+    scene_run_p = scene_sub.add_parser("run", help="Run a single scene")
+    scene_run_p.add_argument("--scene", default="clock", choices=["clock", "info", "solid"])
+    scene_run_p.add_argument("--fps", type=int, default=3)
+    scene_run_p.add_argument("--duration", type=float, default=15.0, help="Run duration in seconds")
+    scene_run_p.add_argument("--accent-color", default="dark.amber10")
+    _add_info_scene_args(scene_run_p)
+    scene_run_p.set_defaults(
+        func=lambda ns: cmd_scene_run(
+            ns.ip,
+            ns.scene,
+            ns.fps,
+            ns.duration,
+            ns.accent_color,
+            ns.info_title,
+            ns.info_font,
+            ns.info_header_height,
+            ns.info_header_border,
+            ns.info_header_border_thickness,
+            ns.info_header_border_color,
+            ns.info_layout_json,
+        )
+    )
+
+    scene_enqueue_p = scene_sub.add_parser("enqueue", help="Run one queued scene transition")
+    scene_enqueue_p.add_argument("--from-scene", default="clock", choices=["clock", "info", "solid"])
+    scene_enqueue_p.add_argument("--to-scene", default="info", choices=["clock", "info", "solid"])
+    scene_enqueue_p.add_argument(
+        "--transition",
+        default="cross_fade",
+        choices=[
+            "cut",
+            "cross_fade",
+            "push_left",
+            "push_right",
+            "push_up",
+            "push_down",
+            "slide_over_left",
+            "slide_over_right",
+            "slide_over_up",
+            "slide_over_down",
+            "wipe_left",
+            "wipe_right",
+            "wipe_up",
+            "wipe_down",
+        ],
+    )
+    scene_enqueue_p.add_argument("--duration-ms", type=int, default=600)
+    scene_enqueue_p.add_argument("--hold-ms", type=int, default=500)
+    scene_enqueue_p.add_argument("--fps", type=int, default=3)
+    scene_enqueue_p.add_argument("--run-seconds", type=float, default=12.0)
+    scene_enqueue_p.add_argument("--accent-color", default="dark.amber10")
+    _add_info_scene_args(scene_enqueue_p)
+    scene_enqueue_p.set_defaults(
+        func=lambda ns: cmd_scene_enqueue(
+            ns.ip,
+            ns.from_scene,
+            ns.to_scene,
+            ns.transition,
+            ns.duration_ms,
+            ns.hold_ms,
+            ns.fps,
+            ns.run_seconds,
+            ns.accent_color,
+            ns.info_title,
+            ns.info_font,
+            ns.info_header_height,
+            ns.info_header_border,
+            ns.info_header_border_thickness,
+            ns.info_header_border_color,
+            ns.info_layout_json,
+        )
+    )
+
+    scene_demo_p = scene_sub.add_parser("demo", help="Run transition showcase")
+    scene_demo_p.add_argument("--fps", type=int, default=3)
+    scene_demo_p.add_argument("--duration-ms", type=int, default=600)
+    scene_demo_p.add_argument("--hold-ms", type=int, default=500)
+    scene_demo_p.add_argument("--run-seconds", type=float, default=30.0)
+    scene_demo_p.add_argument("--all-transitions", action="store_true")
+    scene_demo_p.add_argument("--accent-color", default="dark.amber10")
+    _add_info_scene_args(scene_demo_p)
+    scene_demo_p.set_defaults(
+        func=lambda ns: cmd_scene_demo(
+            ns.ip,
+            ns.fps,
+            ns.duration_ms,
+            ns.hold_ms,
+            ns.all_transitions,
+            ns.run_seconds,
+            ns.accent_color,
+            ns.info_title,
+            ns.info_font,
+            ns.info_header_height,
+            ns.info_header_border,
+            ns.info_header_border_thickness,
+            ns.info_header_border_color,
+            ns.info_layout_json,
+        )
     )
 
     args = parser.parse_args()

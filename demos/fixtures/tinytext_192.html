@@ -79,8 +79,8 @@
       alphabet10: [
         "ABCDEFGH",
         "IJKLMNOP",
-        "QRSTUVWX",
-        "YZ",
+        "QRSTUVW",
+        "XYZ",
       ],
       alphabet15: [
         "ABCDEFGHI",
@@ -153,7 +153,7 @@
       custom: { bg: "#111", fg: "#0f0" },
     };
 
-    const FONT_PROFILES = {
+    const DEFAULT_FONT_PROFILES = {
       tiny5: { family: "Tiny5", sizePx: 23, yOffsetHi: -3, heightPx: 5, sampleHeightPx: 8, maskAlphaThreshold: 64 },
       micro5: { family: "Micro5", sizePx: 34, yOffsetHi: 0, heightPx: 5, sampleHeightPx: 8, maskAlphaThreshold: 64 },
       bytesized: { family: "Bytesized", sizePx: 23, yOffsetHi: -2, heightPx: 4, sampleHeightPx: 8, maskAlphaThreshold: 64 },
@@ -164,6 +164,7 @@
     const LINE_YS_64 = [8, 22, 36, 50];
     const LINE_YS_BY_VARIANT = {
       alphabet15: [8, 26, 44, 62],
+      font_list: [4, 12, 21, 33, 45],
     };
     const MASK_ALPHA_THRESHOLD = 64;
     const BASE_GAP_PX_64 = 1;
@@ -176,6 +177,34 @@
     const params = new URLSearchParams(window.location.search);
     const variant = params.get("variant") || "alphabet";
     const requestedFont = (params.get("font") || "tiny5").toLowerCase();
+    const fontProfilesParam = params.get("font_profiles");
+    const FONT_PROFILES = (() => {
+      if (!fontProfilesParam) return DEFAULT_FONT_PROFILES;
+      try {
+        const parsed = JSON.parse(fontProfilesParam);
+        const merged = { ...DEFAULT_FONT_PROFILES };
+        for (const [key, raw] of Object.entries(parsed || {})) {
+          const normalized = String(key || "").toLowerCase();
+          const fallback = DEFAULT_FONT_PROFILES[normalized] || DEFAULT_FONT_PROFILES.tiny5;
+          const displayName = String(raw.display_name || fallback.family || key);
+          const heightPx = fallback.heightPx || 5;
+          const sampleHeightPx = fallback.sampleHeightPx || 8;
+          merged[normalized] = {
+            family: displayName,
+            sizePx: Number.isFinite(raw.sizePx) ? Number(raw.sizePx) : fallback.sizePx,
+            yOffsetHi: Number.isFinite(raw.yOffsetHi) ? Number(raw.yOffsetHi) : fallback.yOffsetHi,
+            heightPx,
+            sampleHeightPx,
+            maskAlphaThreshold: Number.isFinite(raw.maskAlphaThreshold)
+              ? Number(raw.maskAlphaThreshold)
+              : fallback.maskAlphaThreshold,
+          };
+        }
+        return merged;
+      } catch (_err) {
+        return DEFAULT_FONT_PROFILES;
+      }
+    })();
     const baseFontProfile = FONT_PROFILES[requestedFont] || FONT_PROFILES.tiny5;
     const sizeOverride = Number.parseInt(params.get("font_size") || "", 10);
     const yOffsetOverride = Number.parseInt(params.get("font_y") || "", 10);
@@ -200,7 +229,7 @@
 
     function buildFontListEntries(raw) {
       const page = Number.isFinite(fontListPage) ? Math.max(0, fontListPage) : 0;
-      const pageSize = 4;
+      const pageSize = 5;
       const parsed = raw
         .split(",")
         .map((s) => s.trim())
@@ -216,6 +245,11 @@
       const rows = parsed.slice(start, start + pageSize);
       while (rows.length < pageSize) {
         rows.push({ key: requestedFont, text: "" });
+      }
+      for (const row of rows) {
+        if (row.key === "tiny5" || row.key === "jersey10") {
+          row.rowYOffset = -2;
+        }
       }
       return rows;
     }
@@ -551,7 +585,38 @@
         const atlas = atlases.get(lineFontKey) || atlases.get(requestedFont);
         const glyphs = atlas ? atlas.glyphs : null;
         const spaceAdvancePx = atlas ? atlas.spaceAdvancePx : WORD_SPACE_PX_64;
-        const baseY = lineYs[li];
+        const rowTop = lineYs[li];
+        const nextTop = li + 1 < lineYs.length ? lineYs[li + 1] : 64;
+        const rowHeight = Math.max(1, nextTop - rowTop);
+        let baseY = rowTop;
+
+        if (variant === "font_list" && glyphs) {
+          let minOffsetY = 0;
+          let maxBottomY = 0;
+          let initialized = false;
+          for (const ch of text) {
+            if (ch === " ") continue;
+            const glyph = glyphs.get(ch);
+            if (!glyph || glyph.width === 0 || glyph.height === 0) continue;
+            const top = glyph.offsetY;
+            const bottom = glyph.offsetY + glyph.height;
+            if (!initialized) {
+              minOffsetY = top;
+              maxBottomY = bottom;
+              initialized = true;
+            } else {
+              if (top < minOffsetY) minOffsetY = top;
+              if (bottom > maxBottomY) maxBottomY = bottom;
+            }
+          }
+          if (initialized) {
+            const inkHeight = Math.max(1, maxBottomY - minOffsetY);
+            baseY = rowTop + Math.floor((rowHeight - inkHeight) / 2) - minOffsetY;
+          }
+        }
+
+        const perRowYOffset = Number.isFinite(row.rowYOffset) ? row.rowYOffset : 0;
+        baseY += perRowYOffset;
         let x = START_X_64;
         for (const ch of text) {
           if (ch === " ") {

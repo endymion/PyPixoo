@@ -20,3 +20,8 @@ vs client behavior.
    api_native
    api_fonts
    api_browser
+   api_raster
+   api_scene
+   api_scenes
+   api_info_dsl
+   api_transitions

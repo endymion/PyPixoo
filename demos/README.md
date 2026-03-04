@@ -22,23 +22,10 @@ python demos/black_band_chained.py
 # Requires: pip install -e ".[browser]"
 python demos/browser_mixed.py
 
-# Clock demos (shared core)
-# Default mode is native_clock (device-side clock features only; discovery-first safe default)
-# Native default preserves the current device clock face unless you pass --clock-id.
-python demos/clock_realtime.py
-python demos/storybook_clock.py
-
-# Native clock mode options (device commands only)
-python demos/clock_realtime.py --mode native_clock --clock-id 846 --sync-utc
-python demos/clock_realtime.py --mode native_clock --twenty-four-hour --poll-seconds 5
-
-# Experimental web clock mode (browser-rendered + upload; non-native)
-# Requires: Storybook running (cd storybook-app && npm run storybook)
-python demos/clock_realtime.py --mode web_clock_experimental --fps 3 --render-lead-ms 1500
-python demos/clock_realtime.py --mode web_clock_experimental --clockface ticks_all_thick_quarters --no-second-hand
-python demos/clock_realtime.py --mode web_clock_experimental --no-second-hand --marker-color "#ff00ff"
-python demos/clock_realtime.py --mode web_clock_experimental --fade 20
-python demos/clock_realtime.py --mode web_clock_experimental --delivery upload --fps 6 --window-seconds 3
+# Scene transition showcase (v3 high-level runtime)
+python demos/scene_transitions.py
+python demos/scene_transitions.py --all-transitions --run-seconds 45
+python demos/scene_transitions.py --info-layout-json '{"rows":[{"kind":"text","height":12,"align":"center","content":"STATUS"},{"kind":"table","height":10,"column_align":["left","right"],"block_align":"center","cells":[{"value":"TEMP"},{"value":"72F"}]}]}'
 
 # Font showcase: cycle Tiny5 text screens (alphabet, numbers, alert, warning, success, info) — 5s per screen
 # Uses local 192x192 fixture + 3x downsample (no Storybook required)
@@ -54,7 +41,7 @@ python demos/demo_upload_sequence.py
 python demos/demo_sequence_switching.py --mode stitched
 python demos/demo_sequence_switching.py --mode live
 
-# Unified smooth clock demo
+# Unified smooth clock demo (scene-first runtime + raster transport)
 # `pixooclock` is the canonical clock script; demo_three_hand_clock.py is a compatibility wrapper.
 # Default preset is adaptive: face=dot12, band=auto, day=sand, night=bronze, hand AA on, dot AA on, second hand off.
 python demos/pixooclock.py
@@ -80,7 +67,7 @@ python demos/pixooclock.py --demo --demo-bands tomato,purple,blue
 # - If hands appear truncated or updates stall, lower --fps or --segment-seconds.
 # - Color args support hex/rgb/name and Radix tokens (gray11, dark.gray11, grayDark11).
 # - In `--band auto`, location priority is CLI lat/lon -> PIXOO_LATITUDE/LONGITUDE -> cached/live ipapi -> timezone seasonal fallback.
-# - `--band tomato` remaps the default intensity slots: top=10, markers/minute=7, hour=9, second/center=5.
+# - `--band tomato` remaps the default intensity slots: top=10, markers=7, hour=9, minute=10, second/center=5.
 # - `--dot-anti-aliasing` smooths marker/center dots independently from hand anti-aliasing.
 
 # Device fetches and plays a GIF from a URL

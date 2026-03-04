@@ -1,55 +1,61 @@
 Mental Model
 ============
 
-There are three distinct rendering paths. Understanding them prevents
-confusion about what runs on the device vs what runs on your machine.
+PyPixoo v3 is intentionally layered so both low-level and high-level usage
+are first-class.
 
-1) Device fetches a GIF (remote URL)
+L0: Device transport (`Pixoo`)
+------------------------------
+
+`Pixoo` is the raw command and frame transport layer:
+
+- direct commands (`command`, `set_*`, `get_*`)
+- frame upload (`Draw/SendHttpGif`, `Draw/CommandList`)
+- single-frame push (`push_buffer`)
+- device-side features like weather/tools/clock IDs
+
+If you want total control and no framework opinions, stay at L0.
+
+L1: Raster streaming (`pypixoo.raster`)
+---------------------------------------
+
+`RasterClient` / `AsyncRasterClient` sit on top of a `FrameSink` and provide
+simple, paced frame streaming with reconnect-aware sinks (`PixooFrameSink`).
+
+This layer still has no scene concepts. It is for users who want to push
+buffers directly with minimal ceremony.
+
+L2: Scene runtime (`pypixoo.scene`)
 -----------------------------------
 
-`Device/PlayTFGif` with `FileType=2` tells the Pixoo to download and play
-a GIF directly. The device does the network fetch and decoding. PyPixoo only
-sends a small JSON command with the URL.
+`ScenePlayer` adds queueing, transitions, and compositing on top of L1.
+Scenes expose `LayerNode` lists. The runtime renders host-side and pushes the
+composited frame through the raster layer.
 
-2) Client uploads frames
-------------------------
+`pypixoo.transitions` and `pypixoo.compositor` define transition planning and
+pixel blending behavior.
 
-`Draw/SendHttpGif` uploads raw frame data (RGB) from your Python process
-to the device. The device does not fetch anything from the internet. You
-are pushing frames over HTTP.
+`ScenePlayer` intentionally does not include clock/info assumptions. High-level
+composition choices (for example `ClockScene` and `InfoScene`) are caller-owned
+and live in optional scene modules.
 
-3) Device overlays text on top of the last upload
--------------------------------------------------
+`InfoScene` now takes `InfoLayout` from `pypixoo.info_dsl`. The DSL (rows,
+styles, table alignment) is composition-layer behavior, not runtime behavior in
+`ScenePlayer`.
 
-`Draw/SendHttpText` renders a text overlay on top of the last uploaded
-sequence. This is device-side rendering. It is not a browser or React
-feature. Overlays only make sense after you have uploaded a sequence.
+Device-vs-host behavior
+-----------------------
+
+- `Device/PlayTFGif` with URL source: **device fetches and decodes**.
+- `Draw/SendHttpGif` / `push_buffer`: **host uploads pixels**.
+- Scene transitions (`cross_fade`, `push_*`, `slide_over_*`, `wipe_*`):
+  **host-side compositing** in PyPixoo.
+- Text overlays (`Draw/SendHttpText`): **device-side overlay rendering** on top
+  of uploaded animation context.
 
 Fonts: built-in vs web
 ----------------------
 
-- Built-in animation fonts (0-7) are used by `Draw/SendHttpText`.
-- Dial/display list fonts come from Divoom services and are used by
-  `Draw/SendHttpItemList`.
-- Web fonts (Google Fonts) are only used when you render via
-  `WebFrameSource` in a headless browser and then upload frames.
-
-Weather and device tools
-------------------------
-
-The Pixoo has built-in modes like weather, countdown, stopwatch, and
-scoreboard. PyPixoo exposes these as command wrappers that call device
-endpoints. For weather you set location with `Sys/LogAndLat` and read
-current device weather via `Device/GetWeatherInfo`.
-
-Clock modes (discovery-first)
------------------------------
-
-Clock demos now expose two explicit modes:
-
-- `native_clock`: device commands only (`SetClockSelectId`, `GetClockInfo`,
-  `SetUTC`, `SetTime24Flag`).
-- `web_clock_experimental`: browser-rendered frames uploaded to the device.
-
-`web_clock_experimental` is intentionally labeled experimental because smoothness
-depends on host-side rendering throughput, not only device capability.
+- Built-in animation fonts (0-7): used by `Draw/SendHttpText`.
+- Display list fonts: used by `Draw/SendHttpItemList`.
+- Web fonts (Google Fonts): only when browser-rendering frames then uploading.
