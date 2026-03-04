@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "479490ec-90de-439c-83d1-8bbdbff6b193",
+  "issue_id": "kanbus-2539c551-346d-4e2b-a563-72603003e415",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-04T04:39:49.384Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+    "priority": 1,
+    "status": "open",
+    "title": "Implement alerting clock REPL demo script and docs"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "id": "kanbus-2539c551-346d-4e2b-a563-72603003e415",
+  "title": "Implement alerting clock REPL demo script and docs",
+  "description": "",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "111e15ed-6dfb-4068-b3a0-0477cea60430",
+      "author": "ryan.porter",
+      "text": "Building demos/alerting_clock.py REPL: alert|warn|info commands with default 10s hold, push-left in/push-right out transitions, and color/background overrides including -s5 shorthand.",
+      "created_at": "2026-03-04T04:39:53.376786Z"
+    },
+    {
+      "id": "b3b90bcb-3faf-4580-b1dd-730ba62cd0e1",
+      "author": "ryan.porter",
+      "text": "Implemented demos/alerting_clock.py and docs entry. REPL supports alert|warn|info, default 10s hold, --seconds/-s and -sN shorthand, --color and --background-color overrides, push-left in + push-right out transitions. Demo is now running for manual device verification.",
+      "created_at": "2026-03-04T04:40:59.520080Z"
+    },
+    {
+      "id": "73cde10b-33c1-40e9-b890-bf4df66fec88",
+      "author": "ryan.porter",
+      "text": "Follow-up fixes from live test: transition visibility too subtle; updating alerting_clock defaults for clearly visible push transitions and adding persisted readline history (up/down arrows) via dotfile.",
+      "created_at": "2026-03-04T04:48:44.879127Z"
+    },
+    {
+      "id": "a5ab4034-e4fb-4235-b9f2-f36d8bdb0506",
+      "author": "ryan.porter",
+      "text": "Added REPL history and arrow-key navigation using readline with persistent history file ~/.pypixoo/alerting_clock_history. Increased transition visibility defaults (fps=5, transition_ms=1200) and added --transition-ms option.",
+      "created_at": "2026-03-04T04:49:12.932177Z"
+    },
+    {
+      "id": "f6f18ae6-7b84-40e4-ae51-4ff3256f1cec",
+      "author": "ryan.porter",
+      "text": "Applying palette normalization from live feedback: set alert/warn/info default foregrounds to same intensity level and dim all default backgrounds to band level 2.",
+      "created_at": "2026-03-04T04:57:52.809277Z"
+    }
+  ],
+  "created_at": "2026-03-04T04:39:49.383996Z",
+  "updated_at": "2026-03-04T04:57:52.809277Z",
+  "closed_at": null,
+  "custom": {}
+}

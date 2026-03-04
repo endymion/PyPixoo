@@ -27,6 +27,19 @@ python demos/scene_transitions.py
 python demos/scene_transitions.py --all-transitions --run-seconds 45
 python demos/scene_transitions.py --info-layout-json '{"rows":[{"kind":"text","height":12,"align":"center","content":"STATUS"},{"kind":"table","height":10,"column_align":["left","right"],"block_align":"center","cells":[{"value":"TEMP"},{"value":"72F"}]}]}'
 
+# Alerting clock REPL (clock by default; alert/warn/info commands enqueue transitions)
+python demos/alerting_clock.py
+# Optional tuning:
+#   --fps 5 --transition-ms 1200
+# Then type commands in the REPL:
+#   alert "SOMETHING\nIS\nWRONG"
+#   alert --seconds 5 "lorem ipsum"
+#   alert -s5 "lorem ipsum"
+#   alert --color red-10 --background-color red-5 "lorem ipsum"
+#   warn "disk nearing full"
+#   info "backup completed"
+# REPL history is persisted at ~/.pypixoo/alerting_clock_history (up/down arrows)
+
 # Font showcase: cycle Tiny5 text screens (alphabet, numbers, alert, warning, success, info) — 5s per screen
 # Uses local 192x192 fixture + 3x downsample (no Storybook required)
 python demos/font_showcase.py
