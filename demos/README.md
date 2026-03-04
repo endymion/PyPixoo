@@ -40,6 +40,15 @@ python demos/alerting_clock.py
 #   info "backup completed"
 # REPL history is persisted at ~/.pypixoo/alerting_clock_history (up/down arrows)
 
+# Kanbus Clock REPL + recursive project/events watcher
+# - Recursively discovers all */project/events folders under --root (default: .)
+# - Prints startup folder summary with latest occurred_at
+# - Watches for new *.json files and auto-queues INFO notices
+# - Keeps REPL active for manual alert/warn/info commands
+python demos/kanbus_clock.py
+python demos/kanbus_clock.py --root . --poll-seconds 1 --rescan-seconds 10 --auto-info-seconds 5
+# REPL history is persisted at ~/.pypixoo/kanbus_clock_history (up/down arrows)
+
 # Font showcase: cycle Tiny5 text screens (alphabet, numbers, alert, warning, success, info) — 5s per screen
 # Uses local 192x192 fixture + 3x downsample (no Storybook required)
 python demos/font_showcase.py
