@@ -83,6 +83,8 @@ class AutoNotice:
     body_line_vpad: int = 1
     center_first_line: bool = True
     first_line_darker_steps: int = 2
+    line_darker_steps: dict[int, int] | None = None
+    line_indent_px: dict[int, int] | None = None
     body_max_lines: int = 7
     body_min_row_height: int = 6
     body_max_row_height: int = 8
@@ -134,6 +136,11 @@ def _normalize_space(text: str) -> str:
     return " ".join(text.split())
 
 
+def _format_status_text(raw: Any) -> str:
+    text = str(raw or "?").replace("_", " ").strip().upper()
+    return text or "?"
+
+
 def _text_width_px(text: str, *, font_key: str) -> int:
     if not text:
         return 0
@@ -158,6 +165,14 @@ def _trim_to_pixel_width(text: str, *, max_width_px: int, font_key: str) -> str:
     if not trimmed:
         return ellipsis
     return trimmed + ellipsis
+
+
+def _prefix_for_indent_px(indent_px: int, *, font_key: str) -> str:
+    if indent_px <= 0:
+        return ""
+    space_w = max(1, _text_width_px(" ", font_key=font_key))
+    count = max(1, (int(indent_px) + space_w - 1) // space_w)
+    return " " * count
 
 
 def _wrap_text_lines(
@@ -309,6 +324,8 @@ def _message_scene(
     body_line_vpad: int = 1,
     center_first_line: bool = False,
     first_line_darker_steps: int = 0,
+    line_darker_steps: dict[int, int] | None = None,
+    line_indent_px: dict[int, int] | None = None,
     body_max_lines: int = 7,
     body_min_row_height: int = 6,
     body_max_row_height: int = 8,
@@ -332,6 +349,15 @@ def _message_scene(
 
     max_lines = max(1, int(body_max_lines))
     shown_lines = lines[:max_lines]
+    if line_indent_px:
+        adjusted: list[str] = []
+        for idx, text_line in enumerate(shown_lines):
+            indent = int(line_indent_px.get(idx, 0))
+            if indent > 0:
+                adjusted.append(_prefix_for_indent_px(indent, font_key=body_font) + text_line)
+            else:
+                adjusted.append(text_line)
+        shown_lines = adjusted
     available_body_height = 64 - resolved_header_height
     line_vpad = max(0, int(body_line_vpad))
     measured_h = 0
@@ -363,7 +389,12 @@ def _message_scene(
             )
         )
     for idx, line in enumerate(shown_lines):
-        row_color = first_line_color if idx == 0 and first_line_darker_steps > 0 else fg
+        if idx == 0 and first_line_darker_steps > 0:
+            row_color = first_line_color
+        elif line_darker_steps and idx in line_darker_steps:
+            row_color = _darken_color(fg, steps=int(line_darker_steps[idx]))
+        else:
+            row_color = fg
         row_align = "center" if idx == 0 and center_first_line else body_row_align
         body_rows.append(
             TextRow(
@@ -512,16 +543,22 @@ def summarize_event(event: KanbusEvent) -> AutoNotice:
 
     if etype == "issue_created":
         issue_type = _truncate(str(payload.get("issue_type") or "issue"), 9).upper()
-        status = _truncate(str(payload.get("status") or "open"), 8).upper()
+        status = _format_status_text(payload.get("status"))
         title = _truncate(str(payload.get("title") or "(no title)"), 16)
         lines = [f"{issue}", f"{issue_type} {status}", title]
         return AutoNotice(header="CREATED", message="\n".join(lines))
 
     if etype == "state_transition":
-        from_status = _truncate(str(payload.get("from_status") or "?"), 8).upper()
-        to_status = _truncate(str(payload.get("to_status") or "?"), 8).upper()
-        lines = [f"{issue}", "FROM", from_status, "TO", to_status]
-        return AutoNotice(header="TRANSITION", message="\n".join(lines))
+        from_status = _format_status_text(payload.get("from_status"))
+        to_status = _format_status_text(payload.get("to_status"))
+        lines = [f"{issue}", "FROM:", from_status, "TO:", to_status]
+        return AutoNotice(
+            header="TRANSITION",
+            message="\n".join(lines),
+            center_first_line=True,
+            line_darker_steps={1: 1, 3: 1},
+            line_indent_px={2: 4, 4: 4},
+        )
 
     if etype == "comment_added":
         comment_text = _extract_comment_text(payload)
@@ -600,6 +637,45 @@ def merge_new_event_dirs(root: Path, tracked: dict[Path, set[str]]) -> list[Path
     return added
 
 
+def _watch_poll_step(
+    *,
+    root: Path,
+    tracked: dict[Path, set[str]],
+    failures: dict[Path, int],
+    do_rescan: bool,
+    max_failures: int,
+) -> tuple[list[str], list[AutoNotice]]:
+    """Run one synchronous watcher poll pass.
+
+    This function intentionally runs in a worker thread so filesystem scans,
+    JSON parsing, and optional subprocess fallbacks do not block the main
+    asyncio loop that drives frame pacing.
+    """
+
+    logs: list[str] = []
+    notices: list[AutoNotice] = []
+
+    if do_rescan:
+        added = merge_new_event_dirs(root, tracked)
+        for folder in added:
+            count, latest = latest_event_timestamp(folder)
+            latest_text = latest or "none"
+            logs.append(f"watcher: + {folder} ({count} files, latest={latest_text})")
+
+    for folder in sorted(tracked.keys()):
+        events = scan_folder_for_new_events(
+            folder,
+            tracked[folder],
+            failures,
+            max_failures=max_failures,
+        )
+        for event in events:
+            notices.append(summarize_event(event))
+            logs.append(f"watcher: event {event.event_type} {event.issue_id}")
+
+    return logs, notices
+
+
 # --------------------------
 # Runtime loops
 # --------------------------
@@ -648,6 +724,8 @@ async def _enqueue_message_transition(
     body_line_vpad: int = 1,
     center_first_line: bool = False,
     first_line_darker_steps: int = 0,
+    line_darker_steps: dict[int, int] | None = None,
+    line_indent_px: dict[int, int] | None = None,
     body_max_lines: int = 7,
     body_min_row_height: int = 6,
     body_max_row_height: int = 8,
@@ -667,6 +745,8 @@ async def _enqueue_message_transition(
         body_line_vpad=body_line_vpad,
         center_first_line=center_first_line,
         first_line_darker_steps=first_line_darker_steps,
+        line_darker_steps=line_darker_steps,
+        line_indent_px=line_indent_px,
         body_max_lines=body_max_lines,
         body_min_row_height=body_min_row_height,
         body_max_row_height=body_max_row_height,
@@ -708,25 +788,21 @@ async def _watch_events_loop(
 
     while not stop_event.is_set():
         now = time.monotonic()
-        if now >= next_rescan:
-            added = merge_new_event_dirs(root, tracked)
-            for folder in added:
-                count, latest = latest_event_timestamp(folder)
-                latest_text = latest or "none"
-                print(f"watcher: + {folder} ({count} files, latest={latest_text})")
+        do_rescan = now >= next_rescan
+        logs, discovered = await asyncio.to_thread(
+            _watch_poll_step,
+            root=root,
+            tracked=tracked,
+            failures=failures,
+            do_rescan=do_rescan,
+            max_failures=max_failures,
+        )
+        for line in logs:
+            print(line)
+        for notice in discovered:
+            _enqueue_auto_notice(notices, notice)
+        if do_rescan:
             next_rescan = now + max(0.5, rescan_seconds)
-
-        for folder in sorted(tracked.keys()):
-            events = scan_folder_for_new_events(
-                folder,
-                tracked[folder],
-                failures,
-                max_failures=max_failures,
-            )
-            for event in events:
-                summary = summarize_event(event)
-                _enqueue_auto_notice(notices, summary)
-                print(f"watcher: event {event.event_type} {event.issue_id}")
 
         await asyncio.sleep(max(0.1, poll_seconds))
 
@@ -765,6 +841,8 @@ async def _auto_notice_consumer(
             body_line_vpad=notice.body_line_vpad,
             center_first_line=notice.center_first_line,
             first_line_darker_steps=notice.first_line_darker_steps,
+            line_darker_steps=notice.line_darker_steps,
+            line_indent_px=notice.line_indent_px,
             body_max_lines=notice.body_max_lines,
             body_min_row_height=notice.body_min_row_height,
             body_max_row_height=notice.body_max_row_height,

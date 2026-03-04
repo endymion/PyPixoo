@@ -3,7 +3,7 @@
   "title": "Implement alerting clock REPL demo script and docs",
   "description": "",
   "type": "task",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 1,
   "assignee": null,
   "creator": null,
@@ -40,10 +40,16 @@
       "author": "ryan.porter",
       "text": "Applying palette normalization from live feedback: set alert/warn/info default foregrounds to same intensity level and dim all default backgrounds to band level 2.",
       "created_at": "2026-03-04T04:57:52.809277Z"
+    },
+    {
+      "id": "5359c69a-a317-4112-898a-8f6c2f1b718d",
+      "author": "ryan.porter",
+      "text": "Completed: alerting/kanbus clock REPL demo script and documentation are implemented and validated through live device testing.",
+      "created_at": "2026-03-04T06:57:28.836634Z"
     }
   ],
   "created_at": "2026-03-04T04:39:49.383996Z",
-  "updated_at": "2026-03-04T04:57:52.809277Z",
-  "closed_at": null,
+  "updated_at": "2026-03-04T06:57:28.946215Z",
+  "closed_at": "2026-03-04T06:57:28.946215Z",
   "custom": {}
 }

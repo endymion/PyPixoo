@@ -122,12 +122,12 @@ def test_summarize_event_known_types():
         event_type="issue_created",
         occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
         actor_id="tester",
-        payload={"issue_type": "task", "status": "open", "title": "Create watcher"},
+        payload={"issue_type": "task", "status": "in_progress", "title": "Create watcher"},
     )
     notice = module.summarize_event(created)
     assert notice.header == "CREATED"
     assert "KBS ABCDEF" in notice.message
-    assert "TASK OPEN" in notice.message
+    assert "TASK IN PROGRESS" in notice.message
     assert notice.header_font == "bytesized"
     assert notice.header_tight_padding is True
     assert notice.center_first_line is True
@@ -144,8 +144,10 @@ def test_summarize_event_known_types():
     )
     transition_notice = module.summarize_event(transition)
     assert transition_notice.header == "TRANSITION"
-    assert "\nFROM\nOPEN\nTO\nCLOSED" in transition_notice.message
+    assert "\nFROM:\nOPEN\nTO:\nCLOSED" in transition_notice.message
     assert transition_notice.center_first_line is True
+    assert transition_notice.line_darker_steps == {1: 1, 3: 1}
+    assert transition_notice.line_indent_px == {2: 4, 4: 4}
 
     comment = module.KanbusEvent(
         path=Path("z.json"),
@@ -207,6 +209,35 @@ def test_scan_folder_for_new_events_ignores_baseline_and_picks_new(tmp_path: Pat
     assert len(events) == 1
     assert events[0].path == new_file
     assert new_file.name in known
+
+
+def test_watch_poll_step_returns_logs_and_notices(tmp_path: Path):
+    module = _load_demo_module()
+    events_dir = tmp_path / "project" / "events"
+    events_dir.mkdir(parents=True)
+    event_path = events_dir / "2026-03-04T00:00:01.000Z__new.json"
+    _write_event(
+        event_path,
+        event_type="issue_created",
+        issue_id="kanbus-watch-1",
+        occurred_at="2026-03-04T00:00:01.000Z",
+        payload={"title": "watch", "status": "open", "issue_type": "task"},
+    )
+
+    tracked: dict[Path, set[str]] = {events_dir.resolve(): set()}
+    failures: dict[Path, int] = {}
+    logs, notices = module._watch_poll_step(
+        root=tmp_path,
+        tracked=tracked,
+        failures=failures,
+        do_rescan=False,
+        max_failures=5,
+    )
+
+    assert len(notices) == 1
+    assert notices[0].header == "CREATED"
+    assert any("watcher: event issue_created" in line for line in logs)
+    assert event_path.name in tracked[events_dir.resolve()]
 
 
 def test_merge_new_event_dirs_adds_dirs_after_startup(tmp_path: Path):
@@ -306,6 +337,8 @@ def test_enqueue_message_transition_respects_body_font():
             body_line_vpad=1,
             center_first_line=True,
             first_line_darker_steps=2,
+            line_darker_steps={1: 1},
+            line_indent_px={2: 4},
             body_max_lines=7,
             body_min_row_height=6,
             body_max_row_height=8,
