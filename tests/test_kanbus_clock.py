@@ -128,9 +128,46 @@ def test_summarize_event_known_types():
     assert notice.header == "CREATED"
     assert "KBS ABCDEF" in notice.message
     assert "TASK IN PROGRESS" in notice.message
+    assert "Create watcher" in notice.message
     assert notice.header_font == "bytesized"
     assert notice.header_tight_padding is True
     assert notice.center_first_line is True
+    assert notice.center_line_indices == {1}
+    assert notice.line_darker_steps == {1: 2}
+    assert notice.line_spacer_before_px == {2: 2}
+
+    created_missing_status = module.KanbusEvent(
+        path=Path("x2.json"),
+        schema_version=1,
+        event_id="e1b",
+        issue_id="kanbus-abc12345-2222",
+        event_type="issue_created",
+        occurred_at=module._parse_iso8601("2026-03-04T00:00:01Z"),
+        actor_id="tester",
+        payload={"issue_type": "task", "title": "Missing status"},
+    )
+    missing_status_notice = module.summarize_event(created_missing_status)
+    assert "TASK OPEN" in missing_status_notice.message
+
+    created_long_title = module.KanbusEvent(
+        path=Path("x3.json"),
+        schema_version=1,
+        event_id="e1c",
+        issue_id="kanbus-abcd9999-3333",
+        event_type="issue_created",
+        occurred_at=module._parse_iso8601("2026-03-04T00:00:02Z"),
+        actor_id="tester",
+        payload={
+            "issue_type": "task",
+            "status": "open",
+            "title": "This is a very long created issue title that should wrap across lines",
+        },
+    )
+    long_title_notice = module.summarize_event(created_long_title)
+    created_lines = long_title_notice.message.splitlines()
+    assert created_lines[0].startswith("KBS ")
+    assert created_lines[1] == "TASK OPEN"
+    assert len(created_lines) > 3
 
     transition = module.KanbusEvent(
         path=Path("y.json"),
@@ -140,14 +177,17 @@ def test_summarize_event_known_types():
         event_type="state_transition",
         occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
         actor_id="tester",
-        payload={"from_status": "open", "to_status": "closed"},
+        payload={"from_status": "open", "to_status": "closed", "title": "Clock status sync"},
     )
     transition_notice = module.summarize_event(transition)
     assert transition_notice.header == "TRANSITION"
-    assert "\nFROM:\nOPEN\nTO:\nCLOSED" in transition_notice.message
+    assert "\nClock status\nsync\nFROM:\nOPEN\nTO:\nCLOSED" in transition_notice.message
     assert transition_notice.center_first_line is True
-    assert transition_notice.line_darker_steps == {1: 1, 3: 1}
-    assert transition_notice.line_indent_px == {2: 4, 4: 4}
+    assert transition_notice.body_center_vertical is True
+    assert transition_notice.pin_first_line_top is True
+    assert transition_notice.line_darker_steps == {3: 1, 5: 1}
+    assert transition_notice.line_indent_px == {4: 2, 6: 2}
+    assert transition_notice.line_spacer_before_px == {3: 2}
 
     comment = module.KanbusEvent(
         path=Path("z.json"),
@@ -173,6 +213,7 @@ def test_summarize_event_known_types():
     assert comment_notice.body_line_vpad == 1
     assert comment_notice.center_first_line is True
     assert comment_notice.first_line_darker_steps == 2
+    assert comment_notice.line_spacer_before_px == {1: 2}
     assert comment_notice.header_font == "bytesized"
     assert comment_notice.header_tight_padding is True
     assert comment_notice.body_max_lines == 7
@@ -338,7 +379,7 @@ def test_enqueue_message_transition_respects_body_font():
             center_first_line=True,
             first_line_darker_steps=2,
             line_darker_steps={1: 1},
-            line_indent_px={2: 4},
+            line_indent_px={2: 2},
             body_max_lines=7,
             body_min_row_height=6,
             body_max_row_height=8,
@@ -362,6 +403,70 @@ def test_enqueue_message_transition_respects_body_font():
         second = text_rows[1].style.color
         assert first != second
         assert all(a < b for a, b in zip(first, second))
+
+
+def test_message_scene_pins_first_line_before_vertical_center_pad():
+    module = _load_demo_module()
+
+    scene = module._message_scene(
+        "info",
+        "KBS ABCDEF\nFROM:\nOPEN\nTO:\nCLOSED",
+        fg=(100, 100, 100),
+        bg=(10, 10, 10),
+        body_font="bytesized",
+        body_center_vertical=True,
+        pin_first_line_top=True,
+        body_min_row_height=6,
+        body_max_row_height=6,
+    )
+    rows = scene.layout.rows
+    assert rows[1].content == "KBS ABCDEF"
+    assert rows[2].content == ""
+
+
+def test_message_scene_centers_configured_non_first_line():
+    module = _load_demo_module()
+
+    scene = module._message_scene(
+        "info",
+        "ID\nTASK OPEN\nTitle",
+        fg=(100, 100, 100),
+        bg=(10, 10, 10),
+        center_first_line=True,
+        center_line_indices={1},
+        first_line_darker_steps=2,
+        line_darker_steps={1: 2},
+    )
+    rows = scene.layout.rows[1:]
+    text_rows = [r for r in rows if getattr(r, "content", None) not in ("", None)]
+    assert len(text_rows) >= 2
+    assert text_rows[0].content == "ID"
+    assert text_rows[1].content == "TASK OPEN"
+    assert text_rows[0].align == "center"
+    assert text_rows[1].align == "center"
+    first = text_rows[0].style.color
+    second = text_rows[1].style.color
+    assert first == second
+
+
+def test_message_scene_applies_pre_line_spacer():
+    module = _load_demo_module()
+
+    scene = module._message_scene(
+        "info",
+        "ID\nDESC\nFROM:\nOPEN",
+        fg=(100, 100, 100),
+        bg=(10, 10, 10),
+        line_spacer_before_px={2: 2},
+        body_min_row_height=6,
+        body_max_row_height=6,
+    )
+    rows = scene.layout.rows[1:]
+    assert rows[0].content == "ID"
+    assert rows[1].content == "DESC"
+    assert rows[2].content == ""
+    assert rows[2].height == 2
+    assert rows[3].content == "FROM:"
 
 
 def test_setup_readline_history_permission_error_is_non_fatal(tmp_path: Path, monkeypatch):
@@ -438,4 +543,38 @@ def test_comment_summary_falls_back_to_kbs_show_when_payload_missing(monkeypatch
     assert "KBS AAAAAA" in notice.message
     assert "Newest" in notice.message
     assert "comment" in notice.message
+    assert captured.get("cwd") == str(Path("/tmp/demo-repo").resolve())
+
+
+def test_transition_summary_falls_back_to_kbs_show_title(monkeypatch):
+    module = _load_demo_module()
+    captured: dict[str, object] = {}
+
+    fake_issue_json = json.dumps(
+        {
+            "title": "Transition fallback title from kbs show",
+            "description": "Unused description",
+        }
+    )
+
+    def _fake_run(*_args, **_kwargs):
+        captured.update(_kwargs)
+        return SimpleNamespace(returncode=0, stdout=fake_issue_json)
+
+    monkeypatch.setattr(module.subprocess, "run", _fake_run)
+    module._ISSUE_SUMMARY_CACHE.clear()
+
+    event = module.KanbusEvent(
+        path=Path("/tmp/demo-repo/project/events/event.json"),
+        schema_version=1,
+        event_id="e5",
+        issue_id="kanbus-bbbbbb-0002",
+        event_type="state_transition",
+        occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+        actor_id="tester",
+        payload={"from_status": "open", "to_status": "done"},
+    )
+    notice = module.summarize_event(event)
+    assert notice.header == "TRANSITION"
+    assert "fallback title" in notice.message.lower()
     assert captured.get("cwd") == str(Path("/tmp/demo-repo").resolve())

@@ -42,6 +42,7 @@ _FILENAME_TS_RE = re.compile(
 )
 _SHORT_SECONDS_RE = re.compile(r"^-s(\d+(?:\.\d+)?)$")
 MIN_TS = datetime(1970, 1, 1, tzinfo=timezone.utc)
+_ISSUE_SUMMARY_CACHE: dict[str, str] = {}
 
 try:
     import readline
@@ -80,11 +81,14 @@ class AutoNotice:
     body_font: str = "bytesized"
     body_align: str = "left"
     body_center_vertical: bool = False
+    pin_first_line_top: bool = False
     body_line_vpad: int = 1
     center_first_line: bool = True
+    center_line_indices: set[int] | None = None
     first_line_darker_steps: int = 2
     line_darker_steps: dict[int, int] | None = None
     line_indent_px: dict[int, int] | None = None
+    line_spacer_before_px: dict[int, int] | None = None
     body_max_lines: int = 7
     body_min_row_height: int = 6
     body_max_row_height: int = 8
@@ -296,6 +300,41 @@ def _fetch_latest_issue_comment_text(issue_id: str, repo_root: Optional[Path] = 
     return ""
 
 
+def _fetch_issue_summary_text(issue_id: str, repo_root: Optional[Path] = None) -> str:
+    if not issue_id:
+        return ""
+    cached = _ISSUE_SUMMARY_CACHE.get(issue_id)
+    if cached is not None:
+        return cached
+    try:
+        proc = subprocess.run(
+            ["kbs", "show", issue_id, "--json"],
+            cwd=str(repo_root) if repo_root else None,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=2.0,
+        )
+    except Exception:
+        _ISSUE_SUMMARY_CACHE[issue_id] = ""
+        return ""
+    if proc.returncode != 0 or not proc.stdout:
+        _ISSUE_SUMMARY_CACHE[issue_id] = ""
+        return ""
+    try:
+        issue = json.loads(proc.stdout)
+    except Exception:
+        _ISSUE_SUMMARY_CACHE[issue_id] = ""
+        return ""
+    title = _normalize_space(str(issue.get("title") or ""))
+    if title:
+        _ISSUE_SUMMARY_CACHE[issue_id] = title
+        return title
+    description = _normalize_space(str(issue.get("description") or ""))
+    _ISSUE_SUMMARY_CACHE[issue_id] = description
+    return description
+
+
 def _short_issue_id(issue_id: str) -> str:
     if issue_id.startswith("kanbus-"):
         tail = issue_id[len("kanbus-") :]
@@ -321,11 +360,14 @@ def _message_scene(
     body_font: str = "bytesized",
     body_align: str = "left",
     body_center_vertical: bool = False,
+    pin_first_line_top: bool = False,
     body_line_vpad: int = 1,
     center_first_line: bool = False,
+    center_line_indices: set[int] | None = None,
     first_line_darker_steps: int = 0,
     line_darker_steps: dict[int, int] | None = None,
     line_indent_px: dict[int, int] | None = None,
+    line_spacer_before_px: dict[int, int] | None = None,
     body_max_lines: int = 7,
     body_min_row_height: int = 6,
     body_max_row_height: int = 8,
@@ -371,13 +413,38 @@ def _message_scene(
     row_height = max(min_h, min(max_h, available_body_height // max(1, len(shown_lines))))
     if target_h > 0 and (target_h * len(shown_lines)) <= available_body_height:
         row_height = target_h
-    content_height = len(shown_lines) * row_height
-    top_pad = max(0, (available_body_height - content_height) // 2) if body_center_vertical else 0
+    pin_first = bool(pin_first_line_top and body_center_vertical and len(shown_lines) > 1)
+    pinned_rows = 1 if pin_first else 0
+    pinned_height = pinned_rows * row_height
+    remaining_lines = max(0, len(shown_lines) - pinned_rows)
+    remaining_height = remaining_lines * row_height
+    remaining_space = max(0, available_body_height - pinned_height)
+    top_pad = max(0, (remaining_space - remaining_height) // 2) if body_center_vertical else 0
     body_row_align = "left" if body_align == "left" else "center"
     first_line_color = _darken_color(fg, steps=first_line_darker_steps)
     header_color = _darken_color(fg, steps=header_darker_steps)
 
+    centered_indices = set(center_line_indices or ())
+    spacer_before = dict(line_spacer_before_px or {})
     body_rows: list[TextRow] = []
+    if pin_first:
+        first_line = shown_lines[0]
+        if first_line_darker_steps > 0:
+            row_color = first_line_color
+        elif line_darker_steps and 0 in line_darker_steps:
+            row_color = _darken_color(fg, steps=int(line_darker_steps[0]))
+        else:
+            row_color = fg
+        row_align = "center" if (center_first_line or (0 in centered_indices)) else body_row_align
+        body_rows.append(
+            TextRow(
+                height=row_height,
+                align=row_align,
+                background_color=bg,
+                style=TextStyle(font=body_font, color=row_color),
+                content=first_line,
+            )
+        )
     if top_pad > 0:
         body_rows.append(
             TextRow(
@@ -388,14 +455,27 @@ def _message_scene(
                 content="",
             )
         )
-    for idx, line in enumerate(shown_lines):
+    start_idx = 1 if pin_first else 0
+    for idx in range(start_idx, len(shown_lines)):
+        line = shown_lines[idx]
+        spacer_px = max(0, int(spacer_before.get(idx, 0)))
+        if spacer_px > 0:
+            body_rows.append(
+                TextRow(
+                    height=spacer_px,
+                    align=body_row_align,
+                    background_color=bg,
+                    style=TextStyle(font=body_font, color=fg),
+                    content="",
+                )
+            )
         if idx == 0 and first_line_darker_steps > 0:
             row_color = first_line_color
         elif line_darker_steps and idx in line_darker_steps:
             row_color = _darken_color(fg, steps=int(line_darker_steps[idx]))
         else:
             row_color = fg
-        row_align = "center" if idx == 0 and center_first_line else body_row_align
+        row_align = "center" if ((idx == 0 and center_first_line) or (idx in centered_indices)) else body_row_align
         body_rows.append(
             TextRow(
                 height=row_height,
@@ -543,21 +623,49 @@ def summarize_event(event: KanbusEvent) -> AutoNotice:
 
     if etype == "issue_created":
         issue_type = _truncate(str(payload.get("issue_type") or "issue"), 9).upper()
-        status = _format_status_text(payload.get("status"))
-        title = _truncate(str(payload.get("title") or "(no title)"), 16)
-        lines = [f"{issue}", f"{issue_type} {status}", title]
-        return AutoNotice(header="CREATED", message="\n".join(lines))
+        status_raw = payload.get("status")
+        status = "OPEN" if status_raw is None else _format_status_text(status_raw)
+        title = _normalize_space(str(payload.get("title") or "(no title)")) or "(no title)"
+        wrapped_title = _wrap_text_lines(title, max_width_px=62, max_lines=5, font_key="bytesized")
+        if not wrapped_title:
+            wrapped_title = ["(no title)"]
+        lines = [f"{issue}", f"{issue_type} {status}", *wrapped_title]
+        return AutoNotice(
+            header="CREATED",
+            message="\n".join(lines),
+            center_first_line=True,
+            center_line_indices={1},
+            line_darker_steps={1: 2},
+            line_spacer_before_px={2: 2},
+        )
 
     if etype == "state_transition":
         from_status = _format_status_text(payload.get("from_status"))
         to_status = _format_status_text(payload.get("to_status"))
-        lines = [f"{issue}", "FROM:", from_status, "TO:", to_status]
+        summary_text = _normalize_space(
+            str(payload.get("title") or payload.get("description") or "")
+        )
+        if not summary_text:
+            repo_root = event.repo_root or _repo_root_from_event_path(event.path)
+            summary_text = _fetch_issue_summary_text(event.issue_id, repo_root)
+        summary_lines = _wrap_text_lines(summary_text, max_width_px=62, max_lines=2, font_key="bytesized")
+        if not summary_lines:
+            summary_lines = ["(no title)"]
+
+        lines = [f"{issue}", *summary_lines, "FROM:", from_status, "TO:", to_status]
+        from_idx = 1 + len(summary_lines)
+        from_status_idx = from_idx + 1
+        to_idx = from_status_idx + 1
+        to_status_idx = to_idx + 1
         return AutoNotice(
             header="TRANSITION",
             message="\n".join(lines),
             center_first_line=True,
-            line_darker_steps={1: 1, 3: 1},
-            line_indent_px={2: 4, 4: 4},
+            body_center_vertical=True,
+            pin_first_line_top=True,
+            line_darker_steps={from_idx: 1, to_idx: 1},
+            line_indent_px={from_status_idx: 2, to_status_idx: 2},
+            line_spacer_before_px={from_idx: 2},
         )
 
     if etype == "comment_added":
@@ -578,6 +686,7 @@ def summarize_event(event: KanbusEvent) -> AutoNotice:
             header="COMMENT",
             message="\n".join(lines),
             center_first_line=True,
+            line_spacer_before_px={1: 2},
         )
 
     lines = [f"{issue}", _truncate(f"EVENT {etype}", 18)]
@@ -721,11 +830,14 @@ async def _enqueue_message_transition(
     body_font: str = "bytesized",
     body_align: str = "left",
     body_center_vertical: bool = False,
+    pin_first_line_top: bool = False,
     body_line_vpad: int = 1,
     center_first_line: bool = False,
+    center_line_indices: set[int] | None = None,
     first_line_darker_steps: int = 0,
     line_darker_steps: dict[int, int] | None = None,
     line_indent_px: dict[int, int] | None = None,
+    line_spacer_before_px: dict[int, int] | None = None,
     body_max_lines: int = 7,
     body_min_row_height: int = 6,
     body_max_row_height: int = 8,
@@ -742,11 +854,14 @@ async def _enqueue_message_transition(
         body_font=body_font,
         body_align=body_align,
         body_center_vertical=body_center_vertical,
+        pin_first_line_top=pin_first_line_top,
         body_line_vpad=body_line_vpad,
         center_first_line=center_first_line,
+        center_line_indices=center_line_indices,
         first_line_darker_steps=first_line_darker_steps,
         line_darker_steps=line_darker_steps,
         line_indent_px=line_indent_px,
+        line_spacer_before_px=line_spacer_before_px,
         body_max_lines=body_max_lines,
         body_min_row_height=body_min_row_height,
         body_max_row_height=body_max_row_height,
@@ -838,11 +953,14 @@ async def _auto_notice_consumer(
             body_font=notice.body_font,
             body_align=notice.body_align,
             body_center_vertical=notice.body_center_vertical,
+            pin_first_line_top=notice.pin_first_line_top,
             body_line_vpad=notice.body_line_vpad,
             center_first_line=notice.center_first_line,
+            center_line_indices=notice.center_line_indices,
             first_line_darker_steps=notice.first_line_darker_steps,
             line_darker_steps=notice.line_darker_steps,
             line_indent_px=notice.line_indent_px,
+            line_spacer_before_px=notice.line_spacer_before_px,
             body_max_lines=notice.body_max_lines,
             body_min_row_height=notice.body_min_row_height,
             body_max_row_height=notice.body_max_row_height,
