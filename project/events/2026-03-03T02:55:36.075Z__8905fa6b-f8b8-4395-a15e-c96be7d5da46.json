@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "8905fa6b-f8b8-4395-a15e-c96be7d5da46",
+  "issue_id": "kanbus-7e70d8fb-11e8-4fd9-9780-c100e7114ee4",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T02:55:36.075Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "Demo fails importing AnimationPlayer from pypixoo. Migrate browser_mixed.py to V2 sequence upload/playback API and verify on device.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "kanbus-8f7830a4-6eac-4473-a58f-652ee965d687",
+    "priority": 1,
+    "status": "open",
+    "title": "Fix demo browser_mixed.py for V2 API"
+  }
+}

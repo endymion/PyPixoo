@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "6d252cef-5062-4389-8967-53241be0600a",
+  "issue_id": "kanbus-04dcc719-83c1-41f1-ac41-dbcc17c0bfc8",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T05:23:23.935Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Fix black_band demos background thread exception on shutdown"
+  }
+}

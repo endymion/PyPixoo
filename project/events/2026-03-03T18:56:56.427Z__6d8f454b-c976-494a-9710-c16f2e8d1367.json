@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "6d8f454b-c976-494a-9710-c16f2e8d1367",
+  "issue_id": "kanbus-b4b438ed-fbec-44c9-bda5-47f3c1172db0",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T18:56:56.427Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Implement v1 multi-row InfoLayout DSL with table alignment, host-raster rendering, demo/CLI integration, tests/docs, and manual acceptance checklist.",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+    "priority": 2,
+    "status": "open",
+    "title": "InfoScene row DSL + table alignment"
+  }
+}

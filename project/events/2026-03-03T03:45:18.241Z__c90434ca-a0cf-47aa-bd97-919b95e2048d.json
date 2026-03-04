@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "c90434ca-a0cf-47aa-bd97-919b95e2048d",
+  "issue_id": "kanbus-288f7117-f689-4e21-82dc-202e4fcb1f3f",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T03:45:18.241Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "Add a real-device demo to test smooth switching between sequences with two strategies: stitched single upload (deterministic) and live upload switching (experimental).",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+    "priority": 2,
+    "status": "open",
+    "title": "Demo: smooth sequence switching experiment"
+  }
+}

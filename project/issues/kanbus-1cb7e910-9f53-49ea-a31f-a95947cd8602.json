@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-1cb7e910-9f53-49ea-a31f-a95947cd8602",
+  "title": "Tests + docs for generalized InfoScene",
+  "description": "Add unit/CLI/demo tests and Sphinx docs updates for generalized scene composition.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-03T15:26:30.581751Z",
+  "updated_at": "2026-03-03T15:26:42.622482Z",
+  "closed_at": "2026-03-03T15:26:42.622482Z",
+  "custom": {}
+}

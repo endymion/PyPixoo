@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "ae197ba9-69d5-484d-b001-ee9a2086b14a",
+  "issue_id": "kanbus-f1f747b6-38a3-47c0-9c7d-eda89bb19498",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T15:26:30.576Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Implement generalized InfoScene with centered header title and body renderer hook.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+    "priority": 2,
+    "status": "open",
+    "title": "InfoScene implementation with header row"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "abc34155-554b-403f-9b73-935d8e2edc30",
+  "issue_id": "kanbus-cb7add38-ef4f-4922-bcbc-5e974b9e34d8",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T02:51:21.832Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "Demo fails with ModuleNotFoundError: pypixoo.animation. Migrate black_band_transparent.py to V2 API and verify real-device execution.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "kanbus-81025657-6264-4358-9d22-c94510381e5b",
+    "priority": 1,
+    "status": "open",
+    "title": "Fix demo black_band_transparent.py for V2 API"
+  }
+}

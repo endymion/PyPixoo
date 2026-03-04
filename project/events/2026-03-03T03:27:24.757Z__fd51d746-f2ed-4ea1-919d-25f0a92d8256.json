@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "fd51d746-f2ed-4ea1-919d-25f0a92d8256",
+  "issue_id": "kanbus-2f4f0211-4531-4615-9991-2562045581b8",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T03:27:24.757Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "sub-task",
+    "labels": [],
+    "parent": "kanbus-c5ae3bf7-4d28-4922-8186-2a1e6e3c7fe2",
+    "priority": 2,
+    "status": "open",
+    "title": "shared clock core"
+  }
+}

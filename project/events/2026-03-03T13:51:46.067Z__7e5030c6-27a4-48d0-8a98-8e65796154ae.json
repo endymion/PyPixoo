@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "7e5030c6-27a4-48d0-8a98-8e65796154ae",
+  "issue_id": "kanbus-ae9a7cd8-5036-403b-b8f0-04b8019cbf27",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T13:51:46.067Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Define sink interface and reconnect behavior isolated from scene layer.",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+    "priority": 1,
+    "status": "open",
+    "title": "FrameSink boundary + Pixoo sink"
+  }
+}

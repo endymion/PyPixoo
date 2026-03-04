@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "dd91cf69-ac80-4c56-a19c-34fc642428b3",
+  "issue_id": "kanbus-4db91b70-4d20-4d6a-91d7-94b8a0e9a9e2",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T15:26:30.581Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Registry-driven scene font listing/registration and HeaderConfig validation.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+    "priority": 2,
+    "status": "open",
+    "title": "Scene font registry + validation"
+  }
+}

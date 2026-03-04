@@ -3,7 +3,7 @@
   "title": "V2 native GIF playback + text overlay rules",
   "description": "Device/PlayTFGif + SendHttpText/ClearHttpText behavior",
   "type": "epic",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 1,
   "assignee": null,
   "creator": null,
@@ -19,7 +19,7 @@
     }
   ],
   "created_at": "2026-03-02T05:30:30.983399Z",
-  "updated_at": "2026-03-02T05:43:59.141721Z",
-  "closed_at": null,
+  "updated_at": "2026-03-04T04:12:58.424342Z",
+  "closed_at": "2026-03-04T04:12:58.424342Z",
   "custom": {}
 }

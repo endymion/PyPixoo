@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-41188b49-ac4f-4d0b-b345-e0b9143cd026",
+  "title": "Demo + CLI integration (Info DSL)",
+  "description": "Use InfoLayout in scene_transitions demo and add --info-layout-json path/inline support in CLI scene commands.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-03T18:57:04.830935Z",
+  "updated_at": "2026-03-03T19:03:19.312368Z",
+  "closed_at": "2026-03-03T19:03:19.312368Z",
+  "custom": {}
+}

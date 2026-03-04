@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "ea038cf2-a8c4-4f78-abf0-8f54c3e1c5b9",
+  "issue_id": "kanbus-f4cf9443-7aec-48a6-8bdd-131ffe8723d4",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T04:26:27.540Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "Set three-hand clock default colors to dark-mode Radix purple tokens: top marker purple10, markers purple7, hour purple9, minute purple7, second purple5.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+    "priority": 2,
+    "status": "open",
+    "title": "Clock palette tweak: dark Radix purple scale"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "60f70cfb-afba-417d-9710-961755cb1cf6",
+  "issue_id": "kanbus-4ca0f193-3883-45ba-8133-3cb2c6485cfd",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T05:45:14.626Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Display list text does not render on device (black screen)"
+  }
+}

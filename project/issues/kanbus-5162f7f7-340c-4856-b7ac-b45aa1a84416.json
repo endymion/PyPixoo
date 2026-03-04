@@ -1,0 +1,31 @@
+{
+  "id": "kanbus-5162f7f7-340c-4856-b7ac-b45aa1a84416",
+  "title": "CLI v3 commands",
+  "description": "Add pixoo raster/scene commands for v3 architecture.",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "6e7b6b8b-ef80-4ecd-a81b-e2f121001801",
+      "author": "ryan.porter",
+      "text": "Started implementation for v3 layered architecture.",
+      "created_at": "2026-03-03T13:51:53.345080Z"
+    },
+    {
+      "id": "86ef1b9a-d7aa-4702-9105-4fb095715ec1",
+      "author": "ryan.porter",
+      "text": "Completed in code with automated validation.",
+      "created_at": "2026-03-03T14:03:26.284689Z"
+    }
+  ],
+  "created_at": "2026-03-03T13:51:46.408916Z",
+  "updated_at": "2026-03-03T14:03:26.284689Z",
+  "closed_at": "2026-03-03T14:03:26.196583Z",
+  "custom": {}
+}

@@ -1,0 +1,55 @@
+{
+  "id": "kanbus-e36f1335-0cd4-432a-af6c-88a3ed60f66f",
+  "title": "Web font demo output is blurry on device",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "1c592639-cb20-46be-8349-4f4f819a1a8e",
+      "author": "unknown",
+      "text": "Fixing web font blur by forcing pixel-aligned render path: integer-positioned text in fixture + 64x64 viewport with device_scale_factor=1 and nearest sampling.",
+      "created_at": "2026-03-03T05:54:09.298366Z"
+    },
+    {
+      "id": "dac42372-6099-4454-bf04-6222aab74b64",
+      "author": "unknown",
+      "text": "Acceptance note: user reported text visible but blurry on-device; targeting deterministic pixel-grid rendering.",
+      "created_at": "2026-03-03T05:54:09.315062Z"
+    },
+    {
+      "id": "d5422afe-abd0-418d-8c98-a51b058c0c6d",
+      "author": "unknown",
+      "text": "Switched web_font_demo fixture from Google-hosted Tiny5 to local @font-face Tiny5-Regular.ttf for deterministic glyph output.",
+      "created_at": "2026-03-03T05:56:31.341956Z"
+    },
+    {
+      "id": "49a63232-4dff-4184-b9f8-841c6d914eb5",
+      "author": "unknown",
+      "text": "Working now: switch web-font demo to known-good Tiny5 render path and set color to Radix sand-5 for visual confirmation on device.",
+      "created_at": "2026-03-03T05:58:18.718165Z"
+    },
+    {
+      "id": "a5f5b68d-ffd3-4bfa-854b-fc1c5f653018",
+      "author": "unknown",
+      "text": "Updated demo_web_fonts to use tinytext_192 fixture (same path as font_showcase), default variant=single_a, font=tiny5, and text color default dark.sand5; uploaded to device for visual verification.",
+      "created_at": "2026-03-03T05:59:00.543624Z"
+    },
+    {
+      "id": "4d5cfa5c-82f8-4297-9bb7-d718e7a37862",
+      "author": "unknown",
+      "text": "User confirmed on device: Tiny5 render now correct with Radix sand-5 color.",
+      "created_at": "2026-03-03T05:59:42.542634Z"
+    }
+  ],
+  "created_at": "2026-03-03T05:53:52.801002Z",
+  "updated_at": "2026-03-03T05:59:42.646475Z",
+  "closed_at": "2026-03-03T05:59:42.646475Z",
+  "custom": {}
+}

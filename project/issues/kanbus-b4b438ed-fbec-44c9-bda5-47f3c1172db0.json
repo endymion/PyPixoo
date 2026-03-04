@@ -1,0 +1,31 @@
+{
+  "id": "kanbus-b4b438ed-fbec-44c9-bda5-47f3c1172db0",
+  "title": "InfoScene row DSL + table alignment",
+  "description": "Implement v1 multi-row InfoLayout DSL with table alignment, host-raster rendering, demo/CLI integration, tests/docs, and manual acceptance checklist.",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "a556e11c-531a-4c57-8200-cb48568c138d",
+      "author": "ryan.porter",
+      "text": "Started implementation: adding InfoLayout DSL module, updating InfoScene rendering, then demo/CLI/tests/docs integration.",
+      "created_at": "2026-03-03T18:57:09.882156Z"
+    },
+    {
+      "id": "31e6d94d-47c4-4f4a-9490-45fc454f0569",
+      "author": "ryan.porter",
+      "text": "Implemented DSL/module integration: added pypixoo.info_dsl, migrated InfoScene to layout-based rendering, integrated demo+CLI --info-layout-json, and added tests/docs. Automated validation passed (py_compile, 62 pytest tests across targeted suites, sphinx-build). Keeping acceptance/docs task open for live visual confirmation on device.",
+      "created_at": "2026-03-03T19:03:26.485249Z"
+    }
+  ],
+  "created_at": "2026-03-03T18:56:56.426840Z",
+  "updated_at": "2026-03-04T04:12:58.424577Z",
+  "closed_at": "2026-03-04T04:12:58.424577Z",
+  "custom": {}
+}

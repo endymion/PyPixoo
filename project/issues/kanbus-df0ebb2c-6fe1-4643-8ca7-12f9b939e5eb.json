@@ -1,0 +1,31 @@
+{
+  "id": "kanbus-df0ebb2c-6fe1-4643-8ca7-12f9b939e5eb",
+  "title": "L2 scene/compositor/transitions",
+  "description": "Add scene runtime, transition specs, compositing, and queue execution.",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "8bc7b50c-2a15-49e9-8ed8-bca7df532a78",
+      "author": "ryan.porter",
+      "text": "Started implementation for v3 layered architecture.",
+      "created_at": "2026-03-03T13:51:52.948343Z"
+    },
+    {
+      "id": "9a3adb8d-cb7f-4865-90fd-9479ddabfe57",
+      "author": "ryan.porter",
+      "text": "Completed in code with automated validation.",
+      "created_at": "2026-03-03T14:03:25.898858Z"
+    }
+  ],
+  "created_at": "2026-03-03T13:51:46.185050Z",
+  "updated_at": "2026-03-03T14:03:25.898858Z",
+  "closed_at": "2026-03-03T14:03:25.809640Z",
+  "custom": {}
+}

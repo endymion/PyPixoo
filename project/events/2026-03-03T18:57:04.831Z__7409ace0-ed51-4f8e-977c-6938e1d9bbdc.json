@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "7409ace0-ed51-4f8e-977c-6938e1d9bbdc",
+  "issue_id": "kanbus-1522d3bb-7159-49ff-8360-bc6470c806df",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T18:57:04.831Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Implement contiguous table-block column width metrics and aligned cell rendering.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+    "priority": 2,
+    "status": "open",
+    "title": "Table block layout engine"
+  }
+}

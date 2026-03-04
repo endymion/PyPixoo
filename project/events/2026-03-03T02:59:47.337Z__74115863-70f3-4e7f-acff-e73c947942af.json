@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "74115863-70f3-4e7f-acff-e73c947942af",
+  "issue_id": "kanbus-04c9061f-e7db-4e80-a065-c6f2a6162a29",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T02:59:47.337Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "In clock demos, the 12 o'clock marker appears dimmer than other markers; it should be brighter. Update marker color/opacity logic so top marker is brighter by default.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "kanbus-cc38e836-3e4f-4dab-90b8-45e74cd98d49",
+    "priority": 1,
+    "status": "open",
+    "title": "Clock 12 marker brightness is inverted"
+  }
+}

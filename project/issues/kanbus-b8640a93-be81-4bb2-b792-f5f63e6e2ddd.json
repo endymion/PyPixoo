@@ -1,0 +1,25 @@
+{
+  "id": "kanbus-b8640a93-be81-4bb2-b792-f5f63e6e2ddd",
+  "title": "Story: define day/night default palette behavior for pixooclock",
+  "description": "",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-952eaafe-8576-48c3-aa21-4fcce86fe404",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "6f8a0e44-dc1f-4c05-a4c3-52365bf1cba4",
+      "author": "ryan.porter",
+      "text": "Planning commit pushed: 665c7ba. Added features/pixooclock_adaptive_palette.feature and docs/plans/pixooclock_adaptive_palette.md with adaptive behavior contract and acceptance criteria.",
+      "created_at": "2026-03-03T07:18:52.203693Z"
+    }
+  ],
+  "created_at": "2026-03-03T07:03:36.715541Z",
+  "updated_at": "2026-03-03T07:19:00.754278Z",
+  "closed_at": "2026-03-03T07:19:00.754278Z",
+  "custom": {}
+}

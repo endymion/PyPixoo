@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "6ae35ae0-075e-47f1-90cb-bc6564d51b59",
+  "issue_id": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T13:51:29.191Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Breaking redesign: L0 Pixoo transport, L1 RasterClient, L2 ScenePlayer with transitions and scene-first clock migration.",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "v3 layered runtime (raster + scene engine)"
+  }
+}

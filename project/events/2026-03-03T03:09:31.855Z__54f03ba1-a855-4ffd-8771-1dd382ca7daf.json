@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "54f03ba1-a855-4ffd-8771-1dd382ca7daf",
+  "issue_id": "kanbus-9ff5efd9-ed56-485f-803a-82b838839fc1",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T03:09:31.855Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "Acceptance test failure: demos/storybook_clock.py displays frozen 12:00 and does not progress. Fix clock URL/story args so rendered frames represent advancing current time.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "kanbus-c5ae3bf7-4d28-4922-8186-2a1e6e3c7fe2",
+    "priority": 1,
+    "status": "open",
+    "title": "storybook_clock frozen at 12:00"
+  }
+}

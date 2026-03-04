@@ -1,0 +1,18 @@
+{
+  "id": "kanbus-9539f3fa-6c60-433c-97ce-24e7d4b9d9df",
+  "title": "InfoScene renderer update",
+  "description": "Update InfoScene to render InfoLayout rows (text/table) with deterministic host-raster layout.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-03T18:57:04.773201Z",
+  "updated_at": "2026-03-03T19:03:12.599502Z",
+  "closed_at": "2026-03-03T19:03:12.599502Z",
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "a9851d66-d1bf-45f9-b713-90738463df95",
+  "issue_id": "kanbus-70f80ca8-83ca-495c-9d58-4f0467de3b82",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T03:27:24.665Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "sub-task",
+    "labels": [],
+    "parent": "kanbus-c5ae3bf7-4d28-4922-8186-2a1e6e3c7fe2",
+    "priority": 2,
+    "status": "open",
+    "title": "clock mode split (native vs experimental web)"
+  }
+}

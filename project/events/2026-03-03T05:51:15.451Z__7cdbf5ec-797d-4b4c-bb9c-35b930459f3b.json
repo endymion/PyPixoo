@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "7cdbf5ec-797d-4b4c-bb9c-35b930459f3b",
+  "issue_id": "kanbus-281e8637-e393-4b61-87ff-d544892fddac",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T05:51:15.451Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Weather API works but device display does not switch to weather view"
+  }
+}

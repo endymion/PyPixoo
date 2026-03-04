@@ -521,8 +521,11 @@ def cmd_scene_run(
         except ValueError as e:
             print(f"error: {e}", file=sys.stderr)
             sys.exit(1)
-        asyncio.run(player.set_scene(scene))
-        asyncio.run(_run_scene_player_for_duration(player, duration_s))
+        async def _run() -> None:
+            await player.set_scene(scene)
+            await _run_scene_player_for_duration(player, duration_s)
+
+        asyncio.run(_run())
     finally:
         pixoo.close()
 

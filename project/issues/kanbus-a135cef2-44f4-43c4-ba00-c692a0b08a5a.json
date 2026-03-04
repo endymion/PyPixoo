@@ -3,7 +3,7 @@
   "title": "V2 sequence cycling orchestration",
   "description": "Cycle multiple sequence types with async control",
   "type": "epic",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 1,
   "assignee": null,
   "creator": null,
@@ -19,7 +19,7 @@
     }
   ],
   "created_at": "2026-03-02T05:30:33.100951Z",
-  "updated_at": "2026-03-02T05:43:59.210747Z",
-  "closed_at": null,
+  "updated_at": "2026-03-04T04:12:58.424214Z",
+  "closed_at": "2026-03-04T04:12:58.424214Z",
   "custom": {}
 }

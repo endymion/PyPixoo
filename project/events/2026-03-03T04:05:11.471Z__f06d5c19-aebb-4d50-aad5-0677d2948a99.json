@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "f06d5c19-aebb-4d50-aad5-0677d2948a99",
+  "issue_id": "kanbus-aa26de99-8a42-4624-91cb-24735679de66",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T04:05:11.471Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "Build and validate demo_three_hand_clock.py using bounded stitched upload + phase-locked segments. Includes manual visual acceptance.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+    "priority": 2,
+    "status": "open",
+    "title": "Three-hand stitched clock demo"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "966912a7-bb56-4347-9e3c-68ea7ec0b5b9",
+  "issue_id": "kanbus-035f3d5d-430a-45ae-8b71-d20dd053c5b5",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T07:03:36.940Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "kanbus-952eaafe-8576-48c3-aa21-4fcce86fe404",
+    "priority": 1,
+    "status": "open",
+    "title": "Story: add tests and docs for adaptive default band"
+  }
+}

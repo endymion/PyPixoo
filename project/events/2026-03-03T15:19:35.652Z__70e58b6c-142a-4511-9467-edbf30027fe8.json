@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "70e58b6c-142a-4511-9467-edbf30027fe8",
+  "issue_id": "kanbus-514ec265-24d7-4264-898a-221441e64804",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T15:19:35.652Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Add scene_components + scenes InfoScene/ClockScene, full scene font registry, demo/CLI integration, tests/docs, and manual acceptance checklist updates.",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+    "priority": 1,
+    "status": "open",
+    "title": "Generalized InfoScene header API + full font support"
+  }
+}

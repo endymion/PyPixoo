@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "1574b943-55a9-454a-8198-b727bf94d615",
+  "issue_id": "kanbus-347ddc27-dd66-4820-92a1-1d86ca9ecad8",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-04T01:48:46.939Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Add/adjust tests for profile/renderer parity and keep task open until manual visual confirmation.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+    "priority": 2,
+    "status": "open",
+    "title": "Parity tests + device acceptance"
+  }
+}

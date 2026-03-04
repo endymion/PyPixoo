@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "3dd2b9c5-46eb-4b29-9f12-5e0716583ef0",
+  "issue_id": "kanbus-3086a474-4b5d-40fc-b9f1-b0a8dfb321e7",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T03:27:24.855Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "sub-task",
+    "labels": [],
+    "parent": "kanbus-c5ae3bf7-4d28-4922-8186-2a1e6e3c7fe2",
+    "priority": 2,
+    "status": "open",
+    "title": "acceptance confirmation pass"
+  }
+}

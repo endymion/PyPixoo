@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "7d3f4e53-77e0-40fa-9fcc-adab0d090872",
+  "issue_id": "kanbus-b8640a93-be81-4bb2-b792-f5f63e6e2ddd",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T07:03:36.715Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "kanbus-952eaafe-8576-48c3-aa21-4fcce86fe404",
+    "priority": 1,
+    "status": "open",
+    "title": "Story: define day/night default palette behavior for pixooclock"
+  }
+}

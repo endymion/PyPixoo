@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "c01e72f1-a805-4f5e-8468-b09ae2f816aa",
+  "issue_id": "kanbus-9c778382-7918-4af9-937c-ba0e0d1f966b",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-03T15:26:30.576Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Add BorderConfig/HeaderConfig/RowConfig and reusable drawing primitives.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-952bb8d8-2558-4d80-834c-624e6865bca2",
+    "priority": 2,
+    "status": "open",
+    "title": "Scene primitives + configs (InfoScene API)"
+  }
+}
