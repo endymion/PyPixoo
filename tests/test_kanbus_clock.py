@@ -114,6 +114,51 @@ def test_load_kanbus_event_derives_repo_root(tmp_path: Path):
 def test_summarize_event_known_types():
     module = _load_demo_module()
 
+    def _fake_issue(*args, **kwargs):
+        issue_id = args[0][2]
+        fixtures = {
+            "kanbus-abcdef12-1111": {
+                "id": "kanbus-abcdef12-1111",
+                "type": "task",
+                "status": "open",
+                "description": "Created issue description line one line two",
+                "parent": "kanbus-parent-1",
+                "comments": [],
+            },
+            "kanbus-parent-1": {
+                "id": "kanbus-parent-1",
+                "type": "epic",
+                "status": "open",
+                "description": "Parent description for top section",
+                "comments": [],
+            },
+            "kanbus-bbeeff12-1111": {
+                "id": "kanbus-bbeeff12-1111",
+                "type": "bug",
+                "status": "in_progress",
+                "description": "Transition issue description block",
+                "comments": [],
+            },
+            "kanbus-11223344-1111": {
+                "id": "kanbus-11223344-1111",
+                "type": "task",
+                "status": "open",
+                "description": "Issue description for comment card",
+                "comments": [{"text": "Latest fallback comment"}],
+            },
+            "kanbus-abc12345-2222": {
+                "id": "kanbus-abc12345-2222",
+                "type": "task",
+                "status": "open",
+                "description": "",
+                "comments": [],
+            },
+        }
+        payload = fixtures.get(issue_id, {"id": issue_id, "type": "issue", "status": "open", "description": ""})
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+
     created = module.KanbusEvent(
         path=Path("x.json"),
         schema_version=1,
@@ -125,16 +170,12 @@ def test_summarize_event_known_types():
         payload={"issue_type": "task", "status": "in_progress", "title": "Create watcher"},
     )
     notice = module.summarize_event(created)
-    assert notice.header == "CREATED"
-    assert "KBS ABCDEF" in notice.message
-    assert "TASK IN PROGRESS" in notice.message
-    assert "Create watcher" in notice.message
-    assert notice.header_font == "bytesized"
-    assert notice.header_tight_padding is True
-    assert notice.center_first_line is True
-    assert notice.center_line_indices == {1}
-    assert notice.line_darker_steps == {1: 2}
-    assert notice.line_spacer_before_px == {2: 2}
+    assert notice.scene is not None
+    header_row = notice.scene.layout.rows[0]
+    assert header_row.content.startswith("KANBUS")
+    assert "TASK" in header_row.content
+    # Parent-present layout includes top section, divider, and bottom section.
+    assert len(notice.scene.layout.rows) == 7
 
     created_missing_status = module.KanbusEvent(
         path=Path("x2.json"),
@@ -147,7 +188,8 @@ def test_summarize_event_known_types():
         payload={"issue_type": "task", "title": "Missing status"},
     )
     missing_status_notice = module.summarize_event(created_missing_status)
-    assert "TASK OPEN" in missing_status_notice.message
+    assert missing_status_notice.scene is not None
+    assert missing_status_notice.scene.layout.rows[0].content.startswith("KANBUS TASK")
 
     created_long_title = module.KanbusEvent(
         path=Path("x3.json"),
@@ -164,10 +206,9 @@ def test_summarize_event_known_types():
         },
     )
     long_title_notice = module.summarize_event(created_long_title)
-    created_lines = long_title_notice.message.splitlines()
-    assert created_lines[0].startswith("KBS ")
-    assert created_lines[1] == "TASK OPEN"
-    assert len(created_lines) > 3
+    assert long_title_notice.scene is not None
+    # No parent layout: header + 5 issue rows.
+    assert len(long_title_notice.scene.layout.rows) == 6
 
     transition = module.KanbusEvent(
         path=Path("y.json"),
@@ -180,14 +221,16 @@ def test_summarize_event_known_types():
         payload={"from_status": "open", "to_status": "closed", "title": "Clock status sync"},
     )
     transition_notice = module.summarize_event(transition)
-    assert transition_notice.header == "TRANSITION"
-    assert "\nClock status\nsync\nFROM:\nOPEN\nTO:\nCLOSED" in transition_notice.message
-    assert transition_notice.center_first_line is True
-    assert transition_notice.body_center_vertical is True
-    assert transition_notice.pin_first_line_top is True
-    assert transition_notice.line_darker_steps == {3: 1, 5: 1}
-    assert transition_notice.line_indent_px == {4: 2, 6: 2}
-    assert transition_notice.line_spacer_before_px == {3: 2}
+    assert transition_notice.scene is not None
+    t_header = transition_notice.scene.layout.rows[0].content
+    assert t_header.startswith("KANBUS")
+    assert "BUG" in t_header
+    body_text = "\n".join(
+        str(getattr(r, "content", ""))
+        for r in transition_notice.scene.layout.rows[1:]
+    )
+    assert "FROM:" not in body_text
+    assert "TO:" not in body_text
 
     comment = module.KanbusEvent(
         path=Path("z.json"),
@@ -203,20 +246,14 @@ def test_summarize_event_known_types():
         },
     )
     comment_notice = module.summarize_event(comment)
-    assert comment_notice.header == "COMMENT"
-    assert "KBS 112233" in comment_notice.message
-    assert "Deploy failed" in comment_notice.message
-    assert "staging" in comment_notice.message
-    assert comment_notice.body_font == "bytesized"
-    assert comment_notice.body_align == "left"
-    assert comment_notice.body_center_vertical is False
-    assert comment_notice.body_line_vpad == 1
-    assert comment_notice.center_first_line is True
-    assert comment_notice.first_line_darker_steps == 2
-    assert comment_notice.line_spacer_before_px == {1: 2}
-    assert comment_notice.header_font == "bytesized"
-    assert comment_notice.header_tight_padding is True
-    assert comment_notice.body_max_lines == 7
+    assert comment_notice.scene is not None
+    c_rows = comment_notice.scene.layout.rows
+    # Header + 2 issue rows + 3 comment rows.
+    assert len(c_rows) == 6
+    c_body = [str(getattr(r, "content", "")) for r in c_rows[1:]]
+    assert any("Issue" in line for line in c_body[:2])
+    assert any("description" in line for line in c_body[:2])
+    assert any("Deploy failed" in line for line in c_body[2:])
 
 
 def test_scan_folder_for_new_events_ignores_baseline_and_picks_new(tmp_path: Path):
@@ -276,7 +313,7 @@ def test_watch_poll_step_returns_logs_and_notices(tmp_path: Path):
     )
 
     assert len(notices) == 1
-    assert notices[0].header == "CREATED"
+    assert "KANBUS" in notices[0].header
     assert any("watcher: event issue_created" in line for line in logs)
     assert event_path.name in tracked[events_dir.resolve()]
 
@@ -511,75 +548,136 @@ def test_wrap_text_lines_respects_pixel_width(monkeypatch):
     assert all((len(line) * 5) <= 20 for line in lines)
 
 
-def test_comment_summary_falls_back_to_kbs_show_when_payload_missing(monkeypatch):
+def test_issue_id_prefix_upper_from_before_dash():
     module = _load_demo_module()
-    captured: dict[str, object] = {}
+    assert module._issue_id_prefix_upper("kanbus-abc123") == "KANBUS"
+    assert module._issue_id_prefix_upper("EPIC-123") == "EPIC"
+    assert module._issue_id_prefix_upper("singleid") == "SINGLEID"
 
-    fake_issue_json = json.dumps(
-        {
-            "comments": [
-                {"text": "older"},
-                {"text": "Newest comment from kbs show"},
-            ]
+
+def test_live_issue_fetch_called_for_each_event(monkeypatch):
+    module = _load_demo_module()
+    calls: list[tuple[list[str], str | None]] = []
+
+    def _fake_run(*args, **kwargs):
+        calls.append((list(args[0]), kwargs.get("cwd")))
+        issue_id = args[0][2]
+        payload = {
+            "id": issue_id,
+            "type": "task",
+            "status": "open",
+            "description": "desc",
+            "comments": [{"text": "comment fallback"}],
         }
-    )
-
-    def _fake_run(*_args, **_kwargs):
-        captured.update(_kwargs)
-        return SimpleNamespace(returncode=0, stdout=fake_issue_json)
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
 
     monkeypatch.setattr(module.subprocess, "run", _fake_run)
 
-    event = module.KanbusEvent(
-        path=Path("/tmp/demo-repo/project/events/event.json"),
-        schema_version=1,
-        event_id="e4",
-        issue_id="kanbus-aaaaaa-0001",
-        event_type="comment_added",
-        occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
-        actor_id="tester",
-        payload={"comment_author": "tester"},
-    )
-    notice = module.summarize_event(event)
-    assert notice.header == "COMMENT"
-    assert "KBS AAAAAA" in notice.message
-    assert "Newest" in notice.message
-    assert "comment" in notice.message
-    assert captured.get("cwd") == str(Path("/tmp/demo-repo").resolve())
+    repo_path = Path("/tmp/demo-repo/project/events/event.json")
+    events = [
+        module.KanbusEvent(
+            path=repo_path,
+            schema_version=1,
+            event_id="e1",
+            issue_id="kanbus-live-0001",
+            event_type="issue_created",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+            actor_id="tester",
+            payload={},
+        ),
+        module.KanbusEvent(
+            path=repo_path,
+            schema_version=1,
+            event_id="e2",
+            issue_id="kanbus-live-0002",
+            event_type="state_transition",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:01Z"),
+            actor_id="tester",
+            payload={},
+        ),
+        module.KanbusEvent(
+            path=repo_path,
+            schema_version=1,
+            event_id="e3",
+            issue_id="kanbus-live-0003",
+            event_type="comment_added",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:02Z"),
+            actor_id="tester",
+            payload={},
+        ),
+    ]
+
+    for event in events:
+        module.summarize_event(event)
+
+    assert len(calls) == 3
+    assert all(call[0][:3] == ["kbs", "show", call[0][2]] for call in calls)
+    assert all(call[1] == str(Path("/tmp/demo-repo").resolve()) for call in calls)
 
 
-def test_transition_summary_falls_back_to_kbs_show_title(monkeypatch):
+def test_parent_fetch_only_when_parent_present(monkeypatch):
     module = _load_demo_module()
-    captured: dict[str, object] = {}
+    requested_ids: list[str] = []
 
-    fake_issue_json = json.dumps(
-        {
-            "title": "Transition fallback title from kbs show",
-            "description": "Unused description",
-        }
-    )
-
-    def _fake_run(*_args, **_kwargs):
-        captured.update(_kwargs)
-        return SimpleNamespace(returncode=0, stdout=fake_issue_json)
+    def _fake_run(*args, **kwargs):
+        issue_id = args[0][2]
+        requested_ids.append(issue_id)
+        if issue_id == "kanbus-with-parent":
+            payload = {
+                "id": issue_id,
+                "type": "task",
+                "status": "open",
+                "description": "child desc",
+                "parent": "kanbus-parent-xyz",
+                "comments": [],
+            }
+        elif issue_id == "kanbus-parent-xyz":
+            payload = {
+                "id": issue_id,
+                "type": "epic",
+                "status": "open",
+                "description": "parent desc",
+                "comments": [],
+            }
+        else:
+            payload = {
+                "id": issue_id,
+                "type": "task",
+                "status": "open",
+                "description": "no parent desc",
+                "comments": [],
+            }
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
 
     monkeypatch.setattr(module.subprocess, "run", _fake_run)
-    module._ISSUE_SUMMARY_CACHE.clear()
 
-    event = module.KanbusEvent(
+    event_with_parent = module.KanbusEvent(
         path=Path("/tmp/demo-repo/project/events/event.json"),
         schema_version=1,
-        event_id="e5",
-        issue_id="kanbus-bbbbbb-0002",
-        event_type="state_transition",
+        event_id="ep",
+        issue_id="kanbus-with-parent",
+        event_type="issue_created",
         occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
         actor_id="tester",
-        payload={"from_status": "open", "to_status": "done"},
+        payload={},
     )
-    notice = module.summarize_event(event)
-    assert notice.header == "TRANSITION"
-    assert "fallback title" in notice.message.lower()
-    assert captured.get("cwd") == str(Path("/tmp/demo-repo").resolve())
+    module.summarize_event(event_with_parent)
+
+    event_without_parent = module.KanbusEvent(
+        path=Path("/tmp/demo-repo/project/events/event.json"),
+        schema_version=1,
+        event_id="enp",
+        issue_id="kanbus-no-parent",
+        event_type="issue_created",
+        occurred_at=module._parse_iso8601("2026-03-04T00:00:01Z"),
+        actor_id="tester",
+        payload={},
+    )
+    module.summarize_event(event_without_parent)
+
+    assert requested_ids.count("kanbus-with-parent") == 1
+    assert requested_ids.count("kanbus-parent-xyz") == 1
+    assert requested_ids.count("kanbus-no-parent") == 1
 
 
 def test_build_parser_defaults_auto_info_seconds_30():

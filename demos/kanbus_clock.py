@@ -42,7 +42,6 @@ _FILENAME_TS_RE = re.compile(
 )
 _SHORT_SECONDS_RE = re.compile(r"^-s(\d+(?:\.\d+)?)$")
 MIN_TS = datetime(1970, 1, 1, tzinfo=timezone.utc)
-_ISSUE_SUMMARY_CACHE: dict[str, str] = {}
 
 try:
     import readline
@@ -71,10 +70,28 @@ class KanbusEvent:
 
 
 @dataclass(frozen=True)
+class IssueSnapshot:
+    issue_id: str
+    id_prefix_upper: str
+    issue_type_upper: str
+    status_upper: str
+    description: str
+    parent_id: Optional[str] = None
+    latest_comment_text: str = ""
+
+
+@dataclass(frozen=True)
+class ParentSnapshot:
+    parent_id: str
+    description: str
+
+
+@dataclass(frozen=True)
 class AutoNotice:
     header: str
     message: str
     level: str = "info"
+    scene: Optional[InfoScene] = None
     header_font: str = "bytesized"
     header_tight_padding: bool = True
     header_darker_steps: int = 2
@@ -268,9 +285,9 @@ def _extract_comment_text(payload: dict[str, Any]) -> str:
     return best_text
 
 
-def _fetch_latest_issue_comment_text(issue_id: str, repo_root: Optional[Path] = None) -> str:
+def _run_kbs_show_json(issue_id: str, repo_root: Optional[Path] = None) -> Optional[dict[str, Any]]:
     if not issue_id:
-        return ""
+        return None
     try:
         proc = subprocess.run(
             ["kbs", "show", issue_id, "--json"],
@@ -281,70 +298,168 @@ def _fetch_latest_issue_comment_text(issue_id: str, repo_root: Optional[Path] = 
             timeout=2.0,
         )
     except Exception:
-        return ""
+        return None
     if proc.returncode != 0 or not proc.stdout:
-        return ""
+        return None
     try:
-        issue = json.loads(proc.stdout)
+        parsed = json.loads(proc.stdout)
     except Exception:
-        return ""
+        return None
+    return parsed if isinstance(parsed, dict) else None
+
+
+def _issue_id_prefix_upper(issue_id: str) -> str:
+    compact = str(issue_id or "").strip()
+    if not compact:
+        return "ISSUE"
+    prefix = compact.split("-", 1)[0] or compact
+    return prefix.upper()
+
+
+def _extract_latest_comment_text(issue: dict[str, Any]) -> str:
     comments = issue.get("comments")
     if not isinstance(comments, list):
         return ""
     for item in reversed(comments):
         if not isinstance(item, dict):
             continue
-        text = item.get("text")
-        if isinstance(text, str) and text.strip():
-            return _normalize_space(text)
+        text = _normalize_space(str(item.get("text") or ""))
+        if text:
+            return text
     return ""
 
 
-def _fetch_issue_summary_text(issue_id: str, repo_root: Optional[Path] = None) -> str:
-    if not issue_id:
-        return ""
-    cached = _ISSUE_SUMMARY_CACHE.get(issue_id)
-    if cached is not None:
-        return cached
-    try:
-        proc = subprocess.run(
-            ["kbs", "show", issue_id, "--json"],
-            cwd=str(repo_root) if repo_root else None,
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=2.0,
-        )
-    except Exception:
-        _ISSUE_SUMMARY_CACHE[issue_id] = ""
-        return ""
-    if proc.returncode != 0 or not proc.stdout:
-        _ISSUE_SUMMARY_CACHE[issue_id] = ""
-        return ""
-    try:
-        issue = json.loads(proc.stdout)
-    except Exception:
-        _ISSUE_SUMMARY_CACHE[issue_id] = ""
-        return ""
-    title = _normalize_space(str(issue.get("title") or ""))
-    if title:
-        _ISSUE_SUMMARY_CACHE[issue_id] = title
-        return title
+def _extract_parent_id(issue: dict[str, Any]) -> Optional[str]:
+    for key in ("parent", "parent_id", "parent_issue_id"):
+        value = issue.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+        if isinstance(value, dict):
+            for nested_key in ("id", "issue_id", "key", "external_id"):
+                nested = value.get(nested_key)
+                if isinstance(nested, str) and nested.strip():
+                    return nested.strip()
+    return None
+
+
+def _fetch_issue_snapshot(issue_id: str, repo_root: Optional[Path] = None) -> Optional[IssueSnapshot]:
+    issue = _run_kbs_show_json(issue_id, repo_root)
+    if issue is None:
+        return None
+    issue_type = _normalize_space(str(issue.get("type") or issue.get("issue_type") or "ISSUE")).upper()
+    status = _format_status_text(issue.get("status") or "OPEN")
     description = _normalize_space(str(issue.get("description") or ""))
-    _ISSUE_SUMMARY_CACHE[issue_id] = description
-    return description
+    parent_id = _extract_parent_id(issue)
+    return IssueSnapshot(
+        issue_id=str(issue.get("id") or issue_id),
+        id_prefix_upper=_issue_id_prefix_upper(str(issue.get("id") or issue_id)),
+        issue_type_upper=issue_type or "ISSUE",
+        status_upper=status or "OPEN",
+        description=description,
+        parent_id=parent_id,
+        latest_comment_text=_extract_latest_comment_text(issue),
+    )
 
 
-def _short_issue_id(issue_id: str) -> str:
-    if issue_id.startswith("kanbus-"):
-        tail = issue_id[len("kanbus-") :]
-        head = tail.split("-", 1)[0]
-        if head:
-            return f"KBS {head[:6].upper()}"
-    compact = issue_id.strip()
-    if not compact:
-        return "KBS ?"
-    return _truncate(compact.upper(), 12)
+def _fetch_parent_snapshot(parent_id: str, repo_root: Optional[Path] = None) -> Optional[ParentSnapshot]:
+    issue = _run_kbs_show_json(parent_id, repo_root)
+    if issue is None:
+        return None
+    return ParentSnapshot(
+        parent_id=str(issue.get("id") or parent_id),
+        description=_normalize_space(str(issue.get("description") or "")),
+    )
+
+
+def _compact_header_status(status_upper: str) -> str:
+    compact = _normalize_space(status_upper).upper()
+    if compact == "IN PROGRESS":
+        return "INPROG"
+    return compact.replace(" ", "")
+
+
+def _issue_meta_header_text(snapshot: IssueSnapshot) -> str:
+    raw = (
+        f"{snapshot.id_prefix_upper} "
+        f"{snapshot.issue_type_upper or 'ISSUE'} "
+        f"{_compact_header_status(snapshot.status_upper or 'OPEN')}"
+    )
+    return _trim_to_pixel_width(raw, max_width_px=62, font_key="bytesized")
+
+
+def _wrap_desc(text: str, *, max_lines: int) -> list[str]:
+    wrapped = _wrap_text_lines(text, max_width_px=62, max_lines=max_lines, font_key="bytesized")
+    if wrapped:
+        return wrapped
+    return ["(no description)"]
+
+
+def _fixed_rows(lines: list[str], count: int) -> list[str]:
+    out = list(lines[:count])
+    while len(out) < count:
+        out.append("")
+    return out
+
+
+def _build_card_scene_from_sections(
+    *,
+    level: str,
+    header_text: str,
+    top_lines: list[str],
+    bottom_lines: list[str],
+    show_middle_divider: bool,
+    name: str,
+) -> InfoScene:
+    fg, bg = _level_colors(level)
+    header_color = _darken_color(fg, steps=2)
+    border_color = tuple(max(0, int(c * 0.55)) for c in header_color)
+    row_font = "bytesized"
+    row_height = 10
+
+    body_rows: list[TextRow] = []
+    for line in top_lines:
+        body_rows.append(
+            TextRow(
+                height=row_height,
+                align="left",
+                background_color=bg,
+                style=TextStyle(font=row_font, color=_darken_color(fg, steps=1)),
+                content=line,
+            )
+        )
+    if show_middle_divider:
+        body_rows.append(
+            TextRow(
+                height=1,
+                align="left",
+                background_color=bg,
+                border=BorderConfig(enabled=True, thickness=1, color=border_color),
+                style=TextStyle(font=row_font, color=fg),
+                content="",
+            )
+        )
+    for line in bottom_lines:
+        body_rows.append(
+            TextRow(
+                height=row_height,
+                align="left",
+                background_color=bg,
+                style=TextStyle(font=row_font, color=fg),
+                content=line,
+            )
+        )
+
+    layout = header_layout(
+        title=header_text,
+        font="bytesized",
+        height=max(4, int(measure_scene_text(header_text, "bytesized")[1]) + 3),
+        title_color=header_color,
+        background_color=bg,
+        border=BorderConfig(enabled=True, thickness=1, color=border_color),
+        body_rows=body_rows,
+        body_background_color=bg,
+    )
+    return InfoScene(layout=layout, name=name)
 
 
 def _message_scene(
@@ -617,80 +732,106 @@ def latest_event_timestamp(folder: Path) -> tuple[int, Optional[str]]:
 
 
 def summarize_event(event: KanbusEvent) -> AutoNotice:
-    issue = _short_issue_id(event.issue_id)
     etype = event.event_type
     payload = event.payload
+    repo_root = event.repo_root or _repo_root_from_event_path(event.path)
+
+    snapshot = _fetch_issue_snapshot(event.issue_id, repo_root)
+    if snapshot is None:
+        snapshot = IssueSnapshot(
+            issue_id=event.issue_id,
+            id_prefix_upper=_issue_id_prefix_upper(event.issue_id),
+            issue_type_upper="ISSUE",
+            status_upper="OPEN",
+            description="",
+            parent_id=None,
+            latest_comment_text="",
+        )
+    header_text = _issue_meta_header_text(snapshot)
 
     if etype == "issue_created":
-        issue_type = _truncate(str(payload.get("issue_type") or "issue"), 9).upper()
-        status_raw = payload.get("status")
-        status = "OPEN" if status_raw is None else _format_status_text(status_raw)
-        title = _normalize_space(str(payload.get("title") or "(no title)")) or "(no title)"
-        wrapped_title = _wrap_text_lines(title, max_width_px=62, max_lines=5, font_key="bytesized")
-        if not wrapped_title:
-            wrapped_title = ["(no title)"]
-        lines = [f"{issue}", f"{issue_type} {status}", *wrapped_title]
+        parent_snapshot = (
+            _fetch_parent_snapshot(snapshot.parent_id, repo_root) if snapshot.parent_id else None
+        )
+        if parent_snapshot is not None:
+            top_lines = _fixed_rows(_wrap_desc(parent_snapshot.description, max_lines=2), 2)
+            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=3), 3)
+            show_middle_divider = True
+        else:
+            top_lines = []
+            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=5), 5)
+            show_middle_divider = False
+        scene = _build_card_scene_from_sections(
+            level="info",
+            header_text=header_text,
+            top_lines=top_lines,
+            bottom_lines=bottom_lines,
+            show_middle_divider=show_middle_divider,
+            name="created-scene",
+        )
         return AutoNotice(
-            header="CREATED",
-            message="\n".join(lines),
-            center_first_line=True,
-            center_line_indices={1},
-            line_darker_steps={1: 2},
-            line_spacer_before_px={2: 2},
+            header=header_text,
+            message="\n".join(top_lines + bottom_lines),
+            scene=scene,
         )
 
     if etype == "state_transition":
-        from_status = _format_status_text(payload.get("from_status"))
-        to_status = _format_status_text(payload.get("to_status"))
-        summary_text = _normalize_space(
-            str(payload.get("title") or payload.get("description") or "")
+        parent_snapshot = (
+            _fetch_parent_snapshot(snapshot.parent_id, repo_root) if snapshot.parent_id else None
         )
-        if not summary_text:
-            repo_root = event.repo_root or _repo_root_from_event_path(event.path)
-            summary_text = _fetch_issue_summary_text(event.issue_id, repo_root)
-        summary_lines = _wrap_text_lines(summary_text, max_width_px=62, max_lines=2, font_key="bytesized")
-        if not summary_lines:
-            summary_lines = ["(no title)"]
-
-        lines = [f"{issue}", *summary_lines, "FROM:", from_status, "TO:", to_status]
-        from_idx = 1 + len(summary_lines)
-        from_status_idx = from_idx + 1
-        to_idx = from_status_idx + 1
-        to_status_idx = to_idx + 1
+        if parent_snapshot is not None:
+            top_lines = _fixed_rows(_wrap_desc(parent_snapshot.description, max_lines=2), 2)
+            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=3), 3)
+            show_middle_divider = True
+        else:
+            top_lines = []
+            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=5), 5)
+            show_middle_divider = False
+        scene = _build_card_scene_from_sections(
+            level="info",
+            header_text=header_text,
+            top_lines=top_lines,
+            bottom_lines=bottom_lines,
+            show_middle_divider=show_middle_divider,
+            name="transition-scene",
+        )
         return AutoNotice(
-            header="TRANSITION",
-            message="\n".join(lines),
-            center_first_line=True,
-            body_center_vertical=True,
-            pin_first_line_top=True,
-            line_darker_steps={from_idx: 1, to_idx: 1},
-            line_indent_px={from_status_idx: 2, to_status_idx: 2},
-            line_spacer_before_px={from_idx: 2},
+            header=header_text,
+            message="\n".join(top_lines + bottom_lines),
+            scene=scene,
         )
 
     if etype == "comment_added":
         comment_text = _extract_comment_text(payload)
         if (not comment_text) or (len(comment_text) < 8) or (" " not in comment_text):
-            repo_root = event.repo_root or _repo_root_from_event_path(event.path)
-            comment_text = _fetch_latest_issue_comment_text(event.issue_id, repo_root)
+            comment_text = snapshot.latest_comment_text
 
-        lines = [issue]
-        if comment_text:
-            lines.extend(
-                _wrap_text_lines(comment_text, max_width_px=62, max_lines=6, font_key="bytesized")
-            )
-        if len(lines) == 1:
-            author = _truncate(str(payload.get("comment_author") or event.actor_id or "?"), 14)
-            lines.append(f"BY {author}")
+        issue_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=2), 2)
+        comment_lines = _fixed_rows(_wrap_desc(comment_text, max_lines=3), 3)
+        scene = _build_card_scene_from_sections(
+            level="info",
+            header_text=header_text,
+            top_lines=issue_lines,
+            bottom_lines=comment_lines,
+            show_middle_divider=False,
+            name="comment-scene",
+        )
         return AutoNotice(
-            header="COMMENT",
-            message="\n".join(lines),
-            center_first_line=True,
-            line_spacer_before_px={1: 2},
+            header=header_text,
+            message="\n".join(issue_lines + comment_lines),
+            scene=scene,
         )
 
-    lines = [f"{issue}", _truncate(f"EVENT {etype}", 18)]
-    return AutoNotice(header=_truncate(etype.upper(), 12), message="\n".join(lines))
+    fallback_line = _trim_to_pixel_width(f"EVENT {etype.upper()}", max_width_px=62, font_key="bytesized")
+    scene = _build_card_scene_from_sections(
+        level="info",
+        header_text=header_text,
+        top_lines=[],
+        bottom_lines=_fixed_rows([fallback_line], 5),
+        show_middle_divider=False,
+        name="event-scene",
+    )
+    return AutoNotice(header=header_text, message=fallback_line, scene=scene)
 
 
 def scan_folder_for_new_events(
@@ -823,6 +964,7 @@ async def _enqueue_message_transition(
     transition_ms: int,
     fg: tuple[int, int, int],
     bg: tuple[int, int, int],
+    scene: Optional[InfoScene] = None,
     header_title: str | None = None,
     header_font: str = "bytesized",
     header_tight_padding: bool = True,
@@ -842,37 +984,39 @@ async def _enqueue_message_transition(
     body_min_row_height: int = 6,
     body_max_row_height: int = 8,
 ) -> None:
-    scene = _message_scene(
-        level,
-        message,
-        fg=fg,
-        bg=bg,
-        header_title=header_title,
-        header_font=header_font,
-        header_tight_padding=header_tight_padding,
-        header_darker_steps=header_darker_steps,
-        body_font=body_font,
-        body_align=body_align,
-        body_center_vertical=body_center_vertical,
-        pin_first_line_top=pin_first_line_top,
-        body_line_vpad=body_line_vpad,
-        center_first_line=center_first_line,
-        center_line_indices=center_line_indices,
-        first_line_darker_steps=first_line_darker_steps,
-        line_darker_steps=line_darker_steps,
-        line_indent_px=line_indent_px,
-        line_spacer_before_px=line_spacer_before_px,
-        body_max_lines=body_max_lines,
-        body_min_row_height=body_min_row_height,
-        body_max_row_height=body_max_row_height,
-    )
+    resolved_scene = scene
+    if resolved_scene is None:
+        resolved_scene = _message_scene(
+            level,
+            message,
+            fg=fg,
+            bg=bg,
+            header_title=header_title,
+            header_font=header_font,
+            header_tight_padding=header_tight_padding,
+            header_darker_steps=header_darker_steps,
+            body_font=body_font,
+            body_align=body_align,
+            body_center_vertical=body_center_vertical,
+            pin_first_line_top=pin_first_line_top,
+            body_line_vpad=body_line_vpad,
+            center_first_line=center_first_line,
+            center_line_indices=center_line_indices,
+            first_line_darker_steps=first_line_darker_steps,
+            line_darker_steps=line_darker_steps,
+            line_indent_px=line_indent_px,
+            line_spacer_before_px=line_spacer_before_px,
+            body_max_lines=body_max_lines,
+            body_min_row_height=body_min_row_height,
+            body_max_row_height=body_max_row_height,
+        )
     hold_ms = int(max(0.1, seconds) * 1000)
     duration_ms = max(1, transition_ms)
 
     await _wait_for_queue_capacity(player)
     await player.enqueue(
         QueueItem(
-            scene=scene,
+            scene=resolved_scene,
             transition=TransitionSpec(kind="push_left", duration_ms=duration_ms),
             hold_ms=hold_ms,
         )
@@ -946,6 +1090,7 @@ async def _auto_notice_consumer(
             transition_ms=transition_ms,
             fg=fg,
             bg=bg,
+            scene=notice.scene,
             header_title=notice.header,
             header_font=notice.header_font,
             header_tight_padding=notice.header_tight_padding,
