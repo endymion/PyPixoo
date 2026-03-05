@@ -40,6 +40,22 @@ def _write_event(path: Path, *, event_type: str, issue_id: str, occurred_at: str
     )
 
 
+def _scene_header_text(scene) -> str:
+    row = scene.layout.rows[0]
+    cells = getattr(row, "cells", None)
+    if isinstance(cells, list):
+        parts = [str(getattr(cell, "value", "")).strip() for cell in cells]
+        return " ".join(part for part in parts if part)
+    content = getattr(row, "content", "")
+    if isinstance(content, list):
+        return "".join(
+            str(getattr(span, "text", "") or "")
+            for span in content
+            if getattr(span, "text", "")
+        )
+    return str(content)
+
+
 def test_discover_event_dirs_recursive(tmp_path: Path):
     module = _load_demo_module()
 
@@ -151,6 +167,7 @@ def test_summarize_event_known_types():
                 "type": "task",
                 "status": "open",
                 "description": "",
+                "title": "Missing status title",
                 "comments": [],
             },
         }
@@ -171,11 +188,11 @@ def test_summarize_event_known_types():
     )
     notice = module.summarize_event(created)
     assert notice.scene is not None
-    header_row = notice.scene.layout.rows[0]
-    assert header_row.content.startswith("KANBUS")
-    assert "TASK" in header_row.content
+    header_text = _scene_header_text(notice.scene)
+    assert header_text.startswith("KANBUS")
+    assert "TASK" in header_text
     # Parent-present layout includes top section, divider, and bottom section.
-    assert len(notice.scene.layout.rows) == 7
+    assert len(notice.scene.layout.rows) == 9
 
     created_missing_status = module.KanbusEvent(
         path=Path("x2.json"),
@@ -189,7 +206,11 @@ def test_summarize_event_known_types():
     )
     missing_status_notice = module.summarize_event(created_missing_status)
     assert missing_status_notice.scene is not None
-    assert missing_status_notice.scene.layout.rows[0].content.startswith("KANBUS TASK")
+    assert _scene_header_text(missing_status_notice.scene).startswith("KANBUSTASK")
+    missing_status_body = "\n".join(
+        str(getattr(r, "content", "")) for r in missing_status_notice.scene.layout.rows[1:]
+    )
+    assert "Missing status" in missing_status_body
 
     created_long_title = module.KanbusEvent(
         path=Path("x3.json"),
@@ -207,8 +228,8 @@ def test_summarize_event_known_types():
     )
     long_title_notice = module.summarize_event(created_long_title)
     assert long_title_notice.scene is not None
-    # No parent layout: header + 5 issue rows.
-    assert len(long_title_notice.scene.layout.rows) == 6
+    # No parent layout: header + 7 issue rows.
+    assert len(long_title_notice.scene.layout.rows) == 8
 
     transition = module.KanbusEvent(
         path=Path("y.json"),
@@ -222,9 +243,10 @@ def test_summarize_event_known_types():
     )
     transition_notice = module.summarize_event(transition)
     assert transition_notice.scene is not None
-    t_header = transition_notice.scene.layout.rows[0].content
+    t_header = _scene_header_text(transition_notice.scene)
     assert t_header.startswith("KANBUS")
     assert "BUG" in t_header
+    assert "INPROGRESS" in t_header
     body_text = "\n".join(
         str(getattr(r, "content", ""))
         for r in transition_notice.scene.layout.rows[1:]
@@ -254,6 +276,313 @@ def test_summarize_event_known_types():
     assert any("Issue" in line for line in c_body[:2])
     assert any("description" in line for line in c_body[:2])
     assert any("Deploy failed" in line for line in c_body[2:])
+
+
+def test_issue_type_palette_applies_to_cards_including_comments():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        issue_id = args[0][2]
+        fixtures = {
+            "kanbus-task-1": {
+                "id": "kanbus-task-1",
+                "type": "task",
+                "status": "open",
+                "description": "Task description",
+                "comments": [],
+            },
+            "kanbus-epic-1": {
+                "id": "kanbus-epic-1",
+                "type": "epic",
+                "status": "open",
+                "description": "Epic description",
+                "comments": [],
+            },
+            "kanbus-story-1": {
+                "id": "kanbus-story-1",
+                "type": "story",
+                "status": "open",
+                "description": "Story description",
+                "comments": [],
+            },
+            "kanbus-bug-1": {
+                "id": "kanbus-bug-1",
+                "type": "bug",
+                "status": "open",
+                "description": "Bug description",
+                "comments": [{"text": "Bug comment text"}],
+            },
+        }
+        payload = fixtures.get(issue_id, {"id": issue_id, "type": "issue", "status": "open", "description": ""})
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+
+    def _assert_band(scene, band: str):
+        header = scene.layout.rows[0]
+        expected_bg = module.parse_color(f"dark.{band}2")
+        expected_header = module.parse_color(f"dark.{band}8")
+        expected_main = module.parse_color(f"dark.{band}9")
+        assert header.background_color == expected_bg
+        assert header.style.color == expected_header
+        # Body rows should use the same band background.
+        assert all(getattr(row, "background_color", expected_bg) == expected_bg for row in scene.layout.rows[1:])
+        # Main body content should use the brightest intensity for the band.
+        text_rows = [row for row in scene.layout.rows[1:] if hasattr(row, "style") and getattr(row, "content", "") != ""]
+        assert any(getattr(row.style, "color", None) == expected_main for row in text_rows)
+
+    task_notice = module.summarize_event(
+        module.KanbusEvent(
+            path=Path("task.json"),
+            schema_version=1,
+            event_id="e-task",
+            issue_id="kanbus-task-1",
+            event_type="issue_created",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+            actor_id="tester",
+            payload={},
+        )
+    )
+    assert task_notice.scene is not None
+    _assert_band(task_notice.scene, "blue")
+
+    epic_notice = module.summarize_event(
+        module.KanbusEvent(
+            path=Path("epic.json"),
+            schema_version=1,
+            event_id="e-epic",
+            issue_id="kanbus-epic-1",
+            event_type="state_transition",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+            actor_id="tester",
+            payload={},
+        )
+    )
+    assert epic_notice.scene is not None
+    _assert_band(epic_notice.scene, "indigo")
+
+    story_notice = module.summarize_event(
+        module.KanbusEvent(
+            path=Path("story.json"),
+            schema_version=1,
+            event_id="e-story",
+            issue_id="kanbus-story-1",
+            event_type="issue_created",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+            actor_id="tester",
+            payload={},
+        )
+    )
+    assert story_notice.scene is not None
+    _assert_band(story_notice.scene, "yellow")
+
+    bug_comment_notice = module.summarize_event(
+        module.KanbusEvent(
+            path=Path("bug.json"),
+            schema_version=1,
+            event_id="e-bug",
+            issue_id="kanbus-bug-1",
+            event_type="comment_added",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+            actor_id="tester",
+            payload={"comment": "Manual comment payload"},
+        )
+    )
+    assert bug_comment_notice.scene is not None
+    _assert_band(bug_comment_notice.scene, "red")
+
+
+def test_issue_prefix_uses_event_issue_key_when_show_returns_internal_id():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        payload = {
+            "id": "kanbus-11111111-2222-3333-4444-555555555555",
+            "type": "task",
+            "status": "open",
+            "description": "desc",
+        }
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+    snapshot = module._fetch_issue_snapshot("BIBS-1234")
+    assert snapshot is not None
+    assert snapshot.id_prefix_upper == "BIBS"
+
+
+def test_issue_prefix_uses_key_field_when_available():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        payload = {
+            "id": "kanbus-11111111-2222-3333-4444-555555555555",
+            "key": "ACME-42",
+            "type": "task",
+            "status": "open",
+            "description": "desc",
+        }
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+    snapshot = module._fetch_issue_snapshot("kanbus-abcdef")
+    assert snapshot is not None
+    assert snapshot.id_prefix_upper == "ACME"
+
+
+def test_issue_prefix_uses_payload_key_when_show_returns_internal_id_only():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        payload = {
+            "id": "kanbus-11111111-2222-3333-4444-555555555555",
+            "type": "task",
+            "status": "open",
+            "description": "desc",
+        }
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+    snapshot = module._fetch_issue_snapshot(
+        "kanbus-abcdef",
+        payload={"issue_key": "BIBS-1234"},
+    )
+    assert snapshot is not None
+    assert snapshot.id_prefix_upper == "BIBS"
+
+
+def test_issue_prefix_does_not_fall_back_to_numeric_suffix_when_requested_key_exists():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        payload = {
+            "id": "kanbus-11111111-2222-3333-4444-555555555555",
+            "short_id": "123",
+            "type": "task",
+            "status": "open",
+            "description": "desc",
+        }
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+    snapshot = module._fetch_issue_snapshot("ABC-123")
+    assert snapshot is not None
+    assert snapshot.id_prefix_upper == "ABC"
+
+
+def test_summarize_event_prefers_event_issue_key_prefix_over_lookup_ids():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        payload = {
+            "id": "kanbus-11111111-2222-3333-4444-555555555555",
+            "short_id": "1234",
+            "type": "task",
+            "status": "open",
+            "description": "desc",
+        }
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+    notice = module.summarize_event(
+        module.KanbusEvent(
+            path=Path("ev.json"),
+            schema_version=1,
+            event_id="e-1",
+            issue_id="ABC-1234",
+            event_type="issue_created",
+            occurred_at=module._parse_iso8601("2026-03-05T00:00:00Z"),
+            actor_id="tester",
+            payload={},
+        )
+    )
+    assert notice.scene is not None
+    assert _scene_header_text(notice.scene).startswith("ABCTASK")
+
+
+def test_event_prefix_override_rejects_numeric_only_prefix():
+    module = _load_demo_module()
+    assert module._event_prefix_override("ABC-1234") == "ABC"
+    assert module._event_prefix_override("1234") == ""
+    assert module._event_prefix_override("kanbus-abc123") == ""
+
+
+def test_payload_prefix_override_prefers_full_issue_key():
+    module = _load_demo_module()
+    assert module._payload_prefix_override({"issue_key": "ABC-1234"}) == "ABC"
+    assert module._payload_prefix_override({"project_key": "ABC", "number": 1234}) == "ABC"
+    assert module._payload_prefix_override({"text": "Issue ABC-9876 updated"}) == "ABC"
+
+
+def test_repo_prefix_used_when_show_fails(tmp_path: Path):
+    module = _load_demo_module()
+    config_path = tmp_path / ".kanbus.yml"
+    config_path.write_text("project_key: PIXO\n", encoding="utf-8")
+    event = module.KanbusEvent(
+        path=tmp_path / "project" / "events" / "event.json",
+        schema_version=1,
+        event_id="e-1",
+        issue_id="03adbc",
+        event_type="issue_created",
+        occurred_at=module._parse_iso8601("2026-03-05T00:00:00Z"),
+        actor_id="tester",
+        payload={},
+        repo_root=tmp_path,
+    )
+
+    module._run_kbs_show_json = lambda *args, **kwargs: None  # type: ignore[assignment]
+    notice = module.summarize_event(event)
+    assert notice.scene is not None
+    assert _scene_header_text(notice.scene).startswith("PIXO")
+
+
+def test_repo_prefix_used_when_issue_id_matches_project_key(tmp_path: Path):
+    module = _load_demo_module()
+    config_path = tmp_path / ".kanbus.yml"
+    config_path.write_text("project_key: PIXO\n", encoding="utf-8")
+
+    def _fake_issue(*args, **kwargs):
+        payload = {
+            "id": "PIXO-acdeff11-2222-3333-4444-555555555555",
+            "type": "task",
+            "status": "open",
+            "description": "desc",
+        }
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+    snapshot = module._fetch_issue_snapshot("acdeff11-2222-3333-4444-555555555555", repo_root=tmp_path)
+    assert snapshot is not None
+    assert snapshot.id_prefix_upper == "PIXO"
+
+
+def test_summarize_event_uses_payload_prefix_when_event_id_is_numeric():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        payload = {
+            "id": "kanbus-11111111-2222-3333-4444-555555555555",
+            "short_id": "1234",
+            "type": "task",
+            "status": "open",
+            "description": "desc",
+        }
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+    notice = module.summarize_event(
+        module.KanbusEvent(
+            path=Path("ev2.json"),
+            schema_version=1,
+            event_id="e-2",
+            issue_id="1234",
+            event_type="issue_created",
+            occurred_at=module._parse_iso8601("2026-03-05T00:00:00Z"),
+            actor_id="tester",
+            payload={"issue_key": "ABC-1234"},
+        )
+    )
+    assert notice.scene is not None
+    assert _scene_header_text(notice.scene).startswith("ABCTASK")
 
 
 def test_scan_folder_for_new_events_ignores_baseline_and_picks_new(tmp_path: Path):
@@ -291,6 +620,7 @@ def test_scan_folder_for_new_events_ignores_baseline_and_picks_new(tmp_path: Pat
 
 def test_watch_poll_step_returns_logs_and_notices(tmp_path: Path):
     module = _load_demo_module()
+    module.subprocess.run = lambda *args, **kwargs: SimpleNamespace(returncode=1, stdout="")  # type: ignore[assignment]
     events_dir = tmp_path / "project" / "events"
     events_dir.mkdir(parents=True)
     event_path = events_dir / "2026-03-04T00:00:01.000Z__new.json"
@@ -313,7 +643,7 @@ def test_watch_poll_step_returns_logs_and_notices(tmp_path: Path):
     )
 
     assert len(notices) == 1
-    assert "KANBUS" in notices[0].header
+    assert notices[0].header.startswith("KANBUS")
     assert any("watcher: event issue_created" in line for line in logs)
     assert event_path.name in tracked[events_dir.resolve()]
 
@@ -551,6 +881,7 @@ def test_wrap_text_lines_respects_pixel_width(monkeypatch):
 def test_issue_id_prefix_upper_from_before_dash():
     module = _load_demo_module()
     assert module._issue_id_prefix_upper("kanbus-abc123") == "KANBUS"
+    assert module._issue_id_prefix_upper("kanbus-b31680b6-1514-4fc7") == "KANBUS"
     assert module._issue_id_prefix_upper("EPIC-123") == "EPIC"
     assert module._issue_id_prefix_upper("singleid") == "SINGLEID"
 

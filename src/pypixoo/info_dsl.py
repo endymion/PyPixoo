@@ -54,10 +54,13 @@ class TextSpan:
     text: TextValue
     font: Optional[str] = None
     color: Optional[Color] = None
+    advance_px: Optional[int] = None
 
     def __post_init__(self) -> None:
         if self.font is not None:
             _validate_font(self.font)
+        if self.advance_px is not None and self.advance_px < 0:
+            raise ValueError("TextSpan.advance_px must be >= 0")
 
 
 @dataclass(frozen=True)
@@ -167,8 +170,10 @@ def measure_spans(spans: Sequence[TextSpan], style: TextStyle, ctx: RenderContex
     for span in spans:
         font = span.font or style.font
         span_text = resolve_text(span.text, ctx)
-        span_w, _ = measure_text(span_text, font=font)
-        width += span_w
+        span_w = 0
+        if span_text:
+            span_w, _ = measure_text(span_text, font=font)
+        width += span_w + int(span.advance_px or 0)
     return width
 
 
@@ -275,22 +280,24 @@ def draw_text_row(data: List[int], row: TextRow, ctx: RenderContext, y: int) -> 
         span_text = resolve_text(span.text, ctx)
         span_font = span.font or row.style.font
         span_color = span.color or row.style.color
-        _, span_h = measure_text(span_text, font=span_font)
-        span_y = y + max(0, (row_h - span_h) // 2)
-        _draw_text_clipped(
-            data,
-            text=span_text,
-            font=span_font,
-            x=cursor_x,
-            y=span_y,
-            color=span_color,
-            clip_x=0,
-            clip_y=y,
-            clip_w=CANVAS_SIZE,
-            clip_h=row_h,
-        )
-        span_w, _ = measure_text(span_text, font=span_font)
-        cursor_x += span_w
+        span_w = 0
+        if span_text:
+            _, span_h = measure_text(span_text, font=span_font)
+            span_y = y + max(0, (row_h - span_h) // 2)
+            _draw_text_clipped(
+                data,
+                text=span_text,
+                font=span_font,
+                x=cursor_x,
+                y=span_y,
+                color=span_color,
+                clip_x=0,
+                clip_y=y,
+                clip_w=CANVAS_SIZE,
+                clip_h=row_h,
+            )
+            span_w, _ = measure_text(span_text, font=span_font)
+        cursor_x += span_w + int(span.advance_px or 0)
 
 
 def _effective_cell_align(row: TableRow, cell: TableCell, col_idx: int) -> ColumnAlign:
@@ -420,11 +427,14 @@ def _parse_text_row(payload: Dict[str, object]) -> TextRow:
         for span in raw_content:
             if not isinstance(span, dict):
                 raise ValueError("TextRow span entries must be objects")
+            advance_raw = span.get("advance_px")
+            advance_px = int(advance_raw) if advance_raw is not None else None
             spans.append(
                 TextSpan(
                     text=str(span.get("text", "")),
                     font=str(span["font"]) if "font" in span and span["font"] is not None else None,
                     color=_parse_color(span.get("color")) if "color" in span else None,
+                    advance_px=advance_px,
                 )
             )
         content: Union[str, List[TextSpan]] = spans

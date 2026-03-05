@@ -26,7 +26,18 @@ from typing import Any, Optional
 from dotenv import load_dotenv
 
 import pixooclock as clock
-from pypixoo import ClockScene, InfoScene, Pixoo, TextRow, TextStyle, header_layout
+from pypixoo import (
+    ClockScene,
+    InfoLayout,
+    InfoScene,
+    Pixoo,
+    TableCell,
+    TableRow,
+    TextRow,
+    TextSpan,
+    TextStyle,
+    header_layout,
+)
 from pypixoo.color import parse_color
 from pypixoo.font_render import measure_text as measure_scene_text
 from pypixoo.info_dsl import BorderConfig
@@ -41,6 +52,9 @@ _FILENAME_TS_RE = re.compile(
     r"^(?P<ts>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z)__"
 )
 _SHORT_SECONDS_RE = re.compile(r"^-s(\d+(?:\.\d+)?)$")
+_ISSUE_KEY_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9]*-\d+)\b")
+_PROJECT_KEY_FULL_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-\d+$")
+_PROJECT_KEY_LINE_RE = re.compile(r"^\s*project_key\s*:\s*([A-Za-z0-9_-]+)\s*$", re.MULTILINE)
 MIN_TS = datetime(1970, 1, 1, tzinfo=timezone.utc)
 
 try:
@@ -76,6 +90,7 @@ class IssueSnapshot:
     issue_type_upper: str
     status_upper: str
     description: str
+    title: str = ""
     parent_id: Optional[str] = None
     latest_comment_text: str = ""
 
@@ -84,6 +99,7 @@ class IssueSnapshot:
 class ParentSnapshot:
     parent_id: str
     description: str
+    title: str = ""
 
 
 @dataclass(frozen=True)
@@ -117,6 +133,13 @@ _LEVEL_DEFAULTS = {
     "info": AlertLevelDefaults(title="INFO", fg="dark.sand8", bg="dark.sand2"),
 }
 
+_ISSUE_TYPE_BANDS = {
+    "TASK": "blue",
+    "EPIC": "indigo",
+    "STORY": "yellow",
+    "BUG": "red",
+}
+
 
 # --------------------------
 # Formatting helpers
@@ -135,6 +158,26 @@ def _level_colors(level: str) -> tuple[tuple[int, int, int], tuple[int, int, int
     fg = _safe_parse_color(defaults.fg, fallback=(220, 220, 220))
     bg = _safe_parse_color(defaults.bg, fallback=(20, 20, 20))
     return fg, bg
+
+
+def _canonical_issue_type(issue_type_upper: str) -> str:
+    text = _normalize_space(str(issue_type_upper or "ISSUE")).upper()
+    for token in ("TASK", "EPIC", "STORY", "BUG"):
+        if token in text:
+            return token
+    return "ISSUE"
+
+
+def _issue_type_card_colors(
+    issue_type_upper: str,
+) -> tuple[tuple[int, int, int], tuple[int, int, int], tuple[int, int, int], tuple[int, int, int]]:
+    canonical = _canonical_issue_type(issue_type_upper)
+    band = _ISSUE_TYPE_BANDS.get(canonical, "sand")
+    header_fg = _safe_parse_color(f"dark.{band}8", fallback=(145, 145, 145))
+    main_fg = _safe_parse_color(f"dark.{band}9", fallback=(180, 180, 180))
+    top_dim_fg = _darken_color(header_fg, steps=1)
+    bg = _safe_parse_color(f"dark.{band}2", fallback=(8, 8, 8))
+    return header_fg, main_fg, top_dim_fg, bg
 
 
 def _darken_color(color: tuple[int, int, int], *, steps: int) -> tuple[int, int, int]:
@@ -308,12 +351,182 @@ def _run_kbs_show_json(issue_id: str, repo_root: Optional[Path] = None) -> Optio
     return parsed if isinstance(parsed, dict) else None
 
 
+def _project_key_from_repo_root(repo_root: Optional[Path]) -> str:
+    if repo_root is None:
+        return ""
+    config_path = repo_root / ".kanbus.yml"
+    if not config_path.is_file():
+        return ""
+    try:
+        text = config_path.read_text(encoding="utf-8")
+    except Exception:
+        return ""
+    match = _PROJECT_KEY_LINE_RE.search(text)
+    if match is None:
+        return ""
+    return match.group(1).strip().upper()
+
+
 def _issue_id_prefix_upper(issue_id: str) -> str:
     compact = str(issue_id or "").strip()
     if not compact:
         return "ISSUE"
     prefix = compact.split("-", 1)[0] or compact
     return prefix.upper()
+
+
+def _extract_issue_key_pattern(*texts: str) -> str:
+    for text in texts:
+        if not text:
+            continue
+        for match in _ISSUE_KEY_RE.finditer(text):
+            candidate = match.group(1)
+            # Ignore keys that are just the tail of an internal kanbus id,
+            # e.g. "kanbus-abcdef12-1111" -> "abcdef12-1111".
+            if f"kanbus-{candidate}".lower() in text.lower():
+                continue
+            return candidate
+    return ""
+
+
+def _collect_string_values(node: Any) -> list[str]:
+    out: list[str] = []
+    if isinstance(node, dict):
+        for value in node.values():
+            out.extend(_collect_string_values(value))
+    elif isinstance(node, list):
+        for value in node:
+            out.extend(_collect_string_values(value))
+    elif isinstance(node, str):
+        value = node.strip()
+        if value:
+            out.append(value)
+    return out
+
+
+def _pick_issue_key_for_prefix(
+    issue: dict[str, Any], requested_issue_id: str, payload: Optional[dict[str, Any]] = None
+) -> str:
+    """Pick the most human-meaningful issue key for header prefix derivation."""
+    issue_id_value = str(issue.get("id") or "").strip()
+
+    def _is_explicit_project_key(value: str) -> bool:
+        candidate = value.strip()
+        if not candidate:
+            return False
+        if not _PROJECT_KEY_FULL_RE.fullmatch(candidate):
+            return False
+        if issue_id_value and issue_id_value.startswith(f"{candidate}-"):
+            return False
+        return True
+
+    if requested_issue_id and _is_explicit_project_key(requested_issue_id):
+        return requested_issue_id.strip()
+
+    if payload:
+        for key in ("issue_key", "key", "external_id", "externalId", "display_id", "displayId"):
+            value = payload.get(key)
+            if isinstance(value, str) and _is_explicit_project_key(value):
+                return value.strip()
+
+    candidates: list[str] = []
+    key_fields = (
+        "key",
+        "issue_key",
+        "external_id",
+        "externalId",
+        "display_id",
+        "displayId",
+        "short_id",
+        "shortId",
+        "identifier",
+        "ticket",
+        "ticket_id",
+        "jira_key",
+        "jiraKey",
+        "source_key",
+        "sourceKey",
+        "reference",
+    )
+
+    for key in key_fields:
+        value = issue.get(key)
+        if isinstance(value, str) and value.strip():
+            candidates.append(value.strip())
+    custom = issue.get("custom")
+    if isinstance(custom, dict):
+        for key in key_fields:
+            value = custom.get(key)
+            if isinstance(value, str) and value.strip():
+                candidates.append(value.strip())
+    if isinstance(payload, dict):
+        for key in key_fields + ("issue_id", "id"):
+            value = payload.get(key)
+            if isinstance(value, str) and value.strip():
+                candidates.append(value.strip())
+        payload_custom = payload.get("custom")
+        if isinstance(payload_custom, dict):
+            for key in key_fields:
+                value = payload_custom.get(key)
+                if isinstance(value, str) and value.strip():
+                    candidates.append(value.strip())
+
+    text_key = _extract_issue_key_pattern(
+        _normalize_space(str(issue.get("title") or "")),
+        _normalize_space(str(issue.get("description") or "")),
+        *(_collect_string_values(issue) if isinstance(issue, dict) else []),
+        *(_collect_string_values(payload) if isinstance(payload, dict) else []),
+    )
+    if text_key:
+        candidates.insert(0, text_key)
+
+    # Give explicit, human-facing keys precedence when present.
+    for key in ("external_id", "externalId", "key", "issue_key", "reference"):
+        value = issue.get(key)
+        if isinstance(value, str) and value.strip():
+            candidates.insert(0, value.strip())
+    if requested_issue_id:
+        candidates.append(requested_issue_id.strip())
+    if issue_id_value:
+        candidates.append(issue_id_value)
+
+    requested = requested_issue_id.strip()
+
+    normalized: list[str] = []
+
+    def _push(value: str) -> None:
+        compact = value.strip()
+        if not compact:
+            return
+        if compact not in normalized:
+            normalized.append(compact)
+        embedded = _extract_issue_key_pattern(compact)
+        if embedded and embedded not in normalized:
+            normalized.append(embedded)
+
+    for candidate in candidates:
+        _push(candidate)
+    if requested:
+        _push(requested)
+
+    def _score(value: str) -> int:
+        text = value.strip()
+        if not text:
+            return -100
+        if _PROJECT_KEY_FULL_RE.fullmatch(text):
+            return 100
+        if text.isdigit():
+            return 0
+        if "-" in text and text.split("-", 1)[0][:1].isalpha():
+            return 80
+        if re.fullmatch(r"[A-Za-z][A-Za-z0-9]*", text):
+            return 60
+        return 30
+
+    best = max(normalized, key=_score, default="")
+    if best:
+        return best
+    return requested_issue_id
 
 
 def _extract_latest_comment_text(issue: dict[str, Any]) -> str:
@@ -342,20 +555,30 @@ def _extract_parent_id(issue: dict[str, Any]) -> Optional[str]:
     return None
 
 
-def _fetch_issue_snapshot(issue_id: str, repo_root: Optional[Path] = None) -> Optional[IssueSnapshot]:
+def _fetch_issue_snapshot(
+    issue_id: str, repo_root: Optional[Path] = None, payload: Optional[dict[str, Any]] = None
+) -> Optional[IssueSnapshot]:
     issue = _run_kbs_show_json(issue_id, repo_root)
     if issue is None:
         return None
+    repo_prefix = _project_key_from_repo_root(repo_root)
+    issue_id_value = str(issue.get("id") or "").strip()
+    if repo_prefix and issue_id_value.startswith(f"{repo_prefix}-"):
+        issue_key_for_prefix = issue_id_value
+    else:
+        issue_key_for_prefix = _pick_issue_key_for_prefix(issue, issue_id, payload)
     issue_type = _normalize_space(str(issue.get("type") or issue.get("issue_type") or "ISSUE")).upper()
     status = _format_status_text(issue.get("status") or "OPEN")
-    description = _normalize_space(str(issue.get("description") or ""))
+    title = _normalize_space(str(issue.get("title") or issue.get("name") or ""))
+    description = _normalize_space(str(issue.get("description") or title or ""))
     parent_id = _extract_parent_id(issue)
     return IssueSnapshot(
         issue_id=str(issue.get("id") or issue_id),
-        id_prefix_upper=_issue_id_prefix_upper(str(issue.get("id") or issue_id)),
+        id_prefix_upper=_issue_id_prefix_upper(issue_key_for_prefix),
         issue_type_upper=issue_type or "ISSUE",
         status_upper=status or "OPEN",
         description=description,
+        title=title,
         parent_id=parent_id,
         latest_comment_text=_extract_latest_comment_text(issue),
     )
@@ -365,26 +588,85 @@ def _fetch_parent_snapshot(parent_id: str, repo_root: Optional[Path] = None) -> 
     issue = _run_kbs_show_json(parent_id, repo_root)
     if issue is None:
         return None
+    title = _normalize_space(str(issue.get("title") or issue.get("name") or ""))
     return ParentSnapshot(
         parent_id=str(issue.get("id") or parent_id),
-        description=_normalize_space(str(issue.get("description") or "")),
+        description=_normalize_space(str(issue.get("description") or title or "")),
+        title=title,
     )
 
 
-def _compact_header_status(status_upper: str) -> str:
-    compact = _normalize_space(status_upper).upper()
-    if compact == "IN PROGRESS":
-        return "INPROG"
-    return compact.replace(" ", "")
+def _issue_meta_header_parts(snapshot: IssueSnapshot) -> tuple[str, str, str]:
+    prefix = _normalize_space(snapshot.id_prefix_upper or "ISSUE")
+    issue_type = _normalize_space(snapshot.issue_type_upper or "ISSUE").upper()
+    status = _normalize_space(str(snapshot.status_upper or "OPEN")).upper()
+    return (prefix, issue_type, status)
 
 
-def _issue_meta_header_text(snapshot: IssueSnapshot) -> str:
-    raw = (
-        f"{snapshot.id_prefix_upper} "
-        f"{snapshot.issue_type_upper or 'ISSUE'} "
-        f"{_compact_header_status(snapshot.status_upper or 'OPEN')}"
+def _event_prefix_override(event_issue_id: str) -> str:
+    """Prefer the event issue id for header prefix when it is meaningful."""
+    text = (event_issue_id or "").strip()
+    if not text:
+        return ""
+    if text.lower().startswith("kanbus-"):
+        return ""
+    candidate = _issue_id_prefix_upper(text)
+    # Never use a numeric-only prefix like "1234".
+    if candidate.isdigit():
+        return ""
+    return candidate
+
+
+def _payload_prefix_override(payload: dict[str, Any]) -> str:
+    """Extract an issue-key prefix from event payload when available."""
+    key_fields = (
+        "key",
+        "issue_key",
+        "external_id",
+        "externalId",
+        "display_id",
+        "displayId",
+        "reference",
+        "ticket",
+        "ticket_id",
+        "jira_key",
+        "jiraKey",
+        "source_key",
+        "sourceKey",
+        "project_key",
+        "projectKey",
+        "prefix",
+        "issue_prefix",
+        "issuePrefix",
     )
-    return _trim_to_pixel_width(raw, max_width_px=62, font_key="bytesized")
+    for key in key_fields:
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            prefix = _issue_id_prefix_upper(value)
+            if prefix and not prefix.isdigit() and prefix != "KANBUS":
+                return prefix
+    payload_custom = payload.get("custom")
+    if isinstance(payload_custom, dict):
+        for key in key_fields:
+            value = payload_custom.get(key)
+            if isinstance(value, str) and value.strip():
+                prefix = _issue_id_prefix_upper(value)
+                if prefix and not prefix.isdigit() and prefix != "KANBUS":
+                    return prefix
+    pattern_key = _extract_issue_key_pattern(*_collect_string_values(payload))
+    if pattern_key:
+        prefix = _issue_id_prefix_upper(pattern_key)
+        if prefix and not prefix.isdigit() and prefix != "KANBUS":
+            return prefix
+    # Compose from common split fields.
+    project_key = payload.get("project_key") or payload.get("projectKey") or payload.get("project")
+    issue_num = payload.get("issue_number") or payload.get("issueNumber") or payload.get("number")
+    if isinstance(project_key, str) and project_key.strip() and issue_num is not None:
+        composed = f"{project_key.strip()}-{issue_num}"
+        prefix = _issue_id_prefix_upper(composed)
+        if prefix and not prefix.isdigit() and prefix != "KANBUS":
+            return prefix
+    return ""
 
 
 def _wrap_desc(text: str, *, max_lines: int) -> list[str]:
@@ -403,63 +685,81 @@ def _fixed_rows(lines: list[str], count: int) -> list[str]:
 
 def _build_card_scene_from_sections(
     *,
-    level: str,
-    header_text: str,
+    issue_type_upper: str,
+    header_parts: tuple[str, str, str],
     top_lines: list[str],
     bottom_lines: list[str],
     show_middle_divider: bool,
     name: str,
 ) -> InfoScene:
-    fg, bg = _level_colors(level)
-    header_color = _darken_color(fg, steps=2)
-    border_color = tuple(max(0, int(c * 0.55)) for c in header_color)
+    header_fg, main_fg, top_dim_fg, bg = _issue_type_card_colors(issue_type_upper)
+    header_color = header_fg
+    border_color = tuple(max(0, int(c * 0.55)) for c in header_fg)
     row_font = "bytesized"
-    row_height = 10
+    row_height = 7
 
-    body_rows: list[TextRow] = []
+    header_font = "bytesized"
+    header_metrics = [measure_scene_text(part, header_font)[1] for part in header_parts if part]
+    header_height = max(4, int(max(header_metrics) if header_metrics else 5) + 3)
+
+    def _header_spans(text: str) -> list[TextSpan]:
+        words = [token for token in _normalize_space(text).split(" ") if token]
+        spans: list[TextSpan] = []
+        for idx, word in enumerate(words):
+            spans.append(TextSpan(text=word, font=header_font, color=header_color))
+            if idx < len(words) - 1:
+                spans.append(TextSpan(text="", advance_px=2))
+        return spans
+
+    header_spans: list[TextSpan] = []
+    for part in [p for p in header_parts if p]:
+        if header_spans:
+            header_spans.append(TextSpan(text="", advance_px=3))
+        header_spans.extend(_header_spans(part))
+    rows: list[Any] = [
+        TextRow(
+            height=header_height,
+            align="left",
+            background_color=bg,
+            border=BorderConfig(enabled=True, thickness=1, color=border_color),
+            style=TextStyle(font=header_font, color=header_color),
+            content=header_spans,
+        )
+    ]
+
     for line in top_lines:
-        body_rows.append(
+        rows.append(
             TextRow(
                 height=row_height,
                 align="left",
                 background_color=bg,
-                style=TextStyle(font=row_font, color=_darken_color(fg, steps=1)),
+                style=TextStyle(font=row_font, color=top_dim_fg),
                 content=line,
             )
         )
     if show_middle_divider:
-        body_rows.append(
+        rows.append(
             TextRow(
                 height=1,
                 align="left",
                 background_color=bg,
                 border=BorderConfig(enabled=True, thickness=1, color=border_color),
-                style=TextStyle(font=row_font, color=fg),
+                style=TextStyle(font=row_font, color=header_fg),
                 content="",
             )
         )
     for line in bottom_lines:
-        body_rows.append(
+        rows.append(
             TextRow(
                 height=row_height,
                 align="left",
                 background_color=bg,
-                style=TextStyle(font=row_font, color=fg),
+                style=TextStyle(font=row_font, color=main_fg),
                 content=line,
             )
         )
 
-    layout = header_layout(
-        title=header_text,
-        font="bytesized",
-        height=max(4, int(measure_scene_text(header_text, "bytesized")[1]) + 3),
-        title_color=header_color,
-        background_color=bg,
-        border=BorderConfig(enabled=True, thickness=1, color=border_color),
-        body_rows=body_rows,
-        body_background_color=bg,
-    )
-    return InfoScene(layout=layout, name=name)
+    return InfoScene(layout=InfoLayout(rows=rows, background_color=bg), name=name)
 
 
 def _message_scene(
@@ -735,35 +1035,78 @@ def summarize_event(event: KanbusEvent) -> AutoNotice:
     etype = event.event_type
     payload = event.payload
     repo_root = event.repo_root or _repo_root_from_event_path(event.path)
+    payload_prefix = _payload_prefix_override(payload)
+    repo_prefix = _project_key_from_repo_root(repo_root)
 
-    snapshot = _fetch_issue_snapshot(event.issue_id, repo_root)
+    snapshot = _fetch_issue_snapshot(event.issue_id, repo_root, payload)
+    payload_type = _normalize_space(str(payload.get("issue_type") or payload.get("type") or "ISSUE")).upper()
+    payload_status = _format_status_text(payload.get("status") or "OPEN")
+    payload_description = _normalize_space(
+        str(payload.get("description") or payload.get("issue_description") or payload.get("title") or "")
+    )
     if snapshot is None:
         snapshot = IssueSnapshot(
             issue_id=event.issue_id,
-            id_prefix_upper=_issue_id_prefix_upper(event.issue_id),
-            issue_type_upper="ISSUE",
-            status_upper="OPEN",
-            description="",
+            id_prefix_upper=payload_prefix or repo_prefix or _issue_id_prefix_upper(event.issue_id),
+            issue_type_upper=payload_type or "ISSUE",
+            status_upper=payload_status or "OPEN",
+            description=payload_description,
+            title="",
             parent_id=None,
             latest_comment_text="",
         )
-    header_text = _issue_meta_header_text(snapshot)
+    elif not snapshot.description and payload_description:
+        snapshot = IssueSnapshot(
+            issue_id=snapshot.issue_id,
+            id_prefix_upper=snapshot.id_prefix_upper,
+            issue_type_upper=snapshot.issue_type_upper or payload_type or "ISSUE",
+            status_upper=snapshot.status_upper or payload_status or "OPEN",
+            description=payload_description,
+            title=snapshot.title,
+            parent_id=snapshot.parent_id,
+            latest_comment_text=snapshot.latest_comment_text,
+        )
+    event_prefix = payload_prefix or _event_prefix_override(event.issue_id)
+    if event_prefix and snapshot.id_prefix_upper.isdigit():
+        snapshot = IssueSnapshot(
+            issue_id=snapshot.issue_id,
+            id_prefix_upper=event_prefix,
+            issue_type_upper=snapshot.issue_type_upper,
+            status_upper=snapshot.status_upper,
+            description=snapshot.description,
+            title=snapshot.title,
+            parent_id=snapshot.parent_id,
+            latest_comment_text=snapshot.latest_comment_text,
+        )
+    elif repo_prefix and snapshot.id_prefix_upper.isdigit():
+        snapshot = IssueSnapshot(
+            issue_id=snapshot.issue_id,
+            id_prefix_upper=repo_prefix,
+            issue_type_upper=snapshot.issue_type_upper,
+            status_upper=snapshot.status_upper,
+            description=snapshot.description,
+            title=snapshot.title,
+            parent_id=snapshot.parent_id,
+            latest_comment_text=snapshot.latest_comment_text,
+        )
+    header_parts = _issue_meta_header_parts(snapshot)
+    header_text = " ".join(header_parts)
 
     if etype == "issue_created":
         parent_snapshot = (
             _fetch_parent_snapshot(snapshot.parent_id, repo_root) if snapshot.parent_id else None
         )
         if parent_snapshot is not None:
-            top_lines = _fixed_rows(_wrap_desc(parent_snapshot.description, max_lines=2), 2)
-            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=3), 3)
+            top_lines = _fixed_rows(_wrap_desc(parent_snapshot.description, max_lines=3), 3)
+            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=4), 4)
             show_middle_divider = True
         else:
             top_lines = []
-            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=5), 5)
+            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=7), 7)
             show_middle_divider = False
         scene = _build_card_scene_from_sections(
-            level="info",
-            header_text=header_text,
+            issue_type_upper=snapshot.issue_type_upper,
+            header_parts=header_parts,
             top_lines=top_lines,
             bottom_lines=bottom_lines,
             show_middle_divider=show_middle_divider,
@@ -780,16 +1123,16 @@ def summarize_event(event: KanbusEvent) -> AutoNotice:
             _fetch_parent_snapshot(snapshot.parent_id, repo_root) if snapshot.parent_id else None
         )
         if parent_snapshot is not None:
-            top_lines = _fixed_rows(_wrap_desc(parent_snapshot.description, max_lines=2), 2)
-            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=3), 3)
+            top_lines = _fixed_rows(_wrap_desc(parent_snapshot.description, max_lines=3), 3)
+            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=4), 4)
             show_middle_divider = True
         else:
             top_lines = []
-            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=5), 5)
+            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=7), 7)
             show_middle_divider = False
         scene = _build_card_scene_from_sections(
-            level="info",
-            header_text=header_text,
+            issue_type_upper=snapshot.issue_type_upper,
+            header_parts=header_parts,
             top_lines=top_lines,
             bottom_lines=bottom_lines,
             show_middle_divider=show_middle_divider,
@@ -809,8 +1152,8 @@ def summarize_event(event: KanbusEvent) -> AutoNotice:
         issue_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=2), 2)
         comment_lines = _fixed_rows(_wrap_desc(comment_text, max_lines=3), 3)
         scene = _build_card_scene_from_sections(
-            level="info",
-            header_text=header_text,
+            issue_type_upper=snapshot.issue_type_upper,
+            header_parts=header_parts,
             top_lines=issue_lines,
             bottom_lines=comment_lines,
             show_middle_divider=False,
@@ -824,8 +1167,8 @@ def summarize_event(event: KanbusEvent) -> AutoNotice:
 
     fallback_line = _trim_to_pixel_width(f"EVENT {etype.upper()}", max_width_px=62, font_key="bytesized")
     scene = _build_card_scene_from_sections(
-        level="info",
-        header_text=header_text,
+        issue_type_upper=snapshot.issue_type_upper,
+        header_parts=header_parts,
         top_lines=[],
         bottom_lines=_fixed_rows([fallback_line], 5),
         show_middle_divider=False,

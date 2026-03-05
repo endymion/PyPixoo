@@ -85,3 +85,11 @@ def test_font_validation_row_and_span():
 def test_measure_spans_uses_style_fallback():
     spans = [TextSpan(text="A"), TextSpan(text="B")]
     assert measure_spans(spans, TextStyle(font="tiny5"), _ctx()) > 0
+
+
+def test_measure_spans_accounts_for_advance_px():
+    base = [TextSpan(text="A"), TextSpan(text="B")]
+    with_advance = [TextSpan(text="A", advance_px=3), TextSpan(text="B")]
+    base_width = measure_spans(base, TextStyle(font="tiny5"), _ctx())
+    advance_width = measure_spans(with_advance, TextStyle(font="tiny5"), _ctx())
+    assert advance_width >= base_width + 3
