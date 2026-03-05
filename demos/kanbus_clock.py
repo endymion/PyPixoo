@@ -882,7 +882,7 @@ async def _enqueue_message_transition(
     await player.enqueue(
         QueueItem(
             scene=clock_scene,
-            transition=TransitionSpec(kind="push_right", duration_ms=duration_ms),
+            transition=TransitionSpec(kind="push_left", duration_ms=duration_ms),
             hold_ms=0,
         )
     )
@@ -1134,7 +1134,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--root", default=".")
     parser.add_argument("--poll-seconds", type=float, default=1.0)
     parser.add_argument("--rescan-seconds", type=float, default=10.0)
-    parser.add_argument("--auto-info-seconds", type=float, default=5.0)
+    parser.add_argument("--auto-info-seconds", type=float, default=30.0)
     parser.add_argument("--history-file", default=str(DEFAULT_HISTORY_FILE))
     return parser
 

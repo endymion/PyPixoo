@@ -45,8 +45,9 @@ python demos/alerting_clock.py
 # - Prints startup folder summary with latest occurred_at
 # - Watches for new *.json files and auto-queues INFO notices
 # - Keeps REPL active for manual alert/warn/info commands
+# - Uses leftward push for both enter and return transitions
 python demos/kanbus_clock.py
-python demos/kanbus_clock.py --root . --poll-seconds 1 --rescan-seconds 10 --auto-info-seconds 5
+python demos/kanbus_clock.py --root . --poll-seconds 1 --rescan-seconds 10 --auto-info-seconds 30
 # REPL history is persisted at ~/.pypixoo/kanbus_clock_history (up/down arrows)
 
 # Font showcase: cycle Tiny5 text screens (alphabet, numbers, alert, warning, success, info) — 5s per screen

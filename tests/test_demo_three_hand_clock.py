@@ -190,6 +190,9 @@ def test_parser_rejects_invalid_numeric_values():
     assert args.screen_rotation is None
     assert args.mirror_mode is None
     assert args.fps == 3
+    assert args.hour_length == 20
+    assert args.minute_length == 27
+    assert args.second_length == 32
     with pytest.raises(SystemExit):
         parser.parse_args(["--fps", "0"])
     with pytest.raises(SystemExit):
@@ -239,10 +242,10 @@ def test_band_defaults_apply_expected_intensity_slots():
     args = parser.parse_args(["--band", "tomato"])
     style = clock_demo._style_from_args(args)
     assert style.marker_color == clock_demo.parse_color("dark.tomato7")
-    assert style.top_marker_color == clock_demo.parse_color("dark.tomato10")
-    assert style.hour_hand_color == clock_demo.parse_color("dark.tomato9")
-    assert style.minute_hand_color == clock_demo.parse_color("dark.tomato10")
-    assert style.second_hand_color == clock_demo.parse_color("dark.tomato5")
+    assert style.top_marker_color == clock_demo.parse_color("dark.tomato8")
+    assert style.hour_hand_color == clock_demo.parse_color("dark.tomato10")
+    assert style.minute_hand_color == clock_demo.parse_color("dark.tomato11")
+    assert style.second_hand_color == clock_demo.parse_color("dark.tomato6")
     assert style.center_color == clock_demo.parse_color("dark.tomato5")
 
 

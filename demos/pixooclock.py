@@ -57,10 +57,10 @@ FACE_NAMES = (
 
 DEFAULT_DIAL_COLOR = (0, 0, 0)
 DEFAULT_MARKER_COLOR = parse_color("dark.purple7")
-DEFAULT_TOP_MARKER_COLOR = parse_color("dark.purple10")
-DEFAULT_HOUR_HAND_COLOR = parse_color("dark.purple9")
-DEFAULT_MINUTE_HAND_COLOR = parse_color("dark.purple10")
-DEFAULT_SECOND_HAND_COLOR = parse_color("dark.purple5")
+DEFAULT_TOP_MARKER_COLOR = parse_color("dark.purple8")
+DEFAULT_HOUR_HAND_COLOR = parse_color("dark.purple10")
+DEFAULT_MINUTE_HAND_COLOR = parse_color("dark.purple11")
+DEFAULT_SECOND_HAND_COLOR = parse_color("dark.purple6")
 DEFAULT_CENTER_COLOR = parse_color("dark.purple5")
 
 
@@ -321,9 +321,9 @@ def build_parser(ip_default: str = DEFAULT_IP) -> argparse.ArgumentParser:
     parser.add_argument("--center-color", type=_parse_color_arg, default=DEFAULT_CENTER_COLOR)
 
     # Geometry
-    parser.add_argument("--hour-length", type=_positive_int, default=16)
-    parser.add_argument("--minute-length", type=_positive_int, default=23)
-    parser.add_argument("--second-length", type=_positive_int, default=28)
+    parser.add_argument("--hour-length", type=_positive_int, default=20)
+    parser.add_argument("--minute-length", type=_positive_int, default=27)
+    parser.add_argument("--second-length", type=_positive_int, default=32)
     parser.add_argument("--marker-thickness", type=_positive_int, default=1)
     parser.add_argument("--top-marker-thickness", type=_positive_int, default=2)
     parser.add_argument("--quarter-marker-thickness", type=_positive_int, default=2)
@@ -352,10 +352,10 @@ def _resolved_band_colors(
     # always win.
     band_levels = (
         ("marker_color", DEFAULT_MARKER_COLOR, 7),
-        ("top_marker_color", DEFAULT_TOP_MARKER_COLOR, 10),
-        ("hour_hand_color", DEFAULT_HOUR_HAND_COLOR, 9),
-        ("minute_hand_color", DEFAULT_MINUTE_HAND_COLOR, 10),
-        ("second_hand_color", DEFAULT_SECOND_HAND_COLOR, 5),
+        ("top_marker_color", DEFAULT_TOP_MARKER_COLOR, 8),
+        ("hour_hand_color", DEFAULT_HOUR_HAND_COLOR, 10),
+        ("minute_hand_color", DEFAULT_MINUTE_HAND_COLOR, 11),
+        ("second_hand_color", DEFAULT_SECOND_HAND_COLOR, 6),
         ("center_color", DEFAULT_CENTER_COLOR, 5),
     )
     replacements = {
@@ -1101,10 +1101,10 @@ def _band_palette(band: str) -> tuple[tuple[int, int, int], tuple[int, int, int]
     return (
         DEFAULT_DIAL_COLOR,
         parse_color(f"dark.{band}7"),
+        parse_color(f"dark.{band}8"),
         parse_color(f"dark.{band}10"),
-        parse_color(f"dark.{band}9"),
-        parse_color(f"dark.{band}10"),
-        parse_color(f"dark.{band}5"),
+        parse_color(f"dark.{band}11"),
+        parse_color(f"dark.{band}6"),
     )
 
 

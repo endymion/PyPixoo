@@ -302,7 +302,7 @@ def test_short_seconds_normalization():
     assert tokens == ["--seconds", "5", "--color", "red-10", "hello"]
 
 
-def test_enqueue_message_transition_adds_two_items():
+def test_enqueue_message_transition_uses_push_left_for_in_and_out():
     module = _load_demo_module()
 
     class _DummyClockScene:
@@ -336,7 +336,9 @@ def test_enqueue_message_transition_adds_two_items():
     items = __import__("asyncio").run(_run())
     assert len(items) == 2
     assert items[0].transition.kind == "push_left"
-    assert items[1].transition.kind == "push_right"
+    # Kanbus clock now uses leftward push for both directions:
+    # notice enters from right, then exits left while clock enters from right.
+    assert items[1].transition.kind == "push_left"
     assert items[0].hold_ms == 5000
     assert items[1].hold_ms == 0
 
@@ -578,3 +580,10 @@ def test_transition_summary_falls_back_to_kbs_show_title(monkeypatch):
     assert notice.header == "TRANSITION"
     assert "fallback title" in notice.message.lower()
     assert captured.get("cwd") == str(Path("/tmp/demo-repo").resolve())
+
+
+def test_build_parser_defaults_auto_info_seconds_30():
+    module = _load_demo_module()
+    parser = module.build_parser()
+    args = parser.parse_args([])
+    assert args.auto_info_seconds == 30.0
