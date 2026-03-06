@@ -1,0 +1,391 @@
+{
+  "id": "PIXO-9b569afd-6d46-4f8a-ab03-00a4e2a21add",
+  "title": "React-backed kanbus_clock experiment",
+  "description": "Build an experimental kanbus clock path that renders clock/info cards from Storybook React components and drives the Pixoo from that output.",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "8315afc7-ee0f-4c58-9298-608fc8b93de3",
+      "author": "ryan.porter",
+      "text": "Debugging React text blur: comparing working screen/font test pipeline (192 capture + nearest/binary) against new Storybook clock/info experiment. Next change will align experiment capture settings with known crisp path and add frame debug output.",
+      "created_at": "2026-03-06T02:06:34.234669Z"
+    },
+    {
+      "id": "89ebc017-6907-4c0d-81bb-209793fc38b4",
+      "author": "ryan.porter",
+      "text": "Applied crisp-capture alignment in react_storybook_clock_info: forcing 192x192 viewport + nearest downsample (matching screen/font tests). Added optional --info-threshold for hard text edge testing, default disabled. Running live device test now.",
+      "created_at": "2026-03-06T02:07:10.775579Z"
+    },
+    {
+      "id": "e691e48c-0baf-4de1-89a2-d8ca5531a93b",
+      "author": "ryan.porter",
+      "text": "Found scaling bug source: Storybook stories are authored for 64x64 layout, so forcing viewport 192 shrank effective content to ~1/3 after downsample. Switched experiment capture to viewport_size=64 + device_scale_factor=3 + nearest downsample. Re-running on device now.",
+      "created_at": "2026-03-06T02:08:29.482206Z"
+    },
+    {
+      "id": "adf3a395-8314-4c3a-85aa-f93b544adcd8",
+      "author": "ryan.porter",
+      "text": "Implemented Storybook readiness gating for React capture: preview now sets window.__pixooReady=false, waits for document.fonts.ready and Tiny5 load, then flips ready after two animation frames. Browser renderer already waits on __pixooReady, so captures should stop racing fallback fonts.",
+      "created_at": "2026-03-06T02:10:44.204377Z"
+    },
+    {
+      "id": "c9d16249-82b4-4757-bba7-aa709693acd4",
+      "author": "ryan.porter",
+      "text": "Removed fallback font families in Storybook components (TinyText/KanbusCard/LetterA now use Tiny5 only). Tightened Storybook ready contract: capture fails unless Tiny5 is verifiably loaded; browser renderer now surfaces __pixooReadyError instead of silently proceeding.",
+      "created_at": "2026-03-06T02:12:17.882962Z"
+    },
+    {
+      "id": "52c98b58-1e78-4b5c-9dca-642600cab983",
+      "author": "ryan.porter",
+      "text": "Switching to hard diagnostics per user request: capture LetterA story frame directly, measure lit-pixel bounding boxes in Python, and compare pre-upload frame geometry against expected Tiny5 shape. Next patch will be based on measured frame data.",
+      "created_at": "2026-03-06T02:15:53.937790Z"
+    },
+    {
+      "id": "bfcb371c-371c-44f1-8048-a9e79eda2b8b",
+      "author": "ryan.porter",
+      "text": "Measured capture results confirm bug is in Storybook source frame, not upload: LetterA story renders only a 3x3 lit glyph (bbox=(0,1)-(2,3)) across capture modes. This reproduces user report exactly. Next step: replace React text rendering path with deterministic pixel-glyph renderer (same canonical masks used by working tinytext/font showcase pipeline), then retest.",
+      "created_at": "2026-03-06T02:17:02.962338Z"
+    },
+    {
+      "id": "82461463-ec60-4454-839e-f19e4f6fea68",
+      "author": "ryan.porter",
+      "text": "Calibration result: after increasing Tiny5 CSS size from 5px->8px in React story components, LetterA capture now measures bbox 4x5 (was 3x3). This matches expected glyph height class (4/5). Running live React clock/info demo with this calibration for user confirmation.",
+      "created_at": "2026-03-06T02:17:48.669230Z"
+    },
+    {
+      "id": "d57ff2ad-e119-4a48-b11a-08bd491e3344",
+      "author": "ryan.porter",
+      "text": "Implementing requested refactor: adding reusable KanbusHeader component and switching Kanbus info-card text stack to Bytesized font for higher density. Also wiring Bytesized font into Storybook via @font-face/static asset so React capture uses the intended font.",
+      "created_at": "2026-03-06T02:21:58.097435Z"
+    },
+    {
+      "id": "c56fcc1b-63f1-4c79-b27c-3b4250009bee",
+      "author": "ryan.porter",
+      "text": "Implemented reusable Storybook header component (KanbusHeader) and switched Kanbus card header/body text rendering to Bytesized. Added Bytesized @font-face asset in Storybook and strict readiness checks for Tiny5+Bytesized before capture. Demo restarted for device validation.",
+      "created_at": "2026-03-06T02:22:49.565617Z"
+    },
+    {
+      "id": "0f2d78d0-a945-445c-846c-54c670d379e5",
+      "author": "ryan.porter",
+      "text": "Applying header spacing rules: fixed 3px gaps between [prefix][type][status], and replacing all internal whitespace in each token with explicit 2px pixel spacers. Restarting React demo after patch for visual confirmation.",
+      "created_at": "2026-03-06T02:24:10.735317Z"
+    },
+    {
+      "id": "5d555516-8939-49ba-95e9-012d1bbf48bf",
+      "author": "ryan.porter",
+      "text": "Added React Storybook parity target for original Python clock look: new story Pixoo/Clock -> PixooclockDefault with explicit geometry/colors (dot12, no second hand, larger top dot, tuned hand lengths/thicknesses). Updated react_storybook_clock_info default clock story to this parity story. Storybook build passes.",
+      "created_at": "2026-03-06T02:29:48.957107Z"
+    },
+    {
+      "id": "4deadcbf-0ef0-4bf4-9e52-ba1107e37934",
+      "author": "ryan.porter",
+      "text": "Adding Storybook comment-card matrix per request: task/story/bug/epic x {with_parent, without_parent}. Story names will be explicit and ready for visual tuning in Storybook/device loop.",
+      "created_at": "2026-03-06T03:05:49.535406Z"
+    },
+    {
+      "id": "f2ea9df1-1113-46fe-b299-5724f911cd1c",
+      "author": "ryan.porter",
+      "text": "Added Storybook comment matrix stories for issue types and parent/no-parent variants: task/story/bug/epic x {with_parent, without_parent}. Preserved existing story id alias  -> task without parent so running demo links remain stable. Storybook build passes.",
+      "created_at": "2026-03-06T03:06:27.245263Z"
+    },
+    {
+      "id": "0fbc8691-e9ed-454e-99ba-c0ebb43ab9fd",
+      "author": "ryan.porter",
+      "text": "Added Storybook comment matrix stories for issue types and parent/no-parent variants: task/story/bug/epic x {with_parent, without_parent}. Preserved existing story id alias CommentCard -> task without parent so running demo links remain stable. Storybook build passes.",
+      "created_at": "2026-03-06T03:06:32.400165Z"
+    },
+    {
+      "id": "678f0d32-d919-4ccd-933d-40e882353992",
+      "author": "ryan.porter",
+      "text": "Addressing two regressions: (1) lighten header background band shades across issue types for better visibility; (2) smooth transitions by decoupling Storybook clock capture from ScenePlayer render path (cached frame refresh loop), so transitions no longer wait on per-frame browser rendering.",
+      "created_at": "2026-03-06T03:24:16.248959Z"
+    },
+    {
+      "id": "d1aa79a0-8d07-436b-999a-c11e3a8536a3",
+      "author": "ryan.porter",
+      "text": "Implementing parent-row type tinting: add parentType prop to KanbusCard and color parent rows by parent kind (epic -> indigo band, initiative -> magenta band). Updating all with-parent stories to pass parentType and restarting demo for visual validation.",
+      "created_at": "2026-03-06T03:31:29.457625Z"
+    },
+    {
+      "id": "57fa5d43-5276-42bd-9cda-6a3ff1c75633",
+      "author": "ryan.porter",
+      "text": "Implementing explicit fix: transition no-parent issue description rows from 7 to 10 lines for real-event cards.",
+      "created_at": "2026-03-06T06:09:54.794896Z"
+    },
+    {
+      "id": "26eaae7d-e1c7-49d8-bf39-b92dc337fe92",
+      "author": "ryan.porter",
+      "text": "Updated transition no-parent description capacity to 10 lines and triggered a live transition for visual verification.",
+      "created_at": "2026-03-06T06:10:31.802692Z"
+    },
+    {
+      "id": "493be8bd-117d-40d3-872b-8149dcf12368",
+      "author": "ryan.porter",
+      "text": "Implementing requested layout change: transition cards with parent now allocate 7 lines to the issue description section (up from 4).",
+      "created_at": "2026-03-06T06:11:24.455114Z"
+    },
+    {
+      "id": "581c1d63-8809-48e2-a877-1214f8d8c6a0",
+      "author": "ryan.porter",
+      "text": "Root cause identified: transition card row height caused clipping, so requested line count was not fully visible. Applying row-height reduction so all configured lines render on-screen.",
+      "created_at": "2026-03-06T06:13:26.123568Z"
+    },
+    {
+      "id": "32768e1f-d854-4603-99c2-818078aa7a1a",
+      "author": "ryan.porter",
+      "text": "Fixing regression: transition parent+issue layout should remain 3 parent rows + 7 issue rows with readable row height. Adjusting transition header/body sizing accordingly.",
+      "created_at": "2026-03-06T06:14:03.224212Z"
+    },
+    {
+      "id": "faa8c0c9-59c2-4174-ac41-c52b3be64ce8",
+      "author": "ryan.porter",
+      "text": "Applying deterministic fix: transition-with-parent issue description now uses adaptive tighter wrap to fill 7 rows (when content permits) instead of stopping at ~4.",
+      "created_at": "2026-03-06T06:15:24.400631Z"
+    },
+    {
+      "id": "89e27fac-41c3-414c-8c2a-33ab28f1e67e",
+      "author": "ryan.porter",
+      "text": "Root-cause write-up: repeated failures came from changing line limits without enforcing viewport fit, plus missing targeted tests. Implemented hard fill-to-viewport logic for transition cards and now adding assertions for 3+7 (parent) and 10 (no-parent).",
+      "created_at": "2026-03-06T06:16:03.743862Z"
+    },
+    {
+      "id": "0a624e65-eaea-4d35-98f1-320dd3d9cbfd",
+      "author": "ryan.porter",
+      "text": "Starting transition description height fix: enforce 7 (parent) / 10 (no-parent) visible lines via transition-only sizing + wrap width adjustment, with tests.",
+      "created_at": "2026-03-06T06:22:23.496646Z"
+    },
+    {
+      "id": "a11ce2ae-2a28-4dfe-b36e-6ed2bfd5aaae",
+      "author": "ryan.porter",
+      "text": "Implemented transition-only wrap width (54px) for issue descriptions and header min height (font+2), fill-to-viewport rows for 7/10 line targets. Added targeted transition row-fill test. Note: existing palette/header background tests still failing (pre-existing).",
+      "created_at": "2026-03-06T06:23:43.927993Z"
+    },
+    {
+      "id": "93ecf512-95a0-4688-bcbc-019ab7eac27a",
+      "author": "ryan.porter",
+      "text": "Transition wrapping updated to tighten width iteratively (word-wrap only) for 7/10 lines; transition tests now assert viewport fill. Tests passing (34).",
+      "created_at": "2026-03-06T06:27:55.642072Z"
+    },
+    {
+      "id": "c65b1d5f-b458-4f36-9998-ea2856ddedbc",
+      "author": "ryan.porter",
+      "text": "Switched all info screens to use issue titles (fallback to description if title missing). Transition wrapping now uses title-based wrap with 7/10 line targets. Tests passing (34).",
+      "created_at": "2026-03-06T06:31:08.227264Z"
+    },
+    {
+      "id": "15af5c69-f170-4ec5-a2ed-f7155c673376",
+      "author": "ryan.porter",
+      "text": "Implementing Kanbus card unification: comment layout as canonical for created/transition; titles in top blocks; comment bottom in sand, created/transition bottom in issue-type color; Storybook row counts.",
+      "created_at": "2026-03-06T06:38:50.527776Z"
+    },
+    {
+      "id": "2a023701-e44a-4573-894b-0ee1526fdae7",
+      "author": "ryan.porter",
+      "text": "Implemented comment layout canonicalization: created/transition now match comment layout (2+2+5 or 2+7), top blocks use titles, transition/created bottom uses description in issue-type color, comment bottom uses sand. Tests passing (35).",
+      "created_at": "2026-03-06T06:41:57.671986Z"
+    },
+    {
+      "id": "6367386c-a2f9-4f6a-b689-6cc287ec2904",
+      "author": "ryan.porter",
+      "text": "Comment layout check: title in top blocks, comment in sand.",
+      "created_at": "2026-03-06T06:42:07.813789Z"
+    },
+    {
+      "id": "2c81e7dc-fca0-4179-9e4f-18250498d27c",
+      "author": "ryan.porter",
+      "text": "Changed created/transition to use issue titles for bottom text (no descriptions). Comment/transition/created now share the same layout with titles in top blocks; comment bottom stays sand. Tests passing (35).",
+      "created_at": "2026-03-06T06:46:47.010434Z"
+    },
+    {
+      "id": "3c1d9e9d-02fd-45e5-b581-40332b055b90",
+      "author": "ryan.porter",
+      "text": "Added --no-repl and auto-disable when no TTY; EOFError in REPL now exits cleanly. This prevents background kanbus_clock from dying and allows continuous watch/clock.",
+      "created_at": "2026-03-06T06:56:00.221382Z"
+    },
+    {
+      "id": "9b867644-8044-479e-a651-7c6c9abe70ed",
+      "author": "ryan.porter",
+      "text": "Working on header status color: make transition + created issue status two notches lighter than current in header. Will locate React header token color for status and adjust for those card types, then validate via Storybook + device.",
+      "created_at": "2026-03-06T07:03:51.548365Z"
+    },
+    {
+      "id": "1cec44b6-7038-4956-bfac-19c243681d46",
+      "author": "ryan.porter",
+      "text": "Implemented header status lighten for transition/created cards in Storybook React: added per-token color support in KanbusHeader and set statusColor to a +2-notch lighten (20% mix to white) for created/transition only. Ready to validate on device.",
+      "created_at": "2026-03-06T07:05:18.485130Z"
+    },
+    {
+      "id": "ea702864-76c3-4d61-aca5-7c9d89ddbe85",
+      "author": "ryan.porter",
+      "text": "Implementing comment text +1 notch brightness in React KanbusCard (comment bottom text). Will adjust COMMENT_TEXT_COLOR upward and validate on device.",
+      "created_at": "2026-03-06T07:06:54.705648Z"
+    },
+    {
+      "id": "53e8027a-a29e-4c16-801d-c9f9f833eb26",
+      "author": "ryan.porter",
+      "text": "Comment text brightness bump applied: COMMENT_TEXT_COLOR -> #E8E0CB (one notch lighter). Ready for visual check.",
+      "created_at": "2026-03-06T07:07:01.602782Z"
+    },
+    {
+      "id": "72cc4542-206c-4bb2-81cc-88e2521c0bb5",
+      "author": "ryan.porter",
+      "text": "Filed bug for non-Radix palette in React cards: PIXO-fa4c2e.",
+      "created_at": "2026-03-06T07:08:26.818701Z"
+    },
+    {
+      "id": "f90ff1b2-129c-436e-9aa1-8ddd87d355db",
+      "author": "ryan.porter",
+      "text": "Restarting Storybook + kanbus_clock to pick up brighter comment text color change and validate status lighten.",
+      "created_at": "2026-03-06T07:08:54.492436Z"
+    },
+    {
+      "id": "871adaf4-b31b-4e51-99a3-3052ea0952be",
+      "author": "ryan.porter",
+      "text": "Adjusting comment text color in Python kanbus_clock (InfoScene) from dark.sand8 to dark.sand9 for +1 notch brightness; updating tests and restarting demo.",
+      "created_at": "2026-03-06T07:11:10.409712Z"
+    },
+    {
+      "id": "3e57b4e3-73d2-452c-9cb9-ae45c0038f52",
+      "author": "ryan.porter",
+      "text": "Restarted Storybook + kanbus_clock after raising comment text to dark.sand9. Please re-check comment card brightness.",
+      "created_at": "2026-03-06T07:11:55.338802Z"
+    },
+    {
+      "id": "8ed3936d-a5b0-4877-87b2-0b0c8a7b3c53",
+      "author": "ryan.porter",
+      "text": "kanbus_clock not running after restart; restarting now and retriggering a transition to verify clock returns.",
+      "created_at": "2026-03-06T07:12:05.774697Z"
+    },
+    {
+      "id": "1020542a-0751-450b-ba2b-8b46c809da1a",
+      "author": "ryan.porter",
+      "text": "React clock stalled because Storybook server was down; restarting Storybook now so clock can resume updates.",
+      "created_at": "2026-03-06T07:13:23.697969Z"
+    },
+    {
+      "id": "5a962a2b-fbb3-4f5c-9306-dbac69331813",
+      "author": "ryan.porter",
+      "text": "Comment brightness bumped to dark.sand9 (Python InfoScene). Restarted Storybook + kanbus_clock for live verification.",
+      "created_at": "2026-03-06T07:15:47.143226Z"
+    },
+    {
+      "id": "8d151a38-19c0-49bd-8f1c-f3a01aa7181c",
+      "author": "ryan.porter",
+      "text": "Bumping comment text to +2 notches (dark.sand10) in Python InfoScene; will restart kanbus_clock after change for visual check.",
+      "created_at": "2026-03-06T07:17:00.447797Z"
+    },
+    {
+      "id": "9f7f4da6-fc34-4db9-a239-3c72e1ea8d45",
+      "author": "ryan.porter",
+      "text": "Applied comment text +2 notch brightness (dark.sand10). Restarting kanbus_clock now after Playwright connection crash.",
+      "created_at": "2026-03-06T07:17:38.724827Z"
+    },
+    {
+      "id": "f468f056-f228-4edd-bdbf-2ef68946e541",
+      "author": "ryan.porter",
+      "text": "Comment brightness check (dark.sand10)",
+      "created_at": "2026-03-06T07:18:29.518880Z"
+    },
+    {
+      "id": "02947db0-eca9-4a17-a02d-0253b7653e4b",
+      "author": "ryan.porter",
+      "text": "Bumping comment text two more notches to dark.sand12 (from sand10). Will restart kanbus_clock after change.",
+      "created_at": "2026-03-06T07:19:37.996699Z"
+    },
+    {
+      "id": "ce8344d6-ff78-43a2-8335-fe80240e89a9",
+      "author": "ryan.porter",
+      "text": "Comment brightness check (dark.sand12)",
+      "created_at": "2026-03-06T07:20:21.013673Z"
+    },
+    {
+      "id": "3bad5d34-bb6b-496e-840a-9f0cf25f6e5c",
+      "author": "ryan.porter",
+      "text": "Adjusting comment text one notch dimmer to dark.sand11 and restarting kanbus_clock; will trigger a transition for visual check.",
+      "created_at": "2026-03-06T07:21:35.991855Z"
+    },
+    {
+      "id": "46aceaf2-d025-4fb5-998b-df67ff986d23",
+      "author": "ryan.porter",
+      "text": "Comment brightness check (dark.sand11)",
+      "created_at": "2026-03-06T07:22:34.504020Z"
+    },
+    {
+      "id": "b3e7fa6c-06bf-4540-b00d-f38d073acbce",
+      "author": "ryan.porter",
+      "text": "Comment brightness check (dark.sand11)",
+      "created_at": "2026-03-06T07:24:19.606924Z"
+    },
+    {
+      "id": "eae7552e-f710-486a-a00a-8674961db858",
+      "author": "ryan.porter",
+      "text": "Updating Python InfoScene header status color for transition/created: status token should match main body brightness. Will add header_status_color param and pass main_fg for created/transition.",
+      "created_at": "2026-03-06T07:25:10.694048Z"
+    },
+    {
+      "id": "fd5b74c5-c679-496f-9181-4c82ec5a0d9d",
+      "author": "ryan.porter",
+      "text": "Applied header_status_color override: transition/created status token now uses main_fg (bright) while id/type stay header_fg. Restarting kanbus_clock for visual confirmation.",
+      "created_at": "2026-03-06T07:25:28.307689Z"
+    },
+    {
+      "id": "b254a3b2-1769-4fc2-841f-072e0c5f7db7",
+      "author": "ryan.porter",
+      "text": "Comment brightness check (dark.sand11)",
+      "created_at": "2026-03-06T07:25:56.049472Z"
+    },
+    {
+      "id": "3946e6f2-43ba-473e-bc18-3de4cfe09297",
+      "author": "ryan.porter",
+      "text": "Status token now uses main_fg (bright) on transition/created headers. Restarted kanbus_clock and triggered a transition + comment for verification.",
+      "created_at": "2026-03-06T07:26:00.395564Z"
+    },
+    {
+      "id": "88d6be38-878f-4145-a032-d7d3e4eb937a",
+      "author": "ryan.porter",
+      "text": "Comment brightness check (dark.sand11)",
+      "created_at": "2026-03-06T07:29:05.460854Z"
+    },
+    {
+      "id": "d1216b85-8cd3-4c7a-be85-3a2c06dd2cd5",
+      "author": "ryan.porter",
+      "text": "Notification check",
+      "created_at": "2026-03-06T07:29:13.779566Z"
+    },
+    {
+      "id": "2e591dcf-7c69-4b7c-af1d-365ee15d7333",
+      "author": "ryan.porter",
+      "text": "Adding debug logs in auto notice consumer to confirm notices are dequeued/enqueued; will restart kanbus_clock and re-trigger events.",
+      "created_at": "2026-03-06T07:32:56.038461Z"
+    },
+    {
+      "id": "0b40d66c-951e-47e4-b2ba-09ada09c08c4",
+      "author": "ryan.porter",
+      "text": "Triggered 3 Kanbus comment events (tskl-nlh.1). Watcher logs show 3 comment_added events and transitions enqueued; workspace-root kbs show still timing out and falling back to project-root. Clock session running with --debug.",
+      "created_at": "2026-03-06T07:36:39.639529Z"
+    },
+    {
+      "id": "bfcd3a20-80a3-4bcd-b421-bd69fce63e3a",
+      "author": "ryan.porter",
+      "text": "Starting fix: restore push-left transitions for Kanbus clock notifications (currently popping). Will trace ScenePlayer enqueue path and transition specs in demos/kanbus_clock.py.",
+      "created_at": "2026-03-06T07:37:51.887037Z"
+    },
+    {
+      "id": "0b211c14-9f59-4022-8983-e147a00c47aa",
+      "author": "ryan.porter",
+      "text": "Fixing pop-in transitions: React clock rendering is now cached-only on the render thread; heavy Storybook render moved entirely to background refresh + warmup to avoid blocking ScenePlayer frames during transitions. This should restore push-left animation.",
+      "created_at": "2026-03-06T07:42:18.549867Z"
+    }
+  ],
+  "created_at": "2026-03-06T01:59:39.247808Z",
+  "updated_at": "2026-03-06T07:42:18.549867Z",
+  "closed_at": null,
+  "custom": {}
+}

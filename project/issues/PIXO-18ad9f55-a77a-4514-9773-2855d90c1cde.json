@@ -3,7 +3,7 @@
   "title": "Kanbus clock header prefix uses issue key before dash",
   "description": "",
   "type": "bug",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
@@ -19,7 +19,7 @@
     }
   ],
   "created_at": "2026-03-05T07:15:25.139755Z",
-  "updated_at": "2026-03-05T07:16:42.313331Z",
-  "closed_at": null,
+  "updated_at": "2026-03-06T04:50:17.751103Z",
+  "closed_at": "2026-03-06T04:50:17.751103Z",
   "custom": {}
 }

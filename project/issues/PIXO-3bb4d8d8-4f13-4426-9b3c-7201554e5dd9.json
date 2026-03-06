@@ -3,7 +3,7 @@
   "title": "Storybook coverage for kanbus_clock card variants",
   "description": "Add Storybook stories for Kanbus notification card layouts used by demos/kanbus_clock.py, including created/transition/comment/unknown, parent/no-parent, long-header, wrapping, and issue-type color variants.",
   "type": "task",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
@@ -22,10 +22,130 @@
       "author": "ryan.porter",
       "text": "Implemented Storybook Kanbus card coverage: added reusable KanbusCard component + Pixoo/KanbusClockCards stories for created/transition/comment/unknown, parent/no-parent, long-header overflow, and issue-type color variants. Storybook build passes.",
       "created_at": "2026-03-06T01:26:01.391011Z"
+    },
+    {
+      "id": "00560ec5-a3aa-4bf5-af8e-ca2cbb5e8c83",
+      "author": "ryan.porter",
+      "text": "Implementing reusable two-row issue description component for Kanbus cards and wiring it for both parent and current issue blocks in Storybook demo.",
+      "created_at": "2026-03-06T03:41:05.900308Z"
+    },
+    {
+      "id": "eaa7a9fa-f352-4141-a7a5-0d38ce9aa510",
+      "author": "ryan.porter",
+      "text": "Implemented reusable IssueDescriptionBlock component and migrated KanbusCard parent/current issue sections to use it. Storybook build passes; demo restarted for device visual verification.",
+      "created_at": "2026-03-06T03:42:42.149428Z"
+    },
+    {
+      "id": "10b24d1d-84bb-4be1-9818-4b981a67915e",
+      "author": "ryan.porter",
+      "text": "Tightening Kanbus header spacing: normalizing token whitespace and setting in-token word-space width to 3px to match requested visual spacing.",
+      "created_at": "2026-03-06T03:43:21.599276Z"
+    },
+    {
+      "id": "7092b47d-5e89-4133-8d95-6a7273058766",
+      "author": "ryan.porter",
+      "text": "Adjusting this-issue block vertical text offset to match parent block exactly in shared IssueDescriptionBlock usage.",
+      "created_at": "2026-03-06T03:44:51.484068Z"
+    },
+    {
+      "id": "61f37d54-544d-49f4-8d3e-c82be01f3a8e",
+      "author": "ryan.porter",
+      "text": "Adjusting KanbusHeader spacing again with optical compensation for Bytesized glyph bearings; reducing injected whitespace/gap widths to target visual 3px on-device.",
+      "created_at": "2026-03-06T03:48:25.059693Z"
+    },
+    {
+      "id": "98986211-9658-4466-b9e1-2a74b61ee8c0",
+      "author": "ryan.porter",
+      "text": "Reverting accidental header spacing regression; applying 3px word-spacing fix only to reusable IssueDescriptionBlock for parent/current issue text.",
+      "created_at": "2026-03-06T03:53:31.940940Z"
+    },
+    {
+      "id": "917d85b8-62e2-4804-b9d5-16baa9cb9188",
+      "author": "ryan.porter",
+      "text": "Applying visual tweak: comment body text now uses sand color band at current intensity level in Kanbus cards.",
+      "created_at": "2026-03-06T03:59:28.588818Z"
+    },
+    {
+      "id": "68e9d0b8-65c4-4e06-83d6-3e0f92ef9b69",
+      "author": "ryan.porter",
+      "text": "Adjusting IssueDescriptionBlock word spacing only: replace font default spaces with explicit fixed 3px inter-word gaps to eliminate overly wide spacing in description rows.",
+      "created_at": "2026-03-06T04:03:18.101395Z"
+    },
+    {
+      "id": "849524aa-7201-4fae-854a-14062a6dc959",
+      "author": "ryan.porter",
+      "text": "Increasing Kanbus comment card text capacity by two rows in React layout logic for live readability testing.",
+      "created_at": "2026-03-06T04:06:51.371539Z"
+    },
+    {
+      "id": "3a370927-87db-43c0-93fd-1b81b5ed474b",
+      "author": "ryan.porter",
+      "text": "Tweaking with-parent comment layouts: shifting comment body rows down by 1px for better vertical balance.",
+      "created_at": "2026-03-06T04:10:09.527021Z"
+    },
+    {
+      "id": "6bd16b31-853b-4eee-8d7b-f8d390e4aebf",
+      "author": "ryan.porter",
+      "text": "Increasing non-comment (created/transition) card body capacity by +3 rows and expanding Storybook content to fill those rows for visual validation.",
+      "created_at": "2026-03-06T04:13:12.240242Z"
+    },
+    {
+      "id": "c0f07079-b4e7-4383-a3f3-b53d51f9fc74",
+      "author": "ryan.porter",
+      "text": "Adjusting no-parent comment layout: +1 comment row and move whole comment block down by 2px for improved balance.",
+      "created_at": "2026-03-06T04:18:04.784323Z"
+    },
+    {
+      "id": "795830d1-7644-47b8-95c0-38b12e9e2ad1",
+      "author": "ryan.porter",
+      "text": "Implementing text wrapping for description/comment sections: long text will wrap across available row slots instead of clipping per row.",
+      "created_at": "2026-03-06T04:26:41.681592Z"
+    },
+    {
+      "id": "ee2d8127-f8b5-4b03-9421-2255d8bec63a",
+      "author": "ryan.porter",
+      "text": "Wrap tuning: removing conservative right-side margin so description/comment text can use full row width.",
+      "created_at": "2026-03-06T04:28:09.120446Z"
+    },
+    {
+      "id": "2c74a211-17c2-4ce2-b178-7a69f1ba68a7",
+      "author": "ryan.porter",
+      "text": "Wrap width tuning: reducing max chars slightly to prevent right-edge clipping while keeping near-full line utilization.",
+      "created_at": "2026-03-06T04:29:22.104Z"
+    },
+    {
+      "id": "2a5ce927-9861-45ef-a6b6-8b1d34a998e0",
+      "author": "ryan.porter",
+      "text": "Applying palette notch tweak: dim header/description text by one step and brighten comment text by one step for card readability.",
+      "created_at": "2026-03-06T04:33:52.799917Z"
+    },
+    {
+      "id": "70a1fd74-ca9b-44b8-b3d9-df4e9716bba5",
+      "author": "ryan.porter",
+      "text": "Unifying created/transition layouts with comment design pattern: no-parent variants will also use shared 2-row issue block + wrapped body rows.",
+      "created_at": "2026-03-06T04:36:02.632477Z"
+    },
+    {
+      "id": "4c451dbf-7f87-4221-b592-4f66361a0231",
+      "author": "ryan.porter",
+      "text": "debug event for real-layout verification",
+      "created_at": "2026-03-06T04:39:15.948915Z"
+    },
+    {
+      "id": "7d54bf47-579c-4ade-8baf-44c1297cb78c",
+      "author": "ryan.porter",
+      "text": "debug after timeout increase",
+      "created_at": "2026-03-06T04:40:16.021685Z"
+    },
+    {
+      "id": "14f2969a-d00c-43c4-abb5-09accd35d2d0",
+      "author": "ryan.porter",
+      "text": "event after workspace/project fallback patch",
+      "created_at": "2026-03-06T04:42:01.581051Z"
     }
   ],
   "created_at": "2026-03-06T01:24:25.478825Z",
-  "updated_at": "2026-03-06T01:26:01.391011Z",
-  "closed_at": null,
+  "updated_at": "2026-03-06T04:51:06.948646Z",
+  "closed_at": "2026-03-06T04:51:06.948646Z",
   "custom": {}
 }

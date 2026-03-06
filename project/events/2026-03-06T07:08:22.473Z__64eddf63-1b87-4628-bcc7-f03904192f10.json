@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "64eddf63-1b87-4628-bcc7-f03904192f10",
+  "issue_id": "PIXO-fa4c2e36-abdc-4e5a-b443-c9256c63eb8c",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-06T07:08:22.473Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Observed:\nReact Storybook Kanbus card palette uses hardcoded hex values (non-Radix).\n\nExpected:\nPalette should be sourced from Radix dark color tokens for consistency with Python/radix usage.\n\nImpact:\nHarder to maintain color consistency and match device palette expectations.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "PIXO-9b569afd-6d46-4f8a-ab03-00a4e2a21add",
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus card palette not using Radix tokens"
+  }
+}

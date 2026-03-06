@@ -3,7 +3,7 @@
   "title": "Kanbus clock: metadata-header + parent/issue description layout redesign",
   "description": "",
   "type": "task",
-  "status": "in_progress",
+  "status": "blocked",
   "priority": 2,
   "assignee": null,
   "creator": null,
@@ -208,10 +208,34 @@
       "author": "ryan.porter",
       "text": "Investigating NO DESCRIPTION on Kanbus clock cards; suspect kbs binary not updated for workspace discovery. Rebuilding/installing kbs, then re-testing via kbs show from workspace root.",
       "created_at": "2026-03-05T13:55:17.255135Z"
+    },
+    {
+      "id": "1f9d4d45-dffd-42c8-93b5-3e1405146aa4",
+      "author": "ryan.porter",
+      "text": "fresh clock visibility check",
+      "created_at": "2026-03-06T04:53:22.223963Z"
+    },
+    {
+      "id": "981ff2fc-85b2-40b1-b460-103afeafc0bd",
+      "author": "ryan.porter",
+      "text": "Applying transition-card visual tweak: render NEW status token two notches lighter in state_transition header only; created/comment unchanged.",
+      "created_at": "2026-03-06T04:54:51.351381Z"
+    },
+    {
+      "id": "38a307b7-d0d2-45ba-a6d6-d265b3da0edb",
+      "author": "ryan.porter",
+      "text": "Aligning created/transition description blocks with comment design: use issue background blocks for issue description rows and remove visual line-style mismatch.",
+      "created_at": "2026-03-06T05:02:56.923727Z"
+    },
+    {
+      "id": "0c614dfa-b5c5-48ec-8572-4ff6c8e19527",
+      "author": "ryan.porter",
+      "text": "Adjusting transition/create/comment card backgrounds: body uses base band background; header uses brighter band shade so they are visibly distinct.",
+      "created_at": "2026-03-06T05:31:17.912761Z"
     }
   ],
   "created_at": "2026-03-05T07:15:19.904782Z",
-  "updated_at": "2026-03-05T13:55:17.255135Z",
+  "updated_at": "2026-03-06T05:31:17.912761Z",
   "closed_at": null,
   "custom": {}
 }

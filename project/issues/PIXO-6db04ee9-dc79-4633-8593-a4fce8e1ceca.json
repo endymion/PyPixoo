@@ -3,7 +3,7 @@
   "title": "pixooclock: lighten default hands one step and extend default lengths by 2px",
   "description": "",
   "type": "task",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
@@ -49,7 +49,7 @@
     }
   ],
   "created_at": "2026-03-05T07:15:26.501476Z",
-  "updated_at": "2026-03-05T07:16:51.896091Z",
-  "closed_at": null,
+  "updated_at": "2026-03-06T04:37:43.180553Z",
+  "closed_at": "2026-03-06T04:37:43.180553Z",
   "custom": {}
 }

@@ -3,7 +3,7 @@
   "title": "Kanbus clock: darken default 12-o'clock dot and set auto-info-seconds default to 30",
   "description": "",
   "type": "task",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
@@ -31,7 +31,7 @@
     }
   ],
   "created_at": "2026-03-05T07:15:25.012653Z",
-  "updated_at": "2026-03-05T07:16:42.213516Z",
-  "closed_at": null,
+  "updated_at": "2026-03-06T04:52:27.693245Z",
+  "closed_at": "2026-03-06T04:52:27.693245Z",
   "custom": {}
 }

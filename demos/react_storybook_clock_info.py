@@ -124,13 +124,10 @@ class StorybookClockScene:
         self._refresh_task: asyncio.Task | None = None
         self._stop_refresh = asyncio.Event()
 
-    def _render_clock(self, epoch_s: float) -> Buffer:
+    def _render_clock_sync(self, epoch_s: float) -> Buffer:
         local = time.localtime(epoch_s)
         second_bucket = int(epoch_s)
         key = f"{local.tm_hour}:{local.tm_min}:{local.tm_sec}:{second_bucket}"
-        if self._cache is not None and self._cache.key == key:
-            return self._cache.buffer
-
         url = _storybook_url(
             self._storybook_iframe,
             self._story_id,
@@ -151,6 +148,11 @@ class StorybookClockScene:
         self._cache = _CachedFrame(key=key, buffer=buf)
         return buf
 
+    def _render_clock_cached(self) -> Buffer:
+        if self._cache is None:
+            return Buffer(width=64, height=64, data=tuple([0] * (64 * 64 * 3)))
+        return self._cache.buffer
+
     async def _refresh_loop(self) -> None:
         """Refresh cached clock frame out-of-band so render() stays cheap."""
         while not self._stop_refresh.is_set():
@@ -159,8 +161,7 @@ class StorybookClockScene:
             key = f"{local.tm_hour}:{local.tm_min}:{local.tm_sec}:{int(now)}"
             if self._cache is None or self._cache.key != key:
                 try:
-                    buf = await asyncio.to_thread(self._render_clock, now)
-                    self._cache = _CachedFrame(key=key, buffer=buf)
+                    await asyncio.to_thread(self._render_clock_sync, now)
                 except Exception as exc:  # pragma: no cover - runtime/device timing
                     _log(f"clock refresh skipped: {exc}")
             await asyncio.sleep(0.2)
@@ -169,6 +170,11 @@ class StorybookClockScene:
         if self._refresh_task is not None and not self._refresh_task.done():
             return
         self._stop_refresh.clear()
+        if self._cache is None:
+            try:
+                await asyncio.to_thread(self._render_clock_sync, time.time())
+            except Exception as exc:  # pragma: no cover - runtime/device timing
+                _log(f"clock warmup skipped: {exc}")
         self._refresh_task = asyncio.create_task(self._refresh_loop())
 
     async def stop(self) -> None:
@@ -185,7 +191,7 @@ class StorybookClockScene:
             name = "react-clock-layer"
 
             def render(self, render_ctx: RenderContext) -> Buffer:
-                return scene._render_clock(render_ctx.epoch_s)
+                return scene._render_clock_cached()
 
         return [LayerNode(id="react-clock-root", layer=_Layer(), z=0)]
 
