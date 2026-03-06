@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "2caa610e-accc-4d29-84fa-06aa944e005b",
+  "issue_id": "kanbus-df15cd3c-a7fc-43aa-b34a-cb7b52a7d0bf",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:11.914Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Kanbus clock post-restart demo"
+  }
+}

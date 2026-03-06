@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-40c4f596-7d0f-4f41-a3e9-a3900b232885",
+  "title": "Kanbus clock: wrap issue_created title lines instead of truncating",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "87dd194d-05e9-4652-a619-fa9e37214646",
+      "author": "ryan.porter",
+      "text": "Implementing issue_created title wrapping in event cards and adding regression tests.",
+      "created_at": "2026-03-05T07:16:27.107033Z"
+    },
+    {
+      "id": "1488b204-ca06-4139-80b6-d99b6f88ac50",
+      "author": "ryan.porter",
+      "text": "Done: issue_created title now wraps (pixel-width aware) instead of truncating. Missing status still defaults to OPEN. Validation: py_compile + tests/test_kanbus_clock.py (16 passed).",
+      "created_at": "2026-03-05T07:16:27.204760Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:18.361768Z",
+  "updated_at": "2026-03-05T07:16:27.204760Z",
+  "closed_at": "2026-03-05T07:15:39.529099Z",
+  "custom": {}
+}

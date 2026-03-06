@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "40cc8219-766c-4f06-84fe-d5ecf86d8e89",
+  "issue_id": "PIXO-5e9e31ed-74b3-4611-87d5-e14be412ca9b",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:21.076Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Image construction"
+  }
+}

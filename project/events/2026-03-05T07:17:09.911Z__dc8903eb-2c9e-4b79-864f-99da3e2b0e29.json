@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "dc8903eb-2c9e-4b79-864f-99da3e2b0e29",
+  "issue_id": "kanbus-ce049741-fbf8-42d9-9d46-86e8e017cc62",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:09.911Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "open",
+    "title": "Acceptance test: demo_weather.py"
+  }
+}

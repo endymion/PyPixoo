@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "bf8b7f26-d992-4d45-9863-91f7e4a7cfc6",
+  "issue_id": "PIXO-34ef3a97-8d62-4b74-b4bf-bb971516c2ee",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:08.128Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "System/device controls and raw command"
+  }
+}

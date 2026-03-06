@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "8e98fbe3-1b2c-496c-a624-fe86170ea8f0",
+  "issue_id": "PIXO-e5c9281a-5760-4f5d-9a48-8f3bfff29df7",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:24.383Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Feature: CLI IP resolution from .env\n\nScenario: Use .env when --ip not set\n  Given a .env file with PIXOO_DEVICE_IP set\n  And the CLI is run without --ip\n  When the command resolves the target IP\n  Then it uses the PIXOO_DEVICE_IP value\n\nScenario: --ip overrides .env\n  Given a .env file with PIXOO_DEVICE_IP set\n  When the CLI is run with --ip 192.168.0.99\n  Then it uses 192.168.0.99",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "CLI uses .env PIXOO_DEVICE_IP"
+  }
+}

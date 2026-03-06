@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "eba734e1-8a02-40c3-805e-d11fea382d0c",
+  "issue_id": "kanbus-c42fccfe-a3a9-4d79-aac3-5796cb47087e",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:09.013Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "story",
+    "status": "closed",
+    "title": "Migration guidance from v1.x to v2.0"
+  }
+}

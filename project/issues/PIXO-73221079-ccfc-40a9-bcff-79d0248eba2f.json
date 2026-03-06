@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-73221079-ccfc-40a9-bcff-79d0248eba2f",
+  "title": "Upload multi-frame sequence with stable PicID",
+  "description": "Feature: Upload multi-frame sequence with stable PicID\nScenario: HttpGif upload uses one PicID and ordered offsets\nGiven a native GifSequence with multiple frames\nWhen upload_sequence is called in frame_by_frame mode\nThen all Draw/SendHttpGif commands use the same PicID, PicNum, and PicOffset 0..N-1)",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-48cebaeb-dce9-4af2-9b85-b666f05944e9",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "8ec67b8f-5b07-4c51-b426-ed166bcec230",
+      "author": "ryan.porter",
+      "text": "Implemented and verified stable PicID multi-frame upload behavior with ordered offsets and shared PicNum/PicSpeed.",
+      "created_at": "2026-03-05T07:16:27.494350Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:18.731414Z",
+  "updated_at": "2026-03-05T07:16:27.494350Z",
+  "closed_at": "2026-03-05T07:15:39.914029Z",
+  "custom": {}
+}

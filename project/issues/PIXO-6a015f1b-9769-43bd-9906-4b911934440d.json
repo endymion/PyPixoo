@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-6a015f1b-9769-43bd-9906-4b911934440d",
+  "title": "Kanbus clock left-left transition visual check",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "4ab3e829-60a1-48bb-91bc-cf73b454e402",
+      "author": "ryan.porter",
+      "text": "Visual check for new left-left transition behavior.",
+      "created_at": "2026-03-05T07:16:51.166873Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:26.127485Z",
+  "updated_at": "2026-03-05T07:16:51.166873Z",
+  "closed_at": "2026-03-05T07:15:46.796565Z",
+  "custom": {}
+}

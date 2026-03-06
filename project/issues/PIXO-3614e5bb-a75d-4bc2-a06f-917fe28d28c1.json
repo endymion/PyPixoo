@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-3614e5bb-a75d-4bc2-a06f-917fe28d28c1",
+  "title": "Final restart verification burst",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "6ac59fc6-063c-4aa1-854b-d041bc5c1e46",
+      "author": "ryan.porter",
+      "text": "Done: final restart verification burst completed (transition + watcher + cross-repo comment).",
+      "created_at": "2026-03-05T07:16:24.014218Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:15.730334Z",
+  "updated_at": "2026-03-05T07:16:24.014218Z",
+  "closed_at": "2026-03-05T07:15:37.143817Z",
+  "custom": {}
+}

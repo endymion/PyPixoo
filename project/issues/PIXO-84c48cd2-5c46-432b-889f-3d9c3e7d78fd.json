@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-84c48cd2-5c46-432b-889f-3d9c3e7d78fd",
+  "title": "Add BDD specs + mock coverage for E2",
+  "description": "Add feature scenarios and step definitions for PlayTFGif source variants and text overlay compatibility rules.",
+  "type": "task",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-32d5c0d7-62a2-444b-8483-8a8751a9d9db",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "646977d3-c3da-4614-84a9-9bd4556ac220",
+      "author": "ryan.porter",
+      "text": "Added/updated BDD scenarios and mocks for PlayTFGif + overlay compatibility.",
+      "created_at": "2026-03-05T07:16:33.832420Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:20.040740Z",
+  "updated_at": "2026-03-05T07:16:33.832420Z",
+  "closed_at": "2026-03-05T07:15:41.113653Z",
+  "custom": {}
+}

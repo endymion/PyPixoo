@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "d0be6443-0ae6-4e45-9b0f-00cade058e30",
+  "issue_id": "PIXO-2f8689b8-ba15-4365-9d66-b4ac82fa3ac9",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:23.357Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Prepare breaking-release commit semantics, migration docs completion, and semantic-release major version path.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Release execution for breaking version"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "a0b5083e-3635-44a1-95b7-6edc5e4e1b08",
+  "issue_id": "PIXO-dd943aa1-d144-4a09-9d4f-314b3da2cc3e",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:08.505Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Update README and demos to reflect V2 native GIF upload/playback usage patterns.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Update demos/docs for native GIF paths"
+  }
+}

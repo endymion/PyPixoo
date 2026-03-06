@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "41df1482-85d5-40b6-b351-d0a6d0ffcf3c",
+  "issue_id": "kanbus-ca710e53-8f98-4359-a413-b64360f4527d",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:09.526Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "bug",
+    "status": "closed",
+    "title": "Kanbus clock: issue_created should default missing status to OPEN"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-082e5afd-acea-4fc1-b0ef-b7c657c93168",
+  "title": "Acceptance test: demo_play_url_gif.py",
+  "description": "",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:25.387131Z",
+  "updated_at": "2026-03-05T07:16:05.527815Z",
+  "closed_at": null,
+  "custom": {}
+}

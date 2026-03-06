@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-c464c182-cd21-445d-b2d6-081fb0d454ac",
+  "title": "PyPixoo image and animation platform",
+  "description": "",
+  "type": "initiative",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "a02b73e9-1e91-436e-97a8-8308d1220c3c",
+      "author": "ryan.porter",
+      "text": "Closing as obsolete per user request during board cleanup.",
+      "created_at": "2026-03-05T07:16:25.267718Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:16.796210Z",
+  "updated_at": "2026-03-05T07:16:25.267718Z",
+  "closed_at": "2026-03-05T07:15:37.923060Z",
+  "custom": {}
+}

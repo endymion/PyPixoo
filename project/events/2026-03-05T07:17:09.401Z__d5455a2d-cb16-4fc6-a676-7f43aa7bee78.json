@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "d5455a2d-cb16-4fc6-a676-7f43aa7bee78",
+  "issue_id": "kanbus-c9499821-730e-4b61-8dc1-669bdca4229d",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:09.401Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Transition formatting live verify"
+  }
+}

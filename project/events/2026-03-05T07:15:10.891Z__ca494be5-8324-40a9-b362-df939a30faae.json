@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "ca494be5-8324-40a9-b362-df939a30faae",
+  "issue_id": "PIXO-7a1de46d-dd0b-44da-9cd1-29b54f3a7fe8",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:10.891Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Add scene_components + scenes InfoScene/ClockScene, full scene font registry, demo/CLI integration, tests/docs, and manual acceptance checklist updates.",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Generalized InfoScene header API + full font support"
+  }
+}

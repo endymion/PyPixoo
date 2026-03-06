@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "2675c698-795b-4320-9986-0e232c588f71",
+  "issue_id": "PIXO-95e43154-b5af-4a57-889b-6497288b7c5c",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:06.759Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Make font showcase and tinytext fixture consume canonical profile payload.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Font showcase/fixture migration"
+  }
+}

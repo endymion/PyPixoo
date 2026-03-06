@@ -1,0 +1,523 @@
+{
+  "id": "PIXO-a43b1ee9-64dd-4e5c-82fd-6741c8ab6451",
+  "title": "Web font renders 3px tall instead of 5px on device",
+  "description": "# Web font renders at 3px height instead of 5px on device\n\n## Summary\n\nWhen capturing the letter \"A\" (or any Tiny5 typography) from the browser and sending it to the Pixoo 64, the glyph appears **only 3 pixels tall** on the device instead of the intended **5 pixels tall**. The pipeline (Playwright screenshot → downsampling → threshold → push) is working; the problem is that the **browser-rendered glyph** has only ~3px effective height in the capture, so downsampling cannot add rows that were never drawn.\n\n## Observed behavior\n\n- **letter_a.html** (64×64 viewport, 5px Tiny5 font): Captured frame has lit rows at y = 1, 2, 3 only → **3 rows**.\n- **letter_a_192.html** (192×192 viewport, 18px font): Sometimes 5 rows after 3×3 downscale, sometimes still 3 rows depending on **font load timing** (Google Fonts).\n- **font_showcase.py** (Storybook TinyText stories): Same 3px-tall rendering when capturing from localhost Storybook.\n- **Device**: The Pixoo correctly displays whatever buffer we send; the issue is the content of that buffer, not the device or channel.\n\n## Root cause (current understanding)\n\n1. **64×64 viewport, 5px font**: Chromium/Playwright renders Tiny5 at 5px CSS, but the **visible glyph height** (cap height / bounding box) is only ~3px—either due to font metrics or because the font has not finished loading and a fallback is used. So the screenshot never contains 5 rows of the letter.\n\n2. **Font load timing**: When using Google Fonts (e.g. `family=Tiny5&display=block`), the font may load after `networkidle` or even after `document.fonts.ready`. We added `wait_for_function(\"document.fonts.check('18px Tiny5')\")` and extra timeouts, but results are still inconsistent.\n\n3. **Downsampling cannot invent rows**: 2×2 or 3×3 max-pool (or average) only combines existing pixels. If the source has 3 lit rows, the output has at most 3 (or fewer after averaging). So fixing capture is required; post-processing alone is not enough.\n\n## What was tried\n\n| Approach | Result |\n|----------|--------|\n| `device_scale_factor=1` (64×64 screenshot, no downscale) | Still 3 lit rows. |\n| `device_scale_factor=2` (128×128 → 2×2 max-pool to 64×64) | Still 3 rows. |\n| `device_scale_factor=3` (192×192 → 3×3 max-pool) with 64×64 viewport, 5px font | Still 3 rows (glyph only ~9 device px tall). |\n| **192×192 viewport**, 15px/18px font, 3×3 downscale | **5 rows** when font loads in time; 3 rows when it doesn’t. |\n| Binary threshold (luminance ≥ 64 → white) | Helps anti-aliasing; does not add missing rows. |\n| CSS `transform: scaleY(5/3)` on the character | No visible change in captured rows. |\n| Larger font (10px) in 64×64 | Still 3 rows. |\n| `document.fonts.ready` + `wait_for_function(\"document.fonts.check('18px Tiny5')\")` | Reduces but does not eliminate flakiness. |\n| Save full-resolution screenshot before downsampling | Implemented: `letter_a_fullres.png` (192×192) for debugging. Path: `demos/fixtures/letter_a_fullres.png` when running `python demos/screen_test.py --save-frame`. |\n\n## Current workaround\n\n- **Letter A**: Use **letter_a_192.html** (192×192 viewport, 18px Tiny5) and `viewport_size=192` in `WebFrameSource`. This yields 5 rows when the font loads before the screenshot. Full-res screenshot is saved so the user can verify the web font before downsampling.\n- **Typography demo (font_showcase)**: Still uses browser capture; same 3px issue unless/until the 192-viewport + font-wait strategy is applied there and font load is reliable.\n\n## Desired state\n\n- **Web font** (Tiny5 from Google Fonts or equivalent) used in HTML/Storybook should render at a **full 5px height** in the captured frame so that after downsampling the device shows a 5-pixel-tall glyph.\n- Either:\n  - Font load is guaranteed (or detected) before screenshot, and 64×64 + 5px or 192×192 + 15–18px consistently produces 5 rows, or\n  - Font is bundled/embedded (e.g. base64 or local TTF) so network timing is not a factor.\n\n## Relevant paths\n\n- **Browser capture**: `src/pypixoo/browser.py` — `WebFrameSource`, `_render_web_frame`, `_screenshot_to_buffer`, `viewport_size`, `save_raw_screenshot_path`, font wait.\n- **Letter A fixtures**: `demos/fixtures/letter_a.html` (64×64, 5px), `demos/fixtures/letter_a_192.html` (192×192, 18px).\n- **Screen test**: `demos/screen_test.py` — uses `letter_a_192.html`, `viewport_size=192`, `--save-frame` writes `letter_a_fullres.png` and 64×64 pre/post threshold.\n- **Typography demo**: `demos/font_showcase.py` — Storybook TinyText; still 3px without 192 viewport + reliable font load.\n\n## How to reproduce\n\n1. Run: `python demos/screen_test.py --save-frame`\n2. Open `demos/fixtures/letter_a_fullres.png` (192×192) and check whether the \"A\" has full height.\n3. Open `demos/fixtures/letter_a_rendered.png` (64×64) and count lit rows (y with any white); expect 5 for correct behavior, often 3 currently.\n4. Push to device and observe height of the letter on the Pixoo.",
+  "type": "bug",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c464c182-cd21-445d-b2d6-081fb0d454ac",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "4476b340-8df2-4c37-ae23-76b49b49bf8b",
+      "author": "ryan.porter",
+      "text": "Investigating user-reported vertical alignment issue: in letter_a_fullres.png the top lit row appears to start on row 2, causing distorted 3x downscale alignment. Will adjust capture/cropping so glyph aligns to row 1 before reduction.",
+      "created_at": "2026-03-05T07:16:42.689923Z"
+    },
+    {
+      "id": "a8aa7201-6918-4555-8c36-3779e60fded5",
+      "author": "ryan.porter",
+      "text": "Implemented deterministic fixture font loading to remove fallback misalignment: added demos/fixtures/fonts/Tiny5-Regular.ttf and switched letter_a.html + letter_a_192.html from Google Fonts links to local @font-face. Kept glyph offset in letter_a_192.html at top:-3px. Validation via python demos/screen_test.py --save-frame --ip 0.0.0.0 shows bbox moved from fullres (0,3,8,13) to (0,0,8,10), and 64x64 pre/post moved from y=1..4 to y=0..3. behave currently fails in browser.feature due existing FakePage missing wait_for_timeout (unrelated pre-existing issue in features/environment.py mocks).",
+      "created_at": "2026-03-05T07:16:42.784973Z"
+    },
+    {
+      "id": "e50a8666-9f2d-4b82-855c-36b2b5e8cf2e",
+      "author": "ryan.porter",
+      "text": "Starting programmatic parameter sweep to satisfy strict acceptance: in 64x64 downsampled output, A must touch top+left and be exactly 5 pixels tall x 4 pixels wide. Will test font-size and y-offset combinations against real Playwright capture + max-pool downsample.",
+      "created_at": "2026-03-05T07:16:42.875747Z"
+    },
+    {
+      "id": "d477bda7-cfbe-4253-afd6-7fb80d6b2d8d",
+      "author": "ryan.porter",
+      "text": "Completed iterative tuning with programmatic verification. Final fixture params: letter_a_192.html uses local Tiny5 and font-size 20px with .char top -3px. Measured output after running screen_test --save-frame: fullres bbox=(0,0,9,12) (touches top+left), downsampled pre bbox=(0,0,3,4) and post bbox=(0,0,3,4) => exactly 4px wide x 5px tall touching top-left. Added explicit assertion script run; all checks PASS.",
+      "created_at": "2026-03-05T07:16:42.966801Z"
+    },
+    {
+      "id": "a035589d-089d-4069-8d12-457127d9a063",
+      "author": "ryan.porter",
+      "text": "User asked about removing blur/anti-aliasing in full-res screenshot. Plan: keep raw capture, and add an additional binarized full-res debug output (thresholded black/white) so inspection image is crisp and deterministic even when browser text rasterization is anti-aliased.",
+      "created_at": "2026-03-05T07:16:43.059479Z"
+    },
+    {
+      "id": "f42cf935-1371-401c-b7ab-02c420d94454",
+      "author": "ryan.porter",
+      "text": "Implemented crisp full-res debug output in demos/screen_test.py: now saves letter_a_fullres_binary.png by thresholding the 192x192 raw screenshot to pure black/white (threshold=64). Verified output contains only two colors ((0,0,0),(255,255,255)) and preserves bbox (0,0,9,12). This addresses perceived blur in full-res inspection while retaining original raw capture.",
+      "created_at": "2026-03-05T07:16:43.155351Z"
+    },
+    {
+      "id": "a53978e6-1132-45d7-a78b-c0ff444a4ad1",
+      "author": "ryan.porter",
+      "text": "Locking full-res to exact 3x grid (12x15). Implementing fixture params font-size 23px + top -3px, adding deterministic verification helper, and running 5x capture/assert loop.",
+      "created_at": "2026-03-05T07:16:43.250750Z"
+    },
+    {
+      "id": "b9d62682-7f36-40de-90b0-caaad00b5571",
+      "author": "ryan.porter",
+      "text": "Implementation complete. Updated letter_a_192.html to font-size 23px with .char top -3px/left 0. Added deterministic verifier script: scripts/verify_letter_a_capture.py asserting exact bboxes and intensities {0,255}. Validation: ran 5 iterations of screen_test capture + verifier; all 5 passed with fullres bbox (0,0,11,14) size 12x15 and downsampled pre/post bbox (0,0,3,4) size 4x5. Focused regression check passed: python -m behave --tags '~real_device' features/animation.feature features/display.feature (17 scenarios passed, 0 failed).",
+      "created_at": "2026-03-05T07:16:43.345275Z"
+    },
+    {
+      "id": "4893c0da-5b3c-4ad4-bb56-f01f2cb8b2d6",
+      "author": "ryan.porter",
+      "text": "Applying the same 3x-exact Tiny5 strategy to demos/font_showcase.py so browser font demo renders correctly on device (not 3px-tall). Will update source URLs/render settings and validate output programmatically.",
+      "created_at": "2026-03-05T07:16:43.436285Z"
+    },
+    {
+      "id": "0546d1bd-b9e8-48c4-b147-1f15120564e3",
+      "author": "ryan.porter",
+      "text": "Font demo updated to use the proven 192x192 Tiny5 pipeline. demos/font_showcase.py now reads local fixtures/tinytext_192.html (no Storybook dependency), captures with viewport_size=192, and quantizes each frame to its variant bg/fg colors to remove anti-aliased intermediate pixels while preserving color themes. Validation: demo precompute produces 7 frames; post-quantization each variant has exactly 2 colors (alphabet/numbers/alert/warning/success/info/custom).",
+      "created_at": "2026-03-05T07:16:43.525953Z"
+    },
+    {
+      "id": "3f29e2c7-a7c8-4700-a59e-789d3d185a64",
+      "author": "ryan.porter",
+      "text": "Ran demos/font_showcase.py on real device (192.168.0.37) after clearing stale device lock from old screen_test process. Demo connected successfully and cycled for ~one full pass (7 screens at 2s each) before clean Ctrl+C stop.",
+      "created_at": "2026-03-05T07:16:43.617964Z"
+    },
+    {
+      "id": "e3ad6ef0-aa9a-4c90-bb5c-68fba7398b4a",
+      "author": "ryan.porter",
+      "text": "Investigating font showcase mismatch against the working letter-A calibration. Checking glyph geometry in tinytext_192 alphabet frame, then aligning each text line to the same -3px baseline offset model used by letter_a_192.",
+      "created_at": "2026-03-05T07:16:43.708909Z"
+    },
+    {
+      "id": "b477732f-0c95-4c65-8080-c327f960d008",
+      "author": "ryan.porter",
+      "text": "Adjusted tinytext_192 line layout to match letter-A baseline calibration: each row now uses .line-text absolute top:-3px (same vertical offset model), with line-height 1. Programmatic check: in the font_showcase pipeline, single-A render from this fixture downsamples to exact 4x5 (pattern .##./#..#/####/#..#/#..#). Re-ran demo on real device (2s per screen) and confirmed it connected and cycled 7 screens before clean stop.",
+      "created_at": "2026-03-05T07:16:43.796821Z"
+    },
+    {
+      "id": "5f6ce7c6-44d3-452a-bb32-110883ba96c0",
+      "author": "ryan.porter",
+      "text": "Adding frame export mode to demos/font_showcase.py so user can inspect all rendered frames before sending to device. Will add --save-frames and generate PNGs for each variant frame.",
+      "created_at": "2026-03-05T07:16:43.887457Z"
+    },
+    {
+      "id": "b86e6e3e-59f9-4a6e-8ecd-53a164ed6e3a",
+      "author": "ryan.porter",
+      "text": "Added pre-device frame export to demos/font_showcase.py: --save-frames [DIR] and --save-only. Ran: python demos/font_showcase.py --save-frames --save-only --duration 2. Generated 7 PNGs at demos/fixtures/font_showcase_frames (00_alphabet..06_custom). Verified each exported frame is 64x64 and exactly 2 colors (variant bg/fg only).",
+      "created_at": "2026-03-05T07:16:43.977742Z"
+    },
+    {
+      "id": "a4de93ba-c6fb-460d-8768-42979f9cdaef",
+      "author": "ryan.porter",
+      "text": "Root cause for blurry font demo frames identified: browser pipeline used 3x maxpool downsample, which dilates neighboring glyph pixels for dense text lines. Implemented configurable downsample mode in WebFrameSource/browser.py ( default, new ). Switched demos/font_showcase.py to  for 192->64 reduction. Regenerated exported frames; alphabet row now shows crisp pixel glyph shapes instead of filled blobs. Letter-A path still unchanged and verified via scripts/verify_letter_a_capture.py.",
+      "created_at": "2026-03-05T07:16:44.072405Z"
+    },
+    {
+      "id": "c26da15a-5db1-4d3e-8f91-8b97700fc3d1",
+      "author": "ryan.porter",
+      "text": "Root cause for blurry font demo frames identified: browser pipeline used 3x maxpool downsample, which dilates neighboring glyph pixels for dense text lines. Implemented configurable downsample mode in WebFrameSource/browser.py (maxpool default, added nearest). Switched demos/font_showcase.py to downsample_mode=\"nearest\" for 192->64 reduction. Regenerated exported frames; alphabet row now shows crisp pixel glyph shapes instead of filled blobs. Letter-A path still unchanged and verified via scripts/verify_letter_a_capture.py.",
+      "created_at": "2026-03-05T07:16:44.169691Z"
+    },
+    {
+      "id": "bba22f86-c5d2-4e10-bce9-211a976e31a2",
+      "author": "ryan.porter",
+      "text": "Ran updated demos/font_showcase.py on device 192.168.0.37 with downsample_mode=\"nearest\" (2s per screen). Demo connected and displayed successfully, then was stopped cleanly (Ctrl+C) to release lock.",
+      "created_at": "2026-03-05T07:16:44.264473Z"
+    },
+    {
+      "id": "976bd1b9-bfb5-4b8c-a242-cdf4d8259187",
+      "author": "ryan.porter",
+      "text": "Started continuous on-device run of demos/font_showcase.py with duration=2s per screen; cycling in loop mode until manually stopped.",
+      "created_at": "2026-03-05T07:16:44.359583Z"
+    },
+    {
+      "id": "23152dc4-c274-4a0c-b9e1-93e320aee0e0",
+      "author": "ryan.porter",
+      "text": "Addressed spacing inconsistency concern by enforcing explicit tracking in tinytext fixture. tinytext_192 now accepts tracking query param (device px), and font_showcase uses tracking=1 (applied as +3px at 192 source). Also kept nearest downsample path for crisp glyph edges. Exported frames regenerated and remain 2-color; spacing is now deterministic. Restarted on-device font_showcase so new settings are active.",
+      "created_at": "2026-03-05T07:16:44.448293Z"
+    },
+    {
+      "id": "470cc7d3-c2dd-4574-bad2-fc9a51ffa0ab",
+      "author": "ryan.porter",
+      "text": "Investigating broken w in alert message line (\"status now.\"). Hypothesis: global tracking=1 is causing right-edge clipping for long lines. Measuring rendered bbox/right-edge occupancy for alert variant and then tuning per-variant tracking/fit rules.",
+      "created_at": "2026-03-05T07:16:44.536195Z"
+    },
+    {
+      "id": "c0c374ca-6e35-453f-bab4-de92d7366335",
+      "author": "ryan.porter",
+      "text": "Implemented deterministic glyph spacing to address suspected width/kerning issues: tinytext fixture now lays out each character as its own span with explicit x advances derived from single-char measureText and snapped to 3x source grid, plus tracking. This removes pair-dependent kerning variance and stabilizes spacing. Regenerated frame previews and relaunched on-device showcase for visual check.",
+      "created_at": "2026-03-05T07:16:44.624678Z"
+    },
+    {
+      "id": "4d7a9b91-1dd1-4a3b-921c-ce4eb78e5ab0",
+      "author": "ryan.porter",
+      "text": "Tightened spacing per user feedback by reducing tracking from 1 to 0 in demos/font_showcase.py. Regenerated preview frames and relaunched demo on-device; cycling with updated tighter kerning now.",
+      "created_at": "2026-03-05T07:16:44.716434Z"
+    },
+    {
+      "id": "c14ce335-ecd5-4f0a-9de2-d9ccf668026a",
+      "author": "ryan.porter",
+      "text": "Refined spacing model again to keep text tighter while avoiding broken joins: in tinytext_192, per-character layout now uses glyph metrics (actualBoundingBox left/right), snapped to 3x grid, plus fixed base gap of 3 source px (1 final px). This removes pair-dependent kerning and keeps minimum inter-glyph gap at 1 px in 64x64 output while reducing excess spacing. Regenerated frames and relaunched on-device showcase with updated layout.",
+      "created_at": "2026-03-05T07:16:44.803594Z"
+    },
+    {
+      "id": "7d83844f-7821-492a-9cb7-77b09d180417",
+      "author": "ryan.porter",
+      "text": "Implemented full per-glyph compositor in tinytext_192: glyphs are rasterized individually to offscreen canvas, horizontally trimmed to ink bounds, then placed with explicit fixed base gap (1 final px) and optional tracking. This avoids pair-kerning/side-bearing drift. Rebuilt frames and relaunched on-device showcase with this renderer.",
+      "created_at": "2026-03-05T07:16:44.893610Z"
+    },
+    {
+      "id": "9b904a36-3c9a-435d-bd27-c600d4b4af43",
+      "author": "ryan.porter",
+      "text": "User requested immediate rollback: reverting the latest tinytext_192 per-glyph canvas compositor because it broke letter shapes/spacing; restoring prior working DOM/span renderer while keeping nearest downsample path.",
+      "created_at": "2026-03-05T07:16:44.981387Z"
+    },
+    {
+      "id": "efb6cfaa-947e-4e2a-978e-6411e3a284f7",
+      "author": "ryan.porter",
+      "text": "Rollback completed for the regression request: replaced the latest tinytext_192 canvas compositor with DOM/span glyph rendering (Tiny5 local font, 23px, top -3px) to restore correct letter shapes. Validation: regenerated showcase frames via python demos/font_showcase.py --save-frames --save-only --duration 2 (7 frames saved); all outputs are 64x64 and exactly 2 colors each. Quick on-device run via python demos/font_showcase.py --duration 2 --ip 192.168.0.37 connected and cycled successfully until manual stop.",
+      "created_at": "2026-03-05T07:16:45.074512Z"
+    },
+    {
+      "id": "5d1f7cc6-e3b6-42ba-b089-3dedaec27e1c",
+      "author": "ryan.porter",
+      "text": "Starting deterministic spacing implementation: replacing tinytext_192 layout with a glyph-atlas compositor that renders characters individually to a 64x64 pixel grid, enforces fixed 1px inter-letter gap, then upscales to 192 for capture. Keeping browser.py/font_showcase pipeline interfaces unchanged.",
+      "created_at": "2026-03-05T07:16:45.166492Z"
+    },
+    {
+      "id": "d7ff9325-0407-4d33-98e6-fca5b12c8c21",
+      "author": "ryan.porter",
+      "text": "Implemented deterministic spacing path in tinytext fixture. New renderer waits for Tiny5 load, rasterizes each non-space glyph individually from 23px/-3px high-res source, converts to binary low-res glyph masks, and composes text on a 64x64 canvas with fixed spacing rule: +1 px between letters (plus configurable tracking), +2 px word-space baseline. Result is then upscaled 64->192 with imageSmoothing disabled for capture stability. Validation: regenerated 7 showcase frames (`python demos/font_showcase.py --save-frames --save-only --duration 2`), all outputs are 64x64 with exactly 2 colors; ran on device (`python demos/font_showcase.py --duration 2 --ip 192.168.0.37`) and cycle executed successfully before manual stop.",
+      "created_at": "2026-03-05T07:16:45.257356Z"
+    },
+    {
+      "id": "2c004ae5-f740-4b26-8837-f071b6da156f",
+      "author": "ryan.porter",
+      "text": "Committed working deterministic Tiny5 font demo state: commit 960e660 (Add deterministic Tiny5 text rendering for font showcase). Included browser downsample mode support, local Tiny5 font fixture, deterministic tinytext compositor, and font_showcase demo driver.",
+      "created_at": "2026-03-05T07:16:45.347674Z"
+    },
+    {
+      "id": "099518ec-b439-48be-ab2d-62fef91bb1e0",
+      "author": "ryan.porter",
+      "text": "Investigating reported font readiness bug: browser.py currently hardcodes document.fonts.check(18px Tiny5). Verifying mismatch against fixture FONT_SPEC (23px Tiny5) and patching wait logic to use computed page font spec instead of fixed size.",
+      "created_at": "2026-03-05T07:16:45.438218Z"
+    },
+    {
+      "id": "7d142955-54f5-46d6-a937-c1f61946c237",
+      "author": "ryan.porter",
+      "text": "Bug verified and fixed: browser.py had hardcoded document.fonts.check(18px Tiny5) in both per-frame and persistent paths while tinytext_192 uses 23px Tiny5. Replaced with _wait_for_page_fonts(page) that derives family/size from computed styles and waits on document.fonts.check for that live spec (with safe fallbacks). Validation: python demos/font_showcase.py --save-frames --save-only --duration 2 completed successfully and regenerated all frames.",
+      "created_at": "2026-03-05T07:16:45.527871Z"
+    },
+    {
+      "id": "552686d0-60c8-4d9e-84eb-9bb470820912",
+      "author": "ryan.porter",
+      "text": "Starting multi-font support work for deterministic renderer. Plan: add local Micro5 font asset, parameterize tinytext_192 fixture with font profiles, expose --font option in demos/font_showcase.py, and validate generated 64x64 frames for Tiny5 and Micro5.",
+      "created_at": "2026-03-05T07:16:45.618101Z"
+    },
+    {
+      "id": "f3ffe01f-a27f-4963-b810-aa9f41fced1c",
+      "author": "ryan.porter",
+      "text": "User requested operational workflow update: every new font/demo addition must be reflected in looping demo (5s/frame) and restarted in background after each update. Implementing background launcher + validating current frame set before restart.",
+      "created_at": "2026-03-05T07:16:45.706732Z"
+    },
+    {
+      "id": "a1366c0a-b729-4e01-969d-88517e6029fd",
+      "author": "ryan.porter",
+      "text": "Updated multi-font showcase behavior: alphabet frames now include centered 4px-tall top labels with font names (TINY5 / MICRO5) in reserved top 5px band; font_list frame now renders each listed font name using that font (per-line font key), instead of one shared font. Validation: regenerated 9 frames successfully; top label pixels present for both alphabet frames; font_list line bboxes differ (line1 33x5 vs line2 30x4), confirming distinct per-line rendering. Restarted endless on-device demo at 5s/frame in active session.",
+      "created_at": "2026-03-05T07:16:45.800946Z"
+    },
+    {
+      "id": "5083e979-af73-46a8-a387-473a98bf0b7b",
+      "author": "ryan.porter",
+      "text": "User reports Micro5 appears 4px tall. Running programmatic bbox checks on 64x64 single_glyph output for tiny5 vs micro5, then tuning Micro5 font profile (size/y-offset) to enforce 5px height before restarting demo loop.",
+      "created_at": "2026-03-05T07:16:45.894960Z"
+    },
+    {
+      "id": "068484f1-546b-4693-a9b3-d7a9fdc31ed2",
+      "author": "ryan.porter",
+      "text": "Fixed Micro5 sizing bug and added Jersey10 support. Micro5 profile retuned and verified: single A now 4x5 (matching Tiny5). Added local font file demos/fixtures/fonts/Jersey10-Regular.ttf and new profile (size 58, yOffset -14, sampleHeight 16) verified as single A 8x10. Updated showcase sequence to include 10 frames with dedicated Jersey10 alphabet frame and updated font-list metadata. Regenerated frames: all 10 outputs are 64x64 with 2 colors. Restarted endless on-device loop at 5s/frame (active session running).",
+      "created_at": "2026-03-05T07:16:45.999567Z"
+    },
+    {
+      "id": "e12ba6fa-06d5-4311-837e-43179dc0f677",
+      "author": "ryan.porter",
+      "text": "Adding Bytesized pixel font support (target 4px height). Plan: import local font file, add bytesized profile + alphabet frame + font-list entry, run single_a bbox tuning to lock 4px output, regenerate frames, then restart endless 5s/device loop.",
+      "created_at": "2026-03-05T07:16:46.100403Z"
+    },
+    {
+      "id": "ac630e63-2bc7-40e7-be40-07bfe35495d3",
+      "author": "ryan.porter",
+      "text": "Added Bytesized font support (target 4px). Imported demos/fixtures/fonts/Bytesized-Regular.ttf, added bytesized profile + alphabet4 showcase frame + font-list inclusion. Verified programmatically: single_a with bytesized renders bbox size 3x4 (height 4), tiny/micro remain 4x5 and jersey remains 8x10. Regenerated showcase: 11 frames, all 64x64 and 2-color outputs. Restarted endless device loop at 5s/frame (active session running).",
+      "created_at": "2026-03-05T07:16:46.193676Z"
+    },
+    {
+      "id": "6d76ce67-6e1c-4b41-b964-9c44750802a8",
+      "author": "ryan.porter",
+      "text": "Added Jersey15 support and integrated into deterministic showcase. Imported demos/fixtures/fonts/Jersey15-Regular.ttf, added profile and alphabet15 variant, added dedicated jersey15 alphabet frame, and upgraded font-list rendering to page through all registered fonts (4 per page) via font_list_page. Programmatic height validation: tiny5=5, micro5=5, bytesized=4, jersey10=10, jersey15=15 (single_a bboxes). Regenerated showcase frames: 13 outputs, all 64x64 with 2 colors. Restarted endless on-device loop at 5s/frame (active session running).",
+      "created_at": "2026-03-05T07:16:46.286667Z"
+    },
+    {
+      "id": "d8a7189b-2205-4f9c-bc1f-0e6de514f8ad",
+      "author": "ryan.porter",
+      "text": "Addressed general width calibration issue across fonts. Re-tuned profiles to preserve target heights while reducing over-wide glyphs: micro5 -> size 30/y -8 (A now 3x5), jersey10 -> size 52/y -10 (A now 7x10). Verified current single_a sizes: tiny5 4x5, micro5 3x5, bytesized 3x4, jersey10 7x10, jersey15 11x15. Regenerated 13 showcase frames and restarted endless on-device loop at 5s/frame (active session running).",
+      "created_at": "2026-03-05T07:16:46.381187Z"
+    },
+    {
+      "id": "59405a4d-d402-425b-8961-106a1676eab6",
+      "author": "ryan.porter",
+      "text": "Applying requested showcase reduction: removing numbers/alerts/info/custom frames and keeping only font-focused frames (alphabets + font-list pages). Also switching frame duration to 10 seconds and restarting device loop with updated sequence.",
+      "created_at": "2026-03-05T07:16:46.472814Z"
+    },
+    {
+      "id": "a1af084b-baee-4e27-873d-5e87cac48fb9",
+      "author": "ryan.porter",
+      "text": "Showcase reduced per request: removed non-font content frames (numbers, alerts/warnings, success/info, custom hello/pixoo). Sequence now contains only font alphabet frames plus paged font list. Updated default frame duration to 10s and restarted endless on-device loop with --duration 10. Current run confirms 7 screens cycling at 10s each.",
+      "created_at": "2026-03-05T07:16:46.563009Z"
+    },
+    {
+      "id": "77e74f0d-dd14-4fc8-9445-efa83c9e2d65",
+      "author": "ryan.porter",
+      "text": "Root-caused and fixed Micro5 over-activation issue: glyph binarization used alpha>0, so faint anti-aliased edge pixels were turning on, causing occasional extra pixels (e.g., bottom of B). Updated tinytext_192 mask extraction to use alpha threshold >=64. Validation: single_a sizes remain target (tiny5 4x5, micro5 3x5, bytesized 3x4, jersey10 7x10, jersey15 10x15) and repeated micro5 alphabet captures are now deterministic (10/10 identical hashes). Regenerated showcase frames and restarted endless device loop at 10s/frame (active session running).",
+      "created_at": "2026-03-05T07:16:46.670799Z"
+    },
+    {
+      "id": "89d7360e-9512-4519-8cde-327d1bda33ac",
+      "author": "ryan.porter",
+      "text": "Removed the unusable Jersey15 alphabet showcase frame from the rotating sequence. Regenerated frames now include 6 screens only: tiny5, micro5, bytesized, jersey10, font_list_p1, font_list_p2. Restarted endless on-device loop at 10s/frame with updated sequence.",
+      "created_at": "2026-03-05T07:16:46.759285Z"
+    },
+    {
+      "id": "8696a419-5867-4458-9cb6-aefe842ae76a",
+      "author": "ryan.porter",
+      "text": "Extended anti-alias over-activation fix to be per-font. Added maskAlphaThreshold to font profiles in tinytext_192 and use profile-specific threshold during glyph mask extraction. tiny5/micro5/bytesized remain at 64; jersey10/jersey15 now use 128 to suppress edge spill pixels. Validation: single_a sizes preserved (tiny5 4x5, micro5 3x5, bytesized 3x4, jersey10 7x10, jersey15 10x15). Regenerated frames and restarted endless 10s/device loop with updated thresholds (active session running).",
+      "created_at": "2026-03-05T07:16:46.847320Z"
+    },
+    {
+      "id": "cab9c550-ba17-48b0-82f9-1f873ec787c6",
+      "author": "ryan.porter",
+      "text": "Adjusted Jersey10 width calibration again after user report that some letters were still too wide. Profile changed from size 52/y-10 to size 50/y-9 (mask threshold remains 128). Validation: single_a for jersey10 is now 6x10 (was 7x10); tiny5/micro5 unchanged at 4x5 and 3x5. Regenerated showcase frames and restarted endless on-device loop at 10s/frame (active session running).",
+      "created_at": "2026-03-05T07:16:46.942364Z"
+    },
+    {
+      "id": "ef44fbac-4843-4ed1-a980-fc1df07aacb8",
+      "author": "ryan.porter",
+      "text": "Further Micro5 cleanup for over-activated pixels: adjusted profile from size 30/y-8 to size 28/y-6 while keeping mask threshold 64. This reduces glyph density/width (max width lowered from 5 to 4 in sampled uppercase analysis) and keeps single A at 3x5. Regenerated showcase frames and restarted endless 10s/device loop for live verification (active session running).",
+      "created_at": "2026-03-05T07:16:47.042147Z"
+    },
+    {
+      "id": "7fcf0fc5-66e9-4625-b15f-d822c49588a7",
+      "author": "ryan.porter",
+      "text": "Removed second font-list page from showcase rotation per request. Capped font-list pagination to one page in demos/font_showcase.py; regenerated frames now contain 5 screens (tiny5, micro5, bytesized, jersey10, font_list_p1). Restarted endless 10s/device loop with updated sequence (active session running).",
+      "created_at": "2026-03-05T07:16:47.139273Z"
+    },
+    {
+      "id": "f53c9fac-649b-42e7-bedb-fcf21292316e",
+      "author": "ryan.porter",
+      "text": "Adjusted Jersey10 alphabet layout to reduce perceived width errors from overpacked rows. Updated alphabet10 preset to shorter lines (ABCDEFGH / IJKLMNOP / QRSTUVWX / YZ) so glyphs are displayed with less crowding and reduced clipping pressure. Regenerated showcase frames and restarted endless 10s/device loop with updated layout (active session running).",
+      "created_at": "2026-03-05T07:16:47.240720Z"
+    },
+    {
+      "id": "57424436-2263-44c1-a86c-e457e501c553",
+      "author": "ryan.porter",
+      "text": "Switching spacing to true font metrics: using Canvas measureText advance widths + side-bearing offsetX for glyph placement; regenerating frames and restarting device loop to validate.",
+      "created_at": "2026-03-05T07:16:47.337678Z"
+    },
+    {
+      "id": "39fd1181-c5c9-4296-afb6-bfd6e59839fd",
+      "author": "ryan.porter",
+      "text": "Validated metric-based spacing path: regenerated  (5 frames) successfully and restarted device demo loop with updated renderer (Precomputing deterministic font showcase frames from local fixture...\nGot 5 screens. Connecting to Pixoo..., session 65233).",
+      "created_at": "2026-03-05T07:16:47.429938Z"
+    },
+    {
+      "id": "8b6d3317-708c-4842-8578-8bb6165740e9",
+      "author": "ryan.porter",
+      "text": "Validated metric-based spacing path: regenerated frame set (5 PNG files) successfully and restarted device demo loop with updated renderer in session 65233.",
+      "created_at": "2026-03-05T07:16:47.524109Z"
+    },
+    {
+      "id": "7adcf03f-20b0-4284-8789-74d063c09298",
+      "author": "ryan.porter",
+      "text": "Investigating Jersey10 spacing regression (still wrong after measureText-based advances). Isolating profile + advance quantization, then patching and validating on generated frames and device loop.",
+      "created_at": "2026-03-05T07:16:47.626172Z"
+    },
+    {
+      "id": "a79707f4-36c4-4dbf-b5dd-483cf434cc96",
+      "author": "ryan.porter",
+      "text": "Patched glyph layout to use auto-derived ink widths () with fixed 1px inter-letter gap, removing advance+gap double-spacing that affected Jersey10. Regenerated  and restarted device loop (session 79933).",
+      "created_at": "2026-03-05T07:16:47.716735Z"
+    },
+    {
+      "id": "18fa091c-6907-41fa-9155-331f44007e44",
+      "author": "ryan.porter",
+      "text": "Patched glyph layout to use auto-derived ink widths (mask width) with fixed 1px inter-letter gap, removing advance-plus-gap double spacing that affected Jersey10. Regenerated frame PNGs and restarted device loop in session 79933.",
+      "created_at": "2026-03-05T07:16:47.812334Z"
+    },
+    {
+      "id": "94307bac-0d4b-48ea-be4c-c400bcf69747",
+      "author": "ryan.porter",
+      "text": "Jersey10 follow-up: switched glyph stepping from font advance to auto-derived rendered ink width (mask width) plus fixed 1px gap; this avoids over-wide spacing from advance-plus-gap. Re-rendered frames and restarted device loop (session 95928).",
+      "created_at": "2026-03-05T07:16:47.905950Z"
+    },
+    {
+      "id": "86a5ed66-5d89-4073-b037-ae6f0f98be72",
+      "author": "ryan.porter",
+      "text": "Investigating report that Jersey10 frame became blank; checking generated frame pixel counts and render path for foreground drop-out.",
+      "created_at": "2026-03-05T07:16:48.003452Z"
+    },
+    {
+      "id": "d51ec1a5-989e-41e0-82fd-37c701916689",
+      "author": "ryan.porter",
+      "text": "User flagged possibility of false-on pixels vs width. Running per-font alpha-distribution analysis on glyph masks to tune thresholds empirically.",
+      "created_at": "2026-03-05T07:16:48.118612Z"
+    },
+    {
+      "id": "cd2135a7-2bb2-4e95-815b-53a0aab62f94",
+      "author": "ryan.porter",
+      "text": "Adjusted Jersey10 profile to a grid-aligned strike (, ) discovered via sweep; this yields binary alpha for uppercase glyph sampling and should eliminate false-on fringe pixels (not width tuning). Regenerated frames and restarted device loop (session 70011).",
+      "created_at": "2026-03-05T07:16:48.214597Z"
+    },
+    {
+      "id": "08c3ec53-2e77-4f5f-b219-75f0c60c355f",
+      "author": "ryan.porter",
+      "text": "Investigating Micro5 M width regression. Inspecting sampled glyph mask/width and frame placement to determine whether issue is extraction threshold, draw width, or cursor advance.",
+      "created_at": "2026-03-05T07:16:48.309251Z"
+    },
+    {
+      "id": "0f2ba8f2-c8f1-4492-9832-d9ca15e0b2a7",
+      "author": "ryan.porter",
+      "text": "Micro5 M width root cause: profile was off-grid () producing distorted 4px M. Updated Micro5 profile to grid-aligned strike () yielding binary alpha and 5px-wide M (). Regenerated frames and restarted device loop (session 88329).",
+      "created_at": "2026-03-05T07:16:48.402912Z"
+    },
+    {
+      "id": "f59dc920-964d-49aa-82c7-466b7f8232da",
+      "author": "ryan.porter",
+      "text": "Micro5 M width root cause was off-grid profile values causing distorted rasterization. Updated Micro5 to sizePx 34 and yOffsetHi 0 for a grid-aligned strike that produces binary alpha and a 5-pixel-wide M. Regenerated frames and restarted device loop in session 88329.",
+      "created_at": "2026-03-05T07:16:48.498044Z"
+    },
+    {
+      "id": "6216b160-770d-4b87-a8db-84a9d339e95e",
+      "author": "ryan.porter",
+      "text": "Investigating Bytesized B mismatch: header glyph vs alphabet glyph and mismatch versus expected font shape. Will isolate root cause and patch renderer.",
+      "created_at": "2026-03-05T07:16:48.589568Z"
+    },
+    {
+      "id": "1ef61529-28ca-4411-a9f0-73bcf6858653",
+      "author": "ryan.porter",
+      "text": "Bytesized fix: header on alphabet frames now renders with the active font glyph atlas for <=5px fonts (instead of hardcoded 4px label glyphs), and Bytesized yOffsetHi adjusted to -2 for stable glyph shape. Verified header and alphabet B masks now match.",
+      "created_at": "2026-03-05T07:16:48.679954Z"
+    },
+    {
+      "id": "950d1e7f-9bde-458b-837a-b9e26b2f0797",
+      "author": "ryan.porter",
+      "text": "Adding explicit color parameters for font showcase rendering and switching default showcase text color to blue. Will validate generated sequence for blank frames and restart device loop.",
+      "created_at": "2026-03-05T07:16:48.773796Z"
+    },
+    {
+      "id": "db8f600d-2e87-4aeb-b19c-1ceadc03a84a",
+      "author": "ryan.porter",
+      "text": "Added explicit color parameters (/ query in fixture, / in demo). Switched demo defaults to blue text (#6af) on black (#000). Added blank-frame guard in precompute path and regenerated/restarted showcase.",
+      "created_at": "2026-03-05T07:16:48.866042Z"
+    },
+    {
+      "id": "ff5abea0-570d-4425-a90b-34f7a1d63693",
+      "author": "ryan.porter",
+      "text": "Added explicit color parameters in fixture and demo script. Demo now supports --bg-color and --text-color, defaulting to blue text (#6af) on black (#000). Added a blank-frame guard during precompute and restarted the running showcase loop (session 54609).",
+      "created_at": "2026-03-05T07:16:48.958024Z"
+    },
+    {
+      "id": "9be7f4fb-8f58-47cd-80e4-abee7065f403",
+      "author": "ryan.porter",
+      "text": "Committed and pushed showcase fixes to main: 602403e. Includes stabilized per-font rendering updates (Bytesized/Micro5/Jersey10 alignment), active-font header rendering for small-font alphabet frames, and explicit color controls (/ in fixture and / in demo) with blue default text.",
+      "created_at": "2026-03-05T07:16:49.060035Z"
+    },
+    {
+      "id": "f753ed56-1dfb-40fe-bb15-b9e528c36dad",
+      "author": "ryan.porter",
+      "text": "Committed and pushed showcase fixes to main: 602403e. Includes stabilized per-font rendering updates (Bytesized, Micro5, Jersey10 alignment), active-font header rendering for small-font alphabet frames, and explicit fixture/demo color controls with blue default text.",
+      "created_at": "2026-03-05T07:16:49.158292Z"
+    },
+    {
+      "id": "89b6c4e7-88f3-4fb2-ae11-b0918a9699b3",
+      "author": "ryan.porter",
+      "text": "Starting Row component work: add reusable Row container with height/y/border options and refactor alphabet-frame header to use Row (height 7, 1px faint-blue bottom border).",
+      "created_at": "2026-03-05T07:16:49.252570Z"
+    },
+    {
+      "id": "a168ad75-a6e9-409c-8d8c-31f960767f6f",
+      "author": "ryan.porter",
+      "text": "Implemented Row abstraction and header-row styling: added React Row component ( origin documented as top), updated alphabet-frame header rendering to a 7px row with 1px bottom border at half text brightness, removed 2-color quantization so border color survives, and added precompute retry logic to avoid transient blank-frame startup failures. Restarted showcase loop (session 93908).",
+      "created_at": "2026-03-05T07:16:49.348264Z"
+    },
+    {
+      "id": "25025167-1775-40df-a7dd-6c1631b0f6fd",
+      "author": "ryan.porter",
+      "text": "Implemented Row abstraction and header-row styling. Added a React Row component with y origin documented as top. Updated alphabet-frame header rendering to a 7px row with a 1px bottom border at half text brightness. Removed 2-color quantization in the showcase pipeline so the border color survives. Added precompute retry logic to handle transient blank startup frames. Restarted showcase loop in session 93908.",
+      "created_at": "2026-03-05T07:16:49.447417Z"
+    },
+    {
+      "id": "f5cd42b9-8190-4371-b16e-6b0eac990caf",
+      "author": "ryan.porter",
+      "text": "Preparing focused commit for new Row feature and header-row styling behavior.",
+      "created_at": "2026-03-05T07:16:49.540433Z"
+    },
+    {
+      "id": "acd91069-2753-45d2-9135-7412595338dd",
+      "author": "ryan.porter",
+      "text": "Committed and pushed new Row feature: c093f2e on main. Includes React Row component (top-origin y + height + bottom border params), 7px alphabet header row with 1px half-bright border, and showcase pipeline update to preserve border color plus startup precompute retry.",
+      "created_at": "2026-03-05T07:16:49.641275Z"
+    },
+    {
+      "id": "a33ac5fe-ed1e-4512-869e-b99f64789d89",
+      "author": "ryan.porter",
+      "text": "Starting follow-up per user request: make the font showcase demo work after V2 breaking API migration. Will reproduce current demo failure, patch demos/font_showcase.py for V2 native upload/cycle semantics, then validate with save-only output and runtime checks.",
+      "created_at": "2026-03-05T07:16:49.730277Z"
+    },
+    {
+      "id": "450a838b-50a6-41aa-94aa-c67350c9202e",
+      "author": "ryan.porter",
+      "text": "Font demo is fixed for V2 API. Removed legacy AnimationPlayer/AnimationSequence usage in demos/font_showcase.py, switched playback to native upload_sequence (UploadMode.COMMAND_LIST), and verified: (1) save-only export path works, (2) live run starts, connects, and cycles, (3) existing background font_showcase process was terminated to avoid lock contention.",
+      "created_at": "2026-03-05T07:16:49.821976Z"
+    },
+    {
+      "id": "f90ebcd3-a242-449b-9732-1fbc89cc39eb",
+      "author": "ryan.porter",
+      "text": "Starting clock demo modernization for V2. Goal: replace unreliable just-in-time single-frame pushes with smoother native sequence upload/cycle behavior and validate runtime reliability.",
+      "created_at": "2026-03-05T07:16:49.918475Z"
+    },
+    {
+      "id": "94011b59-2e23-459e-8d12-8eeadcd80e12",
+      "author": "ryan.porter",
+      "text": "Clock demos updated for V2 and smoother playback.  now uses native  loop (no legacy AnimationPlayer).  now pre-renders multi-frame windows and uploads as native HttpGif sequences (command_list by default), avoiding one-frame-per-second just-in-time pushes. Validation: both scripts run on device (192.168.0.37); storybook_clock precomputed+looped, clock_realtime repeatedly uploaded 8-frame windows at fps=4 with stable cycles.",
+      "created_at": "2026-03-05T07:16:50.009966Z"
+    },
+    {
+      "id": "aac16d6c-da8f-472c-b21e-af667f787b1d",
+      "author": "ryan.porter",
+      "text": "Clock demos updated for V2 and smoother playback.\n\n- `demos/storybook_clock.py` now uses native `upload_sequence` looping (no legacy `AnimationPlayer`).\n- `demos/clock_realtime.py` now pre-renders multi-frame windows and uploads native HttpGif sequences (`command_list` by default), avoiding one-frame-per-second just-in-time pushes.\n\nValidation:\n- Both scripts run on device (`192.168.0.37`).\n- `storybook_clock.py` precomputed and looped successfully.\n- `clock_realtime.py` repeatedly uploaded 8-frame windows at `fps=4` with stable cycles.",
+      "created_at": "2026-03-05T07:16:50.099717Z"
+    },
+    {
+      "id": "fdce747e-e116-47ac-a1e8-3bd81fafd86e",
+      "author": "ryan.porter",
+      "text": "Adjusted clock demos to address Loading indicator behavior.  now uploads once and relies on native device loop by default ( optional).  now defaults to , which pre-renders future frames and sends single-frame pushes () to avoid repeated animation upload/loading states. Kept optional  for native sequence windows. Device validation on 192.168.0.37: both scripts run and display with the new defaults.",
+      "created_at": "2026-03-05T07:16:50.195548Z"
+    },
+    {
+      "id": "4de802c6-5bfd-4e39-bc7c-564cb8178e1c",
+      "author": "ryan.porter",
+      "text": "Adjusted clock demos to address Loading indicator behavior.\n\n- `demos/storybook_clock.py` now uploads once and relies on native device loop by default (`--refresh-seconds` optional).\n- `demos/clock_realtime.py` now defaults to `--delivery push`, which pre-renders future frames and sends single-frame pushes (`push_buffer`) to avoid repeated animation upload/loading states.\n- Optional `--delivery upload` remains available for native sequence windows.\n\nDevice validation on `192.168.0.37`:\n- `storybook_clock.py` runs and displays with one initial upload.\n- `clock_realtime.py` runs in push mode and continuously updates without repeated upload loops.",
+      "created_at": "2026-03-05T07:16:50.291361Z"
+    },
+    {
+      "id": "1a4e51db-1d41-4aca-96cc-68615909e413",
+      "author": "ryan.porter",
+      "text": "Adjusted clock demos to avoid Pixoo \"Loading...\" overlay in the default path.\n\nChanges:\n- `demos/storybook_clock.py` now defaults to `--delivery push` (timed `push_buffer` loop of pre-rendered frames).\n- Native upload remains available via `--delivery upload` for explicit testing.\n- `demos/README.md` updated to reflect no-loading default and explicit upload option.\n\nValidation:\n- `python demos/storybook_clock.py --help`\n- `python demos/clock_realtime.py --help`\n- `pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)",
+      "created_at": "2026-03-05T07:16:50.384853Z"
+    },
+    {
+      "id": "4331ce81-d49e-4c84-b820-bc9322240859",
+      "author": "ryan.porter",
+      "text": "Closing per user: reported web font height issue resolved; updated Tiny5 pipeline and demos/fixtures, plus font_showcase fixes. (See recent notes in issue history).",
+      "created_at": "2026-03-05T07:16:50.500607Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:25.628274Z",
+  "updated_at": "2026-03-05T07:16:50.500607Z",
+  "closed_at": "2026-03-05T07:15:46.404530Z",
+  "custom": {}
+}

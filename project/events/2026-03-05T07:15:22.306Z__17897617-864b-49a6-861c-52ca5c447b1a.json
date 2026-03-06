@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "17897617-864b-49a6-861c-52ca5c447b1a",
+  "issue_id": "PIXO-3be4e4f6-f54e-4124-8fd8-1134027695da",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:22.306Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: demo_weather.py"
+  }
+}

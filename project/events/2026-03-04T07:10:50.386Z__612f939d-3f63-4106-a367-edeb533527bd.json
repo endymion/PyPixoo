@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "612f939d-3f63-4106-a367-edeb533527bd",
+  "issue_id": "kanbus-a7f9c12e-e5a4-4ba7-8951-d6458b825b4a",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-04T07:10:50.386Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: wrap issue_created title lines instead of truncating"
+  }
+}

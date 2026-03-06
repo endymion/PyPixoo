@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-18a6ef57-684c-4e5a-b836-b78339e83a1b",
+  "title": "Implement CLI dotenv support",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "eea8a4fb-f1de-4747-bd72-0d00003d707a",
+      "author": "ryan.porter",
+      "text": "Starting: add python-dotenv support and CLI IP resolution precedence (.env PIXOO_DEVICE_IP, then PIXOO_IP, then default; --ip overrides).",
+      "created_at": "2026-03-05T07:16:21.306322Z"
+    },
+    {
+      "id": "89f0a579-8d6a-4cb7-bff8-f02b323cbf9f",
+      "author": "ryan.porter",
+      "text": "Updated CLI to load .env via python-dotenv, resolve default IP from PIXOO_DEVICE_IP or PIXOO_IP, and updated README. Added pytest coverage for IP resolution. Pending: decide if any additional docs/tests needed and run tests.",
+      "created_at": "2026-03-05T07:16:21.402092Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:14.032094Z",
+  "updated_at": "2026-03-05T07:16:21.402092Z",
+  "closed_at": "2026-03-05T07:15:35.389450Z",
+  "custom": {}
+}

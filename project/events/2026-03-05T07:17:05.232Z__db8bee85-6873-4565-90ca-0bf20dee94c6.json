@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "db8bee85-6873-4565-90ca-0bf20dee94c6",
+  "issue_id": "kanbus-a2532895-ae38-4136-afd8-c469a3216fbf",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:05.232Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "bug",
+    "status": "closed",
+    "title": "Kanbus clock: reduce transition status indent"
+  }
+}

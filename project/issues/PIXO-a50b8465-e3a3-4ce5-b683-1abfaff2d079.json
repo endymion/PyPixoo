@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-a50b8465-e3a3-4ce5-b683-1abfaff2d079",
+  "title": "Kanbus clock: transition FROM/TO status line overflow",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "d21741b3-fa85-436c-b168-e5b5f0c40fe3",
+      "author": "ryan.porter",
+      "text": "Implementing UI fix: state_transition notices will use separate lines for FROM and TO statuses to avoid horizontal overflow on-device.",
+      "created_at": "2026-03-05T07:16:20.340309Z"
+    },
+    {
+      "id": "b294a324-ddbd-44ec-80df-84211b58b489",
+      "author": "ryan.porter",
+      "text": "Implemented transition layout change: body now renders issue, FROM, from_status, TO, to_status on separate lines. Also adjusted notice row-height to support up to 5 body lines. Validation: py_compile + tests/test_kanbus_clock.py (13 passed). Triggered state transition event on kanbus-8cf9b8 for visual verification.",
+      "created_at": "2026-03-05T07:16:20.435458Z"
+    },
+    {
+      "id": "e26ece7d-3688-4055-a002-11d7af176531",
+      "author": "ryan.porter",
+      "text": "Closing: transition cards now render issue/FROM/status/TO/status on separate rows and no longer overflow horizontally in live testing.",
+      "created_at": "2026-03-05T07:16:20.527849Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:13.406924Z",
+  "updated_at": "2026-03-05T07:16:20.527849Z",
+  "closed_at": "2026-03-05T07:15:34.825081Z",
+  "custom": {}
+}

@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-721d788b-adf6-460e-8f7f-a15c525bd2d1",
+  "title": "Remove v1 animation API + update internals",
+  "description": "Remove AnimationPlayer/AnimationSequence/Frame from public API and route internals through V2 native methods.",
+  "type": "task",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-8b4a374b-8d84-4656-8b49-f9496fa2cb15",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "54daca01-3281-4cc4-ae01-b57b7ed99a90",
+      "author": "ryan.porter",
+      "text": "Starting implementation for V2 breaking redesign. Scope in this task: remove legacy top-level animation API, add V2-native models/methods, and wire internals to native transport commands.",
+      "created_at": "2026-03-05T07:16:08.141770Z"
+    },
+    {
+      "id": "b42d63e6-d567-4d35-a2cd-45e19bfb0c4f",
+      "author": "ryan.porter",
+      "text": "Completed breaking API migration: removed legacy , replaced top-level exports with V2 native models, and updated internals to native command semantics.",
+      "created_at": "2026-03-05T07:16:08.241612Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:05.393048Z",
+  "updated_at": "2026-03-05T07:16:08.241612Z",
+  "closed_at": "2026-03-05T07:15:27.380138Z",
+  "custom": {}
+}

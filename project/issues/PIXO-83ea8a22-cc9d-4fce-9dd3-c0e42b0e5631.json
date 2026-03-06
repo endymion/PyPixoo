@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-83ea8a22-cc9d-4fce-9dd3-c0e42b0e5631",
+  "title": "Clock migration to scene runtime",
+  "description": "Migrate pixooclock to ScenePlayer and ClockScene.",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "19a64c70-549d-423a-8469-213d62776988",
+      "author": "ryan.porter",
+      "text": "Started implementation for v3 layered architecture.",
+      "created_at": "2026-03-05T07:16:34.393927Z"
+    },
+    {
+      "id": "be6b4040-f7e1-47f9-b4f3-7d324aa3a494",
+      "author": "ryan.porter",
+      "text": "Completed in code with automated validation.",
+      "created_at": "2026-03-05T07:16:34.483271Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:20.569188Z",
+  "updated_at": "2026-03-05T07:16:34.483271Z",
+  "closed_at": "2026-03-05T07:15:41.642981Z",
+  "custom": {}
+}

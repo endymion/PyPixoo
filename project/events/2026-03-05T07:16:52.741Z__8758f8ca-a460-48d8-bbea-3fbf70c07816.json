@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "8758f8ca-a460-48d8-bbea-3fbf70c07816",
+  "issue_id": "kanbus-0c9e0cb2-60e8-4340-ac21-bf69fee7bba3",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:52.741Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Remove v1 animation API + update internals"
+  }
+}

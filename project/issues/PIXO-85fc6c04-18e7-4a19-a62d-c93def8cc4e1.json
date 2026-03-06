@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-85fc6c04-18e7-4a19-a62d-c93def8cc4e1",
+  "title": "pixooclock should auto-recover after device reboot",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "154007f8-b666-45b4-a454-bd88e5f17d04",
+      "author": "ryan.porter",
+      "text": "Implementing reconnect/backoff in pixooclock loops so a device reboot does not terminate the process; target behavior is automatic resume to clock frames after reboot.",
+      "created_at": "2026-03-05T07:16:15.124794Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:09.768574Z",
+  "updated_at": "2026-03-05T07:16:15.124794Z",
+  "closed_at": "2026-03-05T07:15:31.163780Z",
+  "custom": {}
+}

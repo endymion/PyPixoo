@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "46348bce-25e2-4199-974e-6342874fe9c6",
+  "issue_id": "PIXO-03adbc16-60d1-469d-9782-2887f4e9cf4d",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:19.116Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: stripe_pattern_test.py"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "a1aa296b-efdc-4f4e-bb86-929dfb441777",
+  "issue_id": "PIXO-a467530d-f549-4ccc-8294-912b94183e76",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:11.276Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: font_showcase.py"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-db4e1ee8-f4c3-4c4a-a404-d9a88ce41015",
+  "title": "Kanbus clock transition description test",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "840386a6-af52-4a46-840c-6b5b16fc7cf3",
+      "author": "ryan.porter",
+      "text": "Triggering another visual event after created-line style change.",
+      "created_at": "2026-03-05T07:16:15.029638Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:09.642939Z",
+  "updated_at": "2026-03-05T07:16:15.029638Z",
+  "closed_at": "2026-03-05T07:15:31.033941Z",
+  "custom": {}
+}

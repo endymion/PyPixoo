@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-d4672576-8859-4ce4-9b9a-669c98acd186",
+  "title": "PIXO Prefix Check",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "78d7c7b0-ff32-47b5-8e04-f342632c6c51",
+      "author": "ryan.porter",
+      "text": "Prefix check comment",
+      "created_at": "2026-03-05T07:17:25.452437Z"
+    },
+    {
+      "id": "8831171b-6050-4fab-846c-3abfb797c660",
+      "author": "ryan.porter",
+      "text": "Header prefix test after restart",
+      "created_at": "2026-03-05T07:40:56.997031Z"
+    },
+    {
+      "id": "13c6a0ca-3896-48f7-bdc4-2c857c17db3e",
+      "author": "ryan.porter",
+      "text": "Prefix check after repo-key fix",
+      "created_at": "2026-03-05T07:43:18.155658Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:17:21.958254Z",
+  "updated_at": "2026-03-05T07:44:08.265630Z",
+  "closed_at": "2026-03-05T07:44:08.265630Z",
+  "custom": {}
+}

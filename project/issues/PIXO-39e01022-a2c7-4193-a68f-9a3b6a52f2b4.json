@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-39e01022-a2c7-4193-a68f-9a3b6a52f2b4",
+  "title": "Phase 1: fonts and overlays implementation",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "43f9c388-c78a-4060-83bf-6ebcd1d989c4",
+      "author": "ryan.porter",
+      "text": "Implemented built-in font registry, overlay sequencing API, new text.feature + steps, and tests for overlays/font listing.",
+      "created_at": "2026-03-05T07:16:39.387871Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:23.223576Z",
+  "updated_at": "2026-03-05T07:16:39.387871Z",
+  "closed_at": "2026-03-05T07:15:44.175963Z",
+  "custom": {}
+}

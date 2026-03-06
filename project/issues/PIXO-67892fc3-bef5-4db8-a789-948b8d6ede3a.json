@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "title": "v3 layered runtime (raster + scene engine)",
+  "description": "Breaking redesign: L0 Pixoo transport, L1 RasterClient, L2 ScenePlayer with transitions and scene-first clock migration.",
+  "type": "epic",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "5c21c08a-b976-4175-884f-acf75b16e034",
+      "author": "ryan.porter",
+      "text": "Implementation landed for v3 layered runtime modules, CLI surface, scene-first clock integration, docs, and automated tests. Manual device acceptance remains.",
+      "created_at": "2026-03-05T07:16:24.871305Z"
+    },
+    {
+      "id": "4dcaaa42-5ed2-469d-86af-8e036d3dab39",
+      "author": "ryan.porter",
+      "text": "Automated validation complete: 91 targeted pytest tests passing for v3 modules/CLI plus legacy coverage tests; Sphinx HTML build succeeds. Pending real-device manual acceptance before epic closure.",
+      "created_at": "2026-03-05T07:16:24.972647Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:16.249932Z",
+  "updated_at": "2026-03-05T07:16:24.972647Z",
+  "closed_at": "2026-03-05T07:15:37.540923Z",
+  "custom": {}
+}

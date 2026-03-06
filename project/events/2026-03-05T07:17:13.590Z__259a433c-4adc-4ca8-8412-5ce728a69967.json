@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "259a433c-4adc-4ca8-8412-5ce728a69967",
+  "issue_id": "kanbus-f4cf9443-7aec-48a6-8bdd-131ffe8723d4",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:13.590Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Clock palette tweak: dark Radix purple scale"
+  }
+}

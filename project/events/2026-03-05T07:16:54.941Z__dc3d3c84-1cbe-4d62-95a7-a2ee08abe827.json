@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "dc3d3c84-1cbe-4d62-95a7-a2ee08abe827",
+  "issue_id": "kanbus-2c62f2e3-375d-441c-bcf0-98630b48ad21",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:54.941Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Consolidate clock demos into unified pixooclock"
+  }
+}

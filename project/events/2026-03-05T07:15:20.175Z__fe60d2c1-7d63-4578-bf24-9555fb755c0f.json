@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "fe60d2c1-7d63-4578-bf24-9555fb755c0f",
+  "issue_id": "PIXO-60a7f46a-86e7-4194-9e4d-0b9eb1d01626",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:20.175Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Implement v1 multi-row InfoLayout DSL with table alignment, host-raster rendering, demo/CLI integration, tests/docs, and manual acceptance checklist.",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "InfoScene row DSL + table alignment"
+  }
+}

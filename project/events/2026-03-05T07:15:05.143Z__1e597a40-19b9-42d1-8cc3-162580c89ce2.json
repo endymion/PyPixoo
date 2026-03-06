@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "1e597a40-19b9-42d1-8cc3-162580c89ce2",
+  "issue_id": "PIXO-7273339a-0837-41ef-8c84-8e2dd02e8a70",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:05.143Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock demo burst item"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-14b38e8d-5f9a-4cdf-95f5-5d93bfd2b5fa",
+  "title": "Play GIF from URL/TF file/TF directory",
+  "description": "Feature: Play GIF from URL/TF file/TF directory\nScenario: PlayTFGif maps source type to file type correctly\nGiven a valid GifSource of type url, tf_file, or tf_directory\nWhen play_gif is called\nThen Device/PlayTFGif is sent with FileType 2, 0, or 1 respectively",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-32d5c0d7-62a2-444b-8483-8a8751a9d9db",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "f8052d7c-dd8c-4379-81f6-932a377febee",
+      "author": "ryan.porter",
+      "text": "Implemented PlayTFGif source mapping for URL, TF file, and TF directory.",
+      "created_at": "2026-03-05T07:16:27.009802Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:18.233403Z",
+  "updated_at": "2026-03-05T07:16:27.009802Z",
+  "closed_at": "2026-03-05T07:15:39.388412Z",
+  "custom": {}
+}

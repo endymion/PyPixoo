@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-f73dacac-1638-4e52-beb2-6aac89ed27a1",
+  "title": "Add BDD specs for cycle engine",
+  "description": "Add feature scenarios and steps for cycle ordering, loop count, and stop behavior.",
+  "type": "task",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-156e621c-0de9-463a-9113-0b4eed8c8a0b",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "0caae5a4-083a-47a3-b95c-36b82969b4e1",
+      "author": "ryan.porter",
+      "text": "Added cycle BDD coverage for ordered execution, callbacks, and infinite-loop stop behavior.",
+      "created_at": "2026-03-05T07:16:12.661653Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:07.996780Z",
+  "updated_at": "2026-03-05T07:16:12.661653Z",
+  "closed_at": "2026-03-05T07:15:29.760228Z",
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "53374b6a-f8ef-4281-a544-eb2b0330cffb",
+  "issue_id": "PIXO-e4a3e6bc-2ffa-495a-85e9-a1975c7e1ace",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:09.897Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Implement GifSource mapping and play_gif for url/tf_file/tf_directory.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Implement play_gif source variants"
+  }
+}

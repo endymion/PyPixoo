@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-4baa022f-74c2-47c7-b30f-057cf0a29a09",
+  "title": "clock mode split (native vs experimental web)",
+  "description": "",
+  "type": "sub-task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-22586457-017d-48e7-9de4-b41721bff3f1",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "5d459468-9fc2-43bf-95bc-300857d469c7",
+      "author": "ryan.porter",
+      "text": "Starting mode split implementation: native_clock vs web_clock_experimental with hard guardrails.",
+      "created_at": "2026-03-05T07:16:19.347896Z"
+    },
+    {
+      "id": "0b340b06-678e-4041-8191-9da3f2bba729",
+      "author": "ryan.porter",
+      "text": "Implemented explicit mode split with hard guardrails: mode choices are native_clock and web_clock_experimental; native mode rejects web options and web mode rejects native-only options. Experimental banner added for web mode.",
+      "created_at": "2026-03-05T07:16:19.451691Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:12.887192Z",
+  "updated_at": "2026-03-05T07:16:19.451691Z",
+  "closed_at": "2026-03-05T07:15:34.268962Z",
+  "custom": {}
+}

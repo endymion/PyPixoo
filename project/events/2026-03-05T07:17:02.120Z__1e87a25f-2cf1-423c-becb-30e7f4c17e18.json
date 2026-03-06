@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "1e87a25f-2cf1-423c-becb-30e7f4c17e18",
+  "issue_id": "kanbus-81025657-6264-4358-9d22-c94510381e5b",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:02.120Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Acceptance test: black_band_transparent.py"
+  }
+}

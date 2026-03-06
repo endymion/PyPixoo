@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "3460e173-7211-4016-8483-8fdd25af67bd",
+  "issue_id": "kanbus-4acfa3ef-b50a-4088-85b7-62523193cb27",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:57.192Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Kanbus clock transition description test"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "PIXO-3888f282-d908-4497-aa3e-6175110150f1",
+  "title": "Kanbus clock: reduce transition status indent",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "975faa7a-a3de-4324-8cbd-d84f411a59a1",
+      "author": "ryan.porter",
+      "text": "Reduced transition status indent from 4px-equivalent to 2px-equivalent for less table-like appearance. Validation: py_compile + tests/test_kanbus_clock.py (15 passed). Triggered fresh state transitions on kanbus-c94998 for live verification.",
+      "created_at": "2026-03-05T07:16:26.050962Z"
+    },
+    {
+      "id": "49f5daae-9bea-4d2c-9ba9-2b4c02fca5a4",
+      "author": "ryan.porter",
+      "text": "Applying follow-up tweak: transition card body (FROM:/status/TO:/status block) should be vertically centered within the slide while preserving current typography/indent rules.",
+      "created_at": "2026-03-05T07:16:26.149863Z"
+    },
+    {
+      "id": "7bcb3e0b-697d-4663-ba58-847ba3e69ed0",
+      "author": "ryan.porter",
+      "text": "Applied transition vertical-centering: TRANSITION notices now set body_center_vertical=true so FROM:/status/TO:/status block is centered on the slide. Validation: py_compile + tests/test_kanbus_clock.py (15 passed). Triggered fresh state transitions on kanbus-c94998 for live verification.",
+      "created_at": "2026-03-05T07:16:26.246871Z"
+    },
+    {
+      "id": "cf808906-9232-4587-b8f2-d7f99a878ac7",
+      "author": "ryan.porter",
+      "text": "Adjustment requested: keep transition issue-ID line pinned at top under header while vertically centering only the FROM:/status/TO:/status lines below it.",
+      "created_at": "2026-03-05T07:16:26.342859Z"
+    },
+    {
+      "id": "cf37d5fa-cd12-4982-992c-50a4b7870274",
+      "author": "ryan.porter",
+      "text": "Implementing layout split now: transition ID remains pinned under header while only FROM/TO rows are vertically centered.",
+      "created_at": "2026-03-05T07:16:26.437094Z"
+    },
+    {
+      "id": "24fd9e7f-b751-4f85-a991-5b53b8a4be07",
+      "author": "ryan.porter",
+      "text": "Implemented: transition notices now pin line 1 (issue ID) directly under header and vertically center only the remaining FROM:/status/TO:/status block via new pin_first_line_top flag. Validation: python -m py_compile demos/kanbus_clock.py; uv run pytest tests/test_kanbus_clock.py -q (16 passed). Ready for visual confirmation.",
+      "created_at": "2026-03-05T07:16:26.531267Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:17.583754Z",
+  "updated_at": "2026-03-05T07:16:26.531267Z",
+  "closed_at": "2026-03-05T07:15:38.728429Z",
+  "custom": {}
+}

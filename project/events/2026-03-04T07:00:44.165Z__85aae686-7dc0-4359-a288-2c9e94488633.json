@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "85aae686-7dc0-4359-a288-2c9e94488633",
+  "issue_id": "kanbus-1ca41cef-7202-430b-8c10-fed3ae1464c2",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-04T07:00:44.165Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: prevent frame stalls during watcher updates"
+  }
+}

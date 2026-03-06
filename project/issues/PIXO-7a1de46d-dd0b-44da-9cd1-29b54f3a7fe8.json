@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-7a1de46d-dd0b-44da-9cd1-29b54f3a7fe8",
+  "title": "Generalized InfoScene header API + full font support",
+  "description": "Add scene_components + scenes InfoScene/ClockScene, full scene font registry, demo/CLI integration, tests/docs, and manual acceptance checklist updates.",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "d0cfd955-4a51-45d2-beb9-b009d217bd3c",
+      "author": "ryan.porter",
+      "text": "Started implementation: creating generalized InfoScene API with header config + full scene font registry, then wiring demo/CLI/tests/docs.",
+      "created_at": "2026-03-05T07:16:16.764839Z"
+    },
+    {
+      "id": "3967ef81-6d79-4cba-85c2-f7783126e8f4",
+      "author": "ryan.porter",
+      "text": "Implemented generalized InfoScene API and full scene font registry. Added src/pypixoo/scene_components.py and src/pypixoo/scenes.py, wired scene demo + CLI --info-* args, updated Sphinx docs, and added tests (test_info_scene/test_scene_font_registry/test_scene_transitions_demo/test_cli_v3). Validation: py_compile OK, pytest (33 tests) OK, sphinx-build OK.",
+      "created_at": "2026-03-05T07:16:16.863132Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:10.891678Z",
+  "updated_at": "2026-03-05T07:16:16.863132Z",
+  "closed_at": "2026-03-05T07:15:32.341927Z",
+  "custom": {}
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "92cc8798-c8c6-4a6e-a478-76554c3e997d",
+  "issue_id": "kanbus-38c7bf0b-eb75-4170-adaa-5251451d56dd",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:56.410Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Demo + CLI integration for InfoScene"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "5007507d-33aa-4855-8aca-b342ca0e2781",
+  "issue_id": "PIXO-082e5afd-acea-4fc1-b0ef-b7c657c93168",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:25.387Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: demo_play_url_gif.py"
+  }
+}

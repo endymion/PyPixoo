@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "d5c9ec20-380c-4d17-b8ba-e75003a111f0",
+  "issue_id": "PIXO-a7963d4b-9290-42f4-b609-0ad70b35578c",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:23.738Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: increase transition summary-to-FROM vertical gap to 4px"
+  }
+}

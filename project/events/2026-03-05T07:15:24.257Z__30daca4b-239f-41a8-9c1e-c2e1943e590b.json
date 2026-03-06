@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "30daca4b-239f-41a8-9c1e-c2e1943e590b",
+  "issue_id": "PIXO-4292671b-58d9-466a-8861-84c1fa3463a2",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:24.257Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock post-restart demo"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "24a9d701-c5d5-4164-9cd0-576a14fdce4a",
+  "issue_id": "PIXO-83ea8a22-cc9d-4fce-9dd3-c0e42b0e5631",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:20.569Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Migrate pixooclock to ScenePlayer and ClockScene.",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Clock migration to scene runtime"
+  }
+}

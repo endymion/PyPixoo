@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "a65fc63c-ab1a-4546-ba9c-ae3bf712527f",
+  "issue_id": "kanbus-8c862585-1212-4e5d-9253-6927ab742d0d",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:03.407Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Final restart verification burst"
+  }
+}

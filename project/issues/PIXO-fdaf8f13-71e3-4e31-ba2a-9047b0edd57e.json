@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-fdaf8f13-71e3-4e31-ba2a-9047b0edd57e",
+  "title": "Fix demo black_band_chained.py for V2 API",
+  "description": "Demo currently fails with ModuleNotFoundError: pypixoo.animation. Migrate black_band_chained.py to current V2 API and verify real-device execution.",
+  "type": "bug",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-262a0b80-ed1a-420e-9345-b8537f908c76",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "463961d3-f6d0-484f-8889-a79394fb0a0a",
+      "author": "ryan.porter",
+      "text": "Starting fix now. Root cause: demo imports legacy pypixoo.animation API removed in V2.",
+      "created_at": "2026-03-05T07:16:15.322808Z"
+    },
+    {
+      "id": "11f49ea9-b112-4415-8cb5-950d3498d17e",
+      "author": "ryan.porter",
+      "text": "Fix implemented: migrated demos/black_band_chained.py from removed pypixoo.animation API to V2 native cycle flow (GifSequence + CycleItem + Pixoo.start_cycle). Validation on device: demo starts, loops, and stops cleanly on Ctrl+C.",
+      "created_at": "2026-03-05T07:16:15.419846Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:10.021913Z",
+  "updated_at": "2026-03-05T07:16:15.419846Z",
+  "closed_at": "2026-03-05T07:15:31.424011Z",
+  "custom": {}
+}

@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-2ff189dc-9d00-4df2-a738-96f4886c8720",
+  "title": "Send and clear text overlays on HttpGif playback",
+  "description": "Feature: Send and clear text overlays on HttpGif playback\nScenario: Overlay text commands are available for HttpGif flows\nGiven an uploaded HttpGif playback context\nWhen send_text_overlay and clear_text_overlay are called\nThen Draw/SendHttpText and Draw/ClearHttpText are sent with expected fields",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-32d5c0d7-62a2-444b-8483-8a8751a9d9db",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "132db6ff-d262-4f6f-8cf0-207a0c5e1762",
+      "author": "ryan.porter",
+      "text": "Implemented and validated SendHttpText and ClearHttpText overlay flows for HttpGif context.",
+      "created_at": "2026-03-05T07:16:30.280419Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:19.503182Z",
+  "updated_at": "2026-03-05T07:16:30.280419Z",
+  "closed_at": "2026-03-05T07:15:40.575200Z",
+  "custom": {}
+}

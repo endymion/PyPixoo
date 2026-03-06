@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-ca7f89ff-046b-48b8-80b6-5063418c00e7",
+  "title": "Watcher stall stress verify",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "1d043415-0bc7-42aa-a20a-a11797adb3b0",
+      "author": "ryan.porter",
+      "text": "Final restart verify: check clock responsiveness during update burst.",
+      "created_at": "2026-03-05T07:16:30.372311Z"
+    },
+    {
+      "id": "aaa73090-78c0-49a1-88e6-0482e0678848",
+      "author": "ryan.porter",
+      "text": "Done: watcher stall stress verification completed on restarted process.",
+      "created_at": "2026-03-05T07:16:30.464323Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:19.647576Z",
+  "updated_at": "2026-03-05T07:16:30.464323Z",
+  "closed_at": "2026-03-05T07:15:40.711861Z",
+  "custom": {}
+}

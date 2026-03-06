@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-3bc8c405-5d22-4f32-aea8-1bcd1864a740",
+  "title": "Async fire-and-forget animation",
+  "description": "",
+  "type": "epic",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c464c182-cd21-445d-b2d6-081fb0d454ac",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "f0caa5da-5351-475f-9ed0-c24aa5e4f152",
+      "author": "ryan.porter",
+      "text": "Asynchronous constructs that push frames at the right times without blocking.",
+      "created_at": "2026-03-05T07:16:14.723782Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:08.997148Z",
+  "updated_at": "2026-03-05T07:16:14.723782Z",
+  "closed_at": "2026-03-05T07:15:30.524067Z",
+  "custom": {}
+}

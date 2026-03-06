@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-156e621c-0de9-463a-9113-0b4eed8c8a0b",
+  "title": "V2 sequence cycling orchestration",
+  "description": "Cycle multiple sequence types with async control",
+  "type": "epic",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c464c182-cd21-445d-b2d6-081fb0d454ac",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "98bc89b0-9d3f-4221-859c-2b2af3dd1278",
+      "author": "ryan.porter",
+      "text": "Core E3 implementation complete (cycle engine + BDD). Remaining open item: real-device smoke task (kanbus-d525de).",
+      "created_at": "2026-03-05T07:16:25.952421Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:17.455037Z",
+  "updated_at": "2026-03-05T07:16:25.952421Z",
+  "closed_at": "2026-03-05T07:15:38.599093Z",
+  "custom": {}
+}

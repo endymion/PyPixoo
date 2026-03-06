@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "3cc44259-1460-4d8e-9c3d-98848a5d01b7",
+  "issue_id": "PIXO-6912dfb2-0982-40b8-ad05-ad947393b9d6",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:06.882Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: increase created slide gap under TASK OPEN to 4px"
+  }
+}

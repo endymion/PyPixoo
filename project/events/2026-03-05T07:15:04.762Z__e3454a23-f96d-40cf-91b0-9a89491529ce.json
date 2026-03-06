@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "e3454a23-f96d-40cf-91b0-9a89491529ce",
+  "issue_id": "PIXO-483a6731-05cc-4dd4-85fc-087bc2cc1b11",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:04.762Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Story: add tests and docs for adaptive default band"
+  }
+}

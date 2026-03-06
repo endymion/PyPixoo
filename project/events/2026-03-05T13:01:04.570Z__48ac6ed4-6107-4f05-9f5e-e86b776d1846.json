@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "48ac6ed4-6107-4f05-9f5e-e86b776d1846",
+  "issue_id": "PIXO-c9cc123c-cf55-446f-ba33-2e4c96802dc2",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T13:01:04.570Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "As a PyPixoo operator\nI want kanbus_clock to run all kbs commands from a single root\nSo that Kanbus handles nested project discovery and IDs are correct.\n\nFeature: Single-root kbs execution\n\nScenario: kbs show is executed from --root\n  Given kanbus_clock is started with --root /path\n  When it fetches issue details\n  Then kbs show is executed with cwd=/path\n\nScenario: Header prefix uses canonical issue key from kbs show\n  Given kbs show returns id \"PIXO-123abc\"\n  When a card is rendered\n  Then the header prefix is \"PIXO\"",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "PIXO-1742ec6d-696a-4bf7-98a5-78a0a9d0dbad",
+    "priority": 2,
+    "status": "open",
+    "title": "PyPixoo: kanbus_clock uses single kbs root"
+  }
+}

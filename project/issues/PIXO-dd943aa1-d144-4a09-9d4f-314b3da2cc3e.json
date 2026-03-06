@@ -1,0 +1,109 @@
+{
+  "id": "PIXO-dd943aa1-d144-4a09-9d4f-314b3da2cc3e",
+  "title": "Update demos/docs for native GIF paths",
+  "description": "Update README and demos to reflect V2 native GIF upload/playback usage patterns.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-32d5c0d7-62a2-444b-8483-8a8751a9d9db",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "47bc6043-b3ef-4645-849e-8c4b37d3e389",
+      "author": "ryan.porter",
+      "text": "README and PR_FAQ were updated for V2 native workflows. Demo script migration is intentionally deferred per user direction (\"we're going to have to deal with getting those demos working again after this is all changed\").",
+      "created_at": "2026-03-05T07:16:13.144724Z"
+    },
+    {
+      "id": "73915a53-c255-488d-8c11-57ed48c8592a",
+      "author": "ryan.porter",
+      "text": "Implementing requested clock-face redesign in demos/Storybook clock path:\n- Remove circle outline from the clock face.\n- Add marker-mode variants:\n  - dot12\n  - dots_quarters\n  - ticks_all\n  - dots_quarters_ticks_others\n  - ticks_all_thick_quarters\n- Update realtime clock demo to cycle marker modes by minute (endless loop), while keeping no-loading push delivery default.\n\nWill validate by running the demo on device and checking per-minute mode selection logic.",
+      "created_at": "2026-03-05T07:16:13.244083Z"
+    },
+    {
+      "id": "4314f206-cc85-4a3b-8a07-aa68066842bc",
+      "author": "ryan.porter",
+      "text": "Implemented clockface marker-mode redesign for clock demos and Storybook Clock component.\n\nWhat changed:\n- Removed the circular outline from `storybook-app/src/components/Clock.tsx`.\n- Added marker modes in Clock component:\n  - `dot12`\n  - `dots_quarters`\n  - `ticks_all`\n  - `dots_quarters_ticks_others`\n  - `ticks_all_thick_quarters`\n- Added Storybook controls for `markerMode` + `markerColor` in `Clock.stories.tsx`.\n- Updated `demos/clock_realtime.py`:\n  - new optional `--clockface` arg for fixed face mode\n  - if `--clockface` is omitted, demo mode cycles marker styles by minute (endless loop)\n  - `--no-second-hand` remains supported\n- Updated `demos/README.md` to document default minute-cycle behavior and fixed mode usage.\n\nValidation:\n- `python demos/clock_realtime.py --help`\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- `cd storybook-app && npm run build-storybook` (success)\n- Live device run confirmed mode switch on minute boundary in push mode:\n  - observed `clockface mode -> ticks_all (minute cycle)` then\n  - `clockface mode -> dots_quarters_ticks_others (minute cycle)` after minute rollover.",
+      "created_at": "2026-03-05T07:16:13.343126Z"
+    },
+    {
+      "id": "aaa29278-c811-4055-8d9e-00433607fd8a",
+      "author": "ryan.porter",
+      "text": "Adding requested color control for clockface markers in realtime clock demo.\n- Add CLI option `--marker-color` in `demos/clock_realtime.py`.\n- Pass through to Storybook Clock arg `markerColor`.\n- Restart live demo in magenta for user verification.\n- Commit + push.",
+      "created_at": "2026-03-05T07:16:13.437431Z"
+    },
+    {
+      "id": "88d8a0de-cfc7-45d6-9b5a-b6522197fa9b",
+      "author": "ryan.porter",
+      "text": "Implemented clock marker color control and set live demo to magenta.\n\nChanges:\n- Added `--marker-color` option to `demos/clock_realtime.py`.\n- Passed marker color through Storybook URL args as `markerColor`.\n- Updated demo usage examples in `demos/clock_realtime.py` and `demos/README.md`.\n\nValidation:\n- `python demos/clock_realtime.py --help` shows `--marker-color`.\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` -> 29 passed.\n- Live run started with magenta markers:\n  - `python demos/clock_realtime.py --fps 1 --render-lead-ms 2200 --delivery push --no-second-hand --marker-color \"#ff00ff\"`",
+      "created_at": "2026-03-05T07:16:13.544031Z"
+    },
+    {
+      "id": "29846237-5905-4b15-b0f2-62951ecb1a02",
+      "author": "ryan.porter",
+      "text": "Implemented resilience for `demos/clock_realtime.py` so unplug/replug no longer terminates the demo.\n\nWhat changed:\n- Added auto-reconnect loop around demo execution.\n- On startup and after disconnect, the script retries `pixoo.connect()` until successful.\n- Added handling for `requests` connection errors and command/runtime errors during playback.\n- Added CLI option: `--reconnect-delay-seconds` (default `3.0`).\n- Added timestamped logging and reconnect status messages.\n- README demo section updated to document automatic reconnect behavior.\n\nValidation:\n- `python demos/clock_realtime.py --help`\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- Fault simulation: `--ip 192.0.2.1 --reconnect-delay-seconds 1` now keeps retrying instead of exiting.\n- Live device run restarted successfully in magenta mode with no second hand.",
+      "created_at": "2026-03-05T07:16:13.642535Z"
+    },
+    {
+      "id": "1a2e5dad-e6c0-4956-bded-c30f63050751",
+      "author": "ryan.porter",
+      "text": "Applying follow-up clockface adjustment per user feedback:\n- Remove mixed mode (dots on quarters + ticks on others).\n- Replace with all-dot mode using two dot sizes (larger on 12/3/6/9, smaller on other hours).\n- Update mode names in Storybook Clock + realtime clock CLI cycle list.\n- Restart live clock demo after patch.",
+      "created_at": "2026-03-05T07:16:13.734982Z"
+    },
+    {
+      "id": "072d8962-f2e1-4ad6-9042-31e268e66649",
+      "author": "ryan.porter",
+      "text": "Replaced the broken mixed marker mode with a two-dot-size mode.\n\nChanges:\n- Removed `dots_quarters_ticks_others` mode.\n- Added `dots_all_thick_quarters` mode:\n  - larger dots at 12/3/6/9\n  - smaller dots at all other hour positions\n- Updated mode lists in:\n  - `storybook-app/src/components/Clock.tsx`\n  - `storybook-app/src/components/Clock.stories.tsx`\n  - `demos/clock_realtime.py`\n- Restarted live realtime clock demo; minute-cycle now uses `dots_all_thick_quarters` in place of the old mixed mode.\n\nValidation:\n- `python demos/clock_realtime.py --help` (updated mode choices)\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- `cd storybook-app && npm run build-storybook` (success)\n- Live run shows: `clockface mode -> dots_all_thick_quarters (minute cycle)`.",
+      "created_at": "2026-03-05T07:16:13.825388Z"
+    },
+    {
+      "id": "5ca6111e-67a6-4c53-9eb0-bc0bebc54d1f",
+      "author": "ryan.porter",
+      "text": "Applying follow-up visual calibration:\n- Move clockface marker geometry outward so edge pixels are used.\n- Target: dots and tick marks shifted outward by ~1 pixel in the rendered 64x64 clock.\n- Restart live clock demo after patch for immediate verification.",
+      "created_at": "2026-03-05T07:16:13.916771Z"
+    },
+    {
+      "id": "d8a4252a-c9e2-4059-802a-483a24e6071e",
+      "author": "ryan.porter",
+      "text": "Applied marker outward shift so the clock uses more of the available edge pixels.\n\nChange:\n- In `storybook-app/src/components/Clock.tsx`, added `MARKER_OUTWARD_OFFSET = 1.0` and applied it to marker radii (`markerOuter`, `markerInner`, `markerDot`) with bounds clamped to the drawable half-size.\n- This shifts dots and tick geometry outward together by ~1 pixel.\n\nValidation:\n- `cd storybook-app && npm run build-storybook` (success)\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- Live realtime demo restarted successfully with updated rendering.",
+      "created_at": "2026-03-05T07:16:14.011522Z"
+    },
+    {
+      "id": "83a8a9db-2050-4712-8dc6-3c5a0af05beb",
+      "author": "ryan.porter",
+      "text": "Follow-up calibration requested: markers are still too conservative at the outer ring.\n\nPlanned update:\n- Increase outward marker offset beyond current +1.0 so dots/ticks use more of the outer pixel ring.\n- Keep bounds clamp to avoid clipping artifacts.\n- Restart live demo and validate visually.",
+      "created_at": "2026-03-05T07:16:14.112939Z"
+    },
+    {
+      "id": "b88da9ca-ff05-44f5-b71d-e3cb2098072c",
+      "author": "ryan.porter",
+      "text": "Increased marker outward shift further to use more of the outer pixel ring.\n\nChange:\n- `storybook-app/src/components/Clock.tsx`: increased `MARKER_OUTWARD_OFFSET` from `1.0` to `1.8`.\n- Dots and tick radii both use this offset; clamp remains in place to avoid excessive clipping.\n\nValidation:\n- `cd storybook-app && npm run build-storybook` (success)\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- Live demo restarted successfully with updated geometry.",
+      "created_at": "2026-03-05T07:16:14.213007Z"
+    },
+    {
+      "id": "d7137d9c-6961-4c90-9d96-a549424e84ab",
+      "author": "ryan.porter",
+      "text": "Starting implementation of fine-grained clock face colors + fade controls.\n\nScope this pass:\n- Clock props: `hourHandColor`, `minuteHandColor`, `topMarkerColor`, `faceFade`.\n- Back-compat hand fallback: hour/minute use `hourHandColor|minuteHandColor` then `handColor`.\n- Top marker override at 12 o'clock for dot/tick modes.\n- Realtime CLI: `--hour-hand-color`, `--minute-hand-color`, `--top-marker-color`, `--fade`.\n- Demo defaults set to requested FF00FF/mauve profile.\n- Build/test + fade=20 runtime check.",
+      "created_at": "2026-03-05T07:16:14.314817Z"
+    },
+    {
+      "id": "fefb35e6-5590-4c69-8698-561f96ad2240",
+      "author": "ryan.porter",
+      "text": "Implemented fine-grained clock color controls + face fade.\n\nClock component changes (`storybook-app/src/components/Clock.tsx`):\n- Added props: `hourHandColor`, `minuteHandColor`, `topMarkerColor`, `faceFade`.\n- Preserved back-compat `handColor` fallback:\n  - `hourStroke = hourHandColor ?? handColor ?? \"white\"`\n  - `minuteStroke = minuteHandColor ?? handColor ?? \"white\"`\n- Top marker override applies only at marker index 0 (12 o'clock) for both dot and tick modes.\n- Added `<g opacity={faceFade}>` wrapper over markers + hands only (background unchanged).\n- Clamps `faceFade` to `[0,1]`.\n\nRealtime demo changes (`demos/clock_realtime.py`):\n- Added CLI args: `--hour-hand-color`, `--minute-hand-color`, `--top-marker-color`, `--fade`.\n- Extended Storybook arg mapping with `hourHandColor`, `minuteHandColor`, `topMarkerColor`, `faceFade`.\n- Kept `--hands-color` as legacy fallback.\n- Updated defaults to requested profile:\n  - marker ring: `rgba(255,0,255,0.5)`\n  - top marker: `rgba(255,0,255,0.3)`\n  - hour hand: `rgba(242,232,255,0.6)`\n  - minute hand: `rgba(242,232,255,0.5)`\n  - fade default: `100` (maps to `1.0`)\n\nStorybook stories/docs:\n- Added Storybook controls for new props in `Clock.stories.tsx`.\n- Updated `demos/README.md` examples and notes for fade/color controls.\n\nValidation:\n- `python demos/clock_realtime.py --help`\n- `python -m pytest tests/test_cli.py tests/test_pixoo_v2.py -q` (29 passed)\n- `cd storybook-app && npm run build-storybook` (success)\n- Live run check: `python demos/clock_realtime.py --fade 20 --fps 1 --no-second-hand --delivery push` (connected, rendered, pushed frames)",
+      "created_at": "2026-03-05T07:16:14.416548Z"
+    },
+    {
+      "id": "11c7c775-a549-4f11-95ea-ccd4dc78136e",
+      "author": "ryan.porter",
+      "text": "Closing per user request. Demo/doc updates for native GIF paths covered by recent clock/demo/README updates noted in issue history.",
+      "created_at": "2026-03-05T07:16:14.518156Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:08.505Z",
+  "updated_at": "2026-03-05T07:16:14.518156Z",
+  "closed_at": "2026-03-05T07:15:30.145948Z",
+  "custom": {}
+}

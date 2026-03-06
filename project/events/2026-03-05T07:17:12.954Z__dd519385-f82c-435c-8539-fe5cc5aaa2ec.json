@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "dd519385-f82c-435c-8539-fe5cc5aaa2ec",
+  "issue_id": "kanbus-e63a0488-e8b1-4ee3-86fb-3bc26a37b620",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:12.954Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "story",
+    "status": "closed",
+    "title": "Manual acceptance matrix"
+  }
+}

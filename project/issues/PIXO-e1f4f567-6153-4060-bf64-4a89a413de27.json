@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-e1f4f567-6153-4060-bf64-4a89a413de27",
+  "title": "Kanbus clock: darken default 12-o'clock dot and set auto-info-seconds default to 30",
+  "description": "",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "4055174b-3dd4-40ed-b875-7865179efd0b",
+      "author": "ryan.porter",
+      "text": "Implementing defaults tweak: (1) darken default top 12-o'clock marker by two Radix steps in pixooclock palette mapping; (2) set kanbus_clock --auto-info-seconds default to 30; update tests/docs accordingly.",
+      "created_at": "2026-03-05T07:16:42.008590Z"
+    },
+    {
+      "id": "e748c413-955f-4d7c-86c1-4d7413b283e1",
+      "author": "ryan.porter",
+      "text": "Defaults updated test ping: when kanbus_clock runs without --auto-info-seconds, this notice should hold for 30s.",
+      "created_at": "2026-03-05T07:16:42.110896Z"
+    },
+    {
+      "id": "5eac77bc-f4b8-4a85-8c8d-57c3c5818e1a",
+      "author": "ryan.porter",
+      "text": "Code/tests/docs updated. Validation: uv run python -m py_compile demos/pixooclock.py demos/kanbus_clock.py; uv run pytest tests/test_demo_three_hand_clock.py tests/test_kanbus_clock.py -q (35 passed). Left in_progress pending your visual confirmation of (1) darker top dot and (2) 30s auto-info default hold.",
+      "created_at": "2026-03-05T07:16:42.213516Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:25.012653Z",
+  "updated_at": "2026-03-05T07:16:42.213516Z",
+  "closed_at": null,
+  "custom": {}
+}

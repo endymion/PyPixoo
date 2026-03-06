@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-1fb557a8-c391-4a0b-b249-28d6c1c1965f",
+  "title": "Animation sequences with timing",
+  "description": "",
+  "type": "epic",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c464c182-cd21-445d-b2d6-081fb0d454ac",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "a65e54f5-bd57-4206-8677-b203a250601b",
+      "author": "ryan.porter",
+      "text": "Frame sequences with timing between frame updates.",
+      "created_at": "2026-03-05T07:16:19.247170Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:12.768801Z",
+  "updated_at": "2026-03-05T07:16:19.247170Z",
+  "closed_at": "2026-03-05T07:15:34.125739Z",
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "d3946e94-2b90-4fc0-96c8-e85d342c3c63",
+  "issue_id": "PIXO-715ca236-26f7-4d9d-84cc-e5e98ff15dfe",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:21.334Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Feature: Migration guidance from v1.x to v2.0\nScenario: Breaking changes are documented with replacement paths\nGiven a user upgrading from v1.x\nWhen they read README and PR_FAQ migration sections\nThen they can map removed APIs to V2 alternatives",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Migration guidance from v1.x to v2.0"
+  }
+}

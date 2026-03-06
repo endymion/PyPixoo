@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-6912dfb2-0982-40b8-ad05-ad947393b9d6",
+  "title": "Kanbus clock: increase created slide gap under TASK OPEN to 4px",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "875b0263-204a-4050-87f0-f65845a950ef",
+      "author": "ryan.porter",
+      "text": "Applying created-card spacing tweak: add +2px spacer before first title line so TASK OPEN -> title gap is 4px.",
+      "created_at": "2026-03-05T07:16:09.792144Z"
+    },
+    {
+      "id": "16923561-d9ae-4b6a-92ef-4bdebe4d4481",
+      "author": "ryan.porter",
+      "text": "Implemented created-card spacing: added +2px spacer before first title row (line index 2), producing 4px under TASK/BUG OPEN. Validation: py_compile + tests/test_kanbus_clock.py (19 passed). Triggered visual lifecycle on kanbus-9c35d1.",
+      "created_at": "2026-03-05T07:16:09.887002Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:06.882597Z",
+  "updated_at": "2026-03-05T07:16:09.887002Z",
+  "closed_at": "2026-03-05T07:15:28.747517Z",
+  "custom": {}
+}

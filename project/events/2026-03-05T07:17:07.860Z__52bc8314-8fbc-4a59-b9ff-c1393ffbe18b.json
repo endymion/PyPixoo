@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "52bc8314-8fbc-4a59-b9ff-c1393ffbe18b",
+  "issue_id": "kanbus-b4b438ed-fbec-44c9-bda5-47f3c1172db0",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:07.860Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "story",
+    "status": "closed",
+    "title": "InfoScene row DSL + table alignment"
+  }
+}

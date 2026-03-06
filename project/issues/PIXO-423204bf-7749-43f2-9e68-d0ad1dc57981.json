@@ -1,0 +1,61 @@
+{
+  "id": "PIXO-423204bf-7749-43f2-9e68-d0ad1dc57981",
+  "title": "Watcher smoke: status transition ping",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "b0b5b9c3-6b7e-4e2a-ad9e-0977182fb3fc",
+      "author": "ryan.porter",
+      "text": "Watcher restart ping: this comment is intended to trigger kanbus_clock COMMENT notification rendering test.",
+      "created_at": "2026-03-05T07:16:37.743431Z"
+    },
+    {
+      "id": "7a91942a-a71a-4ff4-abcb-4b9ef35f5cca",
+      "author": "ryan.porter",
+      "text": "Watcher body-text check: display this full comment text in the notification body if parsing works correctly.",
+      "created_at": "2026-03-05T07:16:37.833166Z"
+    },
+    {
+      "id": "3d0e2bcf-f906-4070-8d36-fe998262fa85",
+      "author": "ryan.porter",
+      "text": "Restart verification ping: this comment should appear in the COMMENT notification body on kanbus_clock.",
+      "created_at": "2026-03-05T07:16:37.934825Z"
+    },
+    {
+      "id": "04733aa7-655d-408d-ad7c-e963a2540db0",
+      "author": "ryan.porter",
+      "text": "Live verify after fallback fix: this exact sentence should be visible in the COMMENT body on the display.",
+      "created_at": "2026-03-05T07:16:38.033582Z"
+    },
+    {
+      "id": "60803e5c-07a7-425f-b707-8f7f37de5a6d",
+      "author": "ryan.porter",
+      "text": "Display verification burst 2: additional comment event.",
+      "created_at": "2026-03-05T07:16:38.127526Z"
+    },
+    {
+      "id": "9d60299b-12a5-43b5-87df-c9b4a746989c",
+      "author": "ryan.porter",
+      "text": "Demo burst D: smoke issue transition+comment path.",
+      "created_at": "2026-03-05T07:16:38.231316Z"
+    },
+    {
+      "id": "030e7cb1-246f-4372-81a5-b73f15803872",
+      "author": "ryan.porter",
+      "text": "Done: watcher smoke issue used to generate/verify event cards; no further action required.",
+      "created_at": "2026-03-05T07:16:38.327429Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:22.435745Z",
+  "updated_at": "2026-03-05T07:16:38.327429Z",
+  "closed_at": "2026-03-05T07:15:43.359658Z",
+  "custom": {}
+}

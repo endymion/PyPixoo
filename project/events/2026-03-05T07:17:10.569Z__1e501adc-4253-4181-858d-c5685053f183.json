@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "1e501adc-4253-4181-858d-c5685053f183",
+  "issue_id": "kanbus-d465e9e1-1220-42f1-ab90-c8c8b419f46e",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:10.569Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Kanbus clock live visual test event"
+  }
+}

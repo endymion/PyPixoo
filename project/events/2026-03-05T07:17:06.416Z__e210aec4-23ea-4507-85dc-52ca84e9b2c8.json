@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "e210aec4-23ea-4507-85dc-52ca84e9b2c8",
+  "issue_id": "kanbus-a9de70b5-d99b-4cbf-8128-d44e0081d2a5",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:06.416Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "story",
+    "status": "closed",
+    "title": "Upload multi-frame sequence with stable PicID"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-dec89776-803d-433a-a217-8d35a81ad7a6",
+  "title": "Acceptance test: black_band_opaque.py",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "07f712b5-d462-4dd1-a710-a4b49dab48de",
+      "author": "ryan.porter",
+      "text": "Starting manual acceptance test on real device: running demos/black_band_opaque.py and validating expected playback.",
+      "created_at": "2026-03-05T07:16:16.471219Z"
+    },
+    {
+      "id": "5cfaeda7-0d01-405a-9e7b-cbac0d3d6968",
+      "author": "ryan.porter",
+      "text": "Failure captured: startup error ModuleNotFoundError for pypixoo.animation. Linked bug opened: kanbus-1d72ca. Fix in progress.",
+      "created_at": "2026-03-05T07:16:16.567336Z"
+    },
+    {
+      "id": "857079a5-41a7-4fc6-9ced-64fb24bb46ea",
+      "author": "ryan.porter",
+      "text": "Acceptance test PASSED after bug fix. Ran demos/black_band_opaque.py on device; completed successfully with expected one-pass opaque sequence.",
+      "created_at": "2026-03-05T07:16:16.671245Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:10.771277Z",
+  "updated_at": "2026-03-05T07:16:16.671245Z",
+  "closed_at": "2026-03-05T07:15:32.212149Z",
+  "custom": {}
+}

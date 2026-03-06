@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-c85db655-f6fa-443f-89d7-d8168ff4a521",
+  "title": "Kanbus clock: transition labels, indent, and status text formatting",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "51c5903a-28d9-46b8-b256-4e2c0d28ee1c",
+      "author": "ryan.porter",
+      "text": "Implemented: transition lines now render FROM:/TO: labels (darkened one step), status values are no longer hard-truncated (e.g., IN PROGRESS), and status lines are indented by 4px equivalent spacing. Also propagated per-line darkening/indent controls through notice rendering. Validation: py_compile + tests/test_kanbus_clock.py (14 passed).",
+      "created_at": "2026-03-05T07:16:25.465920Z"
+    },
+    {
+      "id": "7ffdc02b-6c06-4d5f-a9fc-671759ffe942",
+      "author": "ryan.porter",
+      "text": "Done: transition formatting finalized and verified (FROM:/TO: labels, indented state lines, full status text e.g. IN PROGRESS).",
+      "created_at": "2026-03-05T07:16:25.566719Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:17.061431Z",
+  "updated_at": "2026-03-05T07:16:25.566719Z",
+  "closed_at": "2026-03-05T07:15:38.191241Z",
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-69aa7992-ef2b-457e-b868-47b411a35eb4",
+  "title": "Acceptance test: demo_text_overlay.py",
+  "description": "",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:24.506275Z",
+  "updated_at": "2026-03-05T07:16:04.978449Z",
+  "closed_at": null,
+  "custom": {}
+}

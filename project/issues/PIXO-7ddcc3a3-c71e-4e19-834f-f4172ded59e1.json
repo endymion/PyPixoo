@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-7ddcc3a3-c71e-4e19-834f-f4172ded59e1",
+  "title": "Acceptance test: demo_display_list.py",
+  "description": "",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:12.020295Z",
+  "updated_at": "2026-03-05T07:15:53.930776Z",
+  "closed_at": null,
+  "custom": {}
+}

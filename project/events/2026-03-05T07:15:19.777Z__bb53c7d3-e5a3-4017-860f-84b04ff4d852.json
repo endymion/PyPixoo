@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "bb53c7d3-e5a3-4017-860f-84b04ff4d852",
+  "issue_id": "PIXO-762c0ab2-1c49-416b-91bb-cc5f58cbfba4",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:19.777Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Rename CLI command to pixoo"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-e8bfdb0b-8ab0-4763-b81a-48f357676b3a",
+  "title": "Scene font registry + validation",
+  "description": "Registry-driven scene font listing/registration and HeaderConfig validation.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:10.278421Z",
+  "updated_at": "2026-03-05T07:15:52.219359Z",
+  "closed_at": "2026-03-05T07:15:31.679355Z",
+  "custom": {}
+}

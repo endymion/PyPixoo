@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "6edee919-775f-4ce5-a993-96d614a43aa9",
+  "issue_id": "PIXO-ed83a4e6-a56b-4845-af89-3e76b801ac18",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:13.778Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: single_pixel_test.py"
+  }
+}

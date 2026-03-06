@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-1cf8b0d6-bc4e-494f-b846-31e461cbaf20",
+  "title": "PyPixoo acceptance testing",
+  "description": "",
+  "type": "initiative",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:09.260939Z",
+  "updated_at": "2026-03-05T07:15:09.260939Z",
+  "closed_at": null,
+  "custom": {}
+}

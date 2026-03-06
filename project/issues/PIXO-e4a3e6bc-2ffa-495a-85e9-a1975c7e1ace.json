@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-e4a3e6bc-2ffa-495a-85e9-a1975c7e1ace",
+  "title": "Implement play_gif source variants",
+  "description": "Implement GifSource mapping and play_gif for url/tf_file/tf_directory.",
+  "type": "task",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-32d5c0d7-62a2-444b-8483-8a8751a9d9db",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "6dbfd66f-45c3-49c7-8020-b74613672774",
+      "author": "ryan.porter",
+      "text": "Implemented  variants and  mapping to Device/PlayTFGif FileType 0/1/2.",
+      "created_at": "2026-03-05T07:16:15.224942Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:09.897346Z",
+  "updated_at": "2026-03-05T07:16:15.224942Z",
+  "closed_at": "2026-03-05T07:15:31.295070Z",
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-c9aa4d14-f8a7-4f86-bc44-0f8eb705388f",
+  "title": "Table block layout engine",
+  "description": "Implement contiguous table-block column width metrics and aligned cell rendering.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:05.638009Z",
+  "updated_at": "2026-03-05T07:15:48.087099Z",
+  "closed_at": "2026-03-05T07:15:27.633039Z",
+  "custom": {}
+}

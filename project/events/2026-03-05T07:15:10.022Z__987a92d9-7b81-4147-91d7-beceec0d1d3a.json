@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "987a92d9-7b81-4147-91d7-beceec0d1d3a",
+  "issue_id": "PIXO-fdaf8f13-71e3-4e31-ba2a-9047b0edd57e",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:10.022Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Demo currently fails with ModuleNotFoundError: pypixoo.animation. Migrate black_band_chained.py to current V2 API and verify real-device execution.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Fix demo black_band_chained.py for V2 API"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "a3f9dfbb-2ec4-4e5e-8da6-bf95277554e9",
+  "issue_id": "kanbus-8aef906c-bc74-4ed1-b840-9c5d9fcf57a2",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:03.279Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "bug",
+    "status": "closed",
+    "title": "Fix cli scene run double asyncio.run event loop usage"
+  }
+}

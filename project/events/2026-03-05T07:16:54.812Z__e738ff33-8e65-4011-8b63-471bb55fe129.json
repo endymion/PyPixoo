@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "e738ff33-8e65-4011-8b63-471bb55fe129",
+  "issue_id": "kanbus-2b358a23-e86c-474a-92fb-71ecdf0d6f86",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:54.812Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "bug",
+    "status": "closed",
+    "title": "Kanbus clock: center and dim issue_created type/status line"
+  }
+}

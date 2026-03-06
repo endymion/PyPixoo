@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "948adf70-b077-4ed4-9002-6537b8081d14",
+  "issue_id": "kanbus-1d72ca64-6913-4ebb-8046-48f6fd6265a7",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:53.762Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "bug",
+    "status": "closed",
+    "title": "Fix demo black_band_opaque.py for V2 API"
+  }
+}

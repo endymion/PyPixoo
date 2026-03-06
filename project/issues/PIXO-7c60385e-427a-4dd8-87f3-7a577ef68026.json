@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-7c60385e-427a-4dd8-87f3-7a577ef68026",
+  "title": "Demos use PIXOO_DEVICE_IP",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "17523975-f6e7-4d12-a18c-50dd9fd736de",
+      "author": "ryan.porter",
+      "text": "Starting: update demos to load .env and use PIXOO_DEVICE_IP (fallback PIXOO_IP, then default) for device IP.",
+      "created_at": "2026-03-05T07:16:09.018209Z"
+    },
+    {
+      "id": "748d0c77-db9c-4968-91d2-d77c196caa8d",
+      "author": "ryan.porter",
+      "text": "Updated demos to load .env and use PIXOO_DEVICE_IP (fallback PIXOO_IP, then 192.168.0.37). Updated demos README with new default IP behavior. Tests not run.",
+      "created_at": "2026-03-05T07:16:09.117913Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:06.514323Z",
+  "updated_at": "2026-03-05T07:16:09.117913Z",
+  "closed_at": "2026-03-05T07:15:28.381627Z",
+  "custom": {}
+}

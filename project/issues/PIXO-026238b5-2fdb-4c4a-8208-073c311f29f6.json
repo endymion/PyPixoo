@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-026238b5-2fdb-4c4a-8208-073c311f29f6",
+  "title": "InfoScene renderer update",
+  "description": "Update InfoScene to render InfoLayout rows (text/table) with deterministic host-raster layout.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:16.511802Z",
+  "updated_at": "2026-03-05T07:15:57.756694Z",
+  "closed_at": "2026-03-05T07:15:37.797381Z",
+  "custom": {}
+}

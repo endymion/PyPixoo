@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-5ab4eb1a-9389-4488-9fb3-c9bd49e86c95",
+  "title": "Kanbus clock: add 4px gap under ID on COMMENT slides",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "94cb8f33-75db-4a6f-a0b0-d499610582dc",
+      "author": "ryan.porter",
+      "text": "Applying same spacing tweak as CREATED: add +2px spacer before first comment body line so ID-to-body gap is 4px total.",
+      "created_at": "2026-03-05T07:16:34.110485Z"
+    },
+    {
+      "id": "e1a7d489-e751-4146-9250-d253174840a1",
+      "author": "ryan.porter",
+      "text": "Implemented COMMENT slide spacing: added +2px spacer before first body row (line index 1), giving 4px total under ID. Validation: py_compile + tests/test_kanbus_clock.py (19 passed). Triggered visual comment event on kanbus-a3994c.",
+      "created_at": "2026-03-05T07:16:34.206155Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:20.311265Z",
+  "updated_at": "2026-03-05T07:16:34.206155Z",
+  "closed_at": "2026-03-05T07:15:41.382422Z",
+  "custom": {}
+}

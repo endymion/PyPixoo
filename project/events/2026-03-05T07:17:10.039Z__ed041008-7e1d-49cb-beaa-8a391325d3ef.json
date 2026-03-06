@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "ed041008-7e1d-49cb-beaa-8a391325d3ef",
+  "issue_id": "kanbus-cef3128a-f92c-469a-8479-c88050c88053",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:10.039Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Watcher smoke: status transition ping"
+  }
+}

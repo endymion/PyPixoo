@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-abbf8d72-4a3e-484b-90b4-2883b4c93c39",
+  "title": "Batch upload via CommandList with safe chunking",
+  "description": "Feature: Batch upload via CommandList with safe chunking\nScenario: Large frame sets are chunked safely\nGiven a GifSequence with 90 frames\nWhen upload_sequence is called in command_list mode with chunk_size 40\nThen three Draw/CommandList requests are sent with chunk sizes 40, 40, and 10",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-48cebaeb-dce9-4af2-9b85-b666f05944e9",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "89366758-b694-4a35-9e85-e86d23af3652",
+      "author": "ryan.porter",
+      "text": "Implemented and verified Draw/CommandList chunking behavior (including 90-frame, chunk_size=40 scenario).",
+      "created_at": "2026-03-05T07:16:51.073480Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:25.999243Z",
+  "updated_at": "2026-03-05T07:16:51.073480Z",
+  "closed_at": "2026-03-05T07:15:46.670682Z",
+  "custom": {}
+}

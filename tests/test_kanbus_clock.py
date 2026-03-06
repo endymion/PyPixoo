@@ -513,15 +513,13 @@ def test_payload_prefix_override_prefers_full_issue_key():
     assert module._payload_prefix_override({"text": "Issue ABC-9876 updated"}) == "ABC"
 
 
-def test_repo_prefix_used_when_show_fails(tmp_path: Path):
+def test_issue_prefix_falls_back_to_event_issue_id_when_show_fails(tmp_path: Path):
     module = _load_demo_module()
-    config_path = tmp_path / ".kanbus.yml"
-    config_path.write_text("project_key: PIXO\n", encoding="utf-8")
     event = module.KanbusEvent(
         path=tmp_path / "project" / "events" / "event.json",
         schema_version=1,
         event_id="e-1",
-        issue_id="03adbc",
+        issue_id="PIXO-03adbc",
         event_type="issue_created",
         occurred_at=module._parse_iso8601("2026-03-05T00:00:00Z"),
         actor_id="tester",
@@ -535,10 +533,8 @@ def test_repo_prefix_used_when_show_fails(tmp_path: Path):
     assert _scene_header_text(notice.scene).startswith("PIXO")
 
 
-def test_repo_prefix_used_when_issue_id_matches_project_key(tmp_path: Path):
+def test_issue_prefix_uses_key_from_show_payload():
     module = _load_demo_module()
-    config_path = tmp_path / ".kanbus.yml"
-    config_path.write_text("project_key: PIXO\n", encoding="utf-8")
 
     def _fake_issue(*args, **kwargs):
         payload = {
@@ -550,7 +546,7 @@ def test_repo_prefix_used_when_issue_id_matches_project_key(tmp_path: Path):
         return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
 
     module.subprocess.run = _fake_issue  # type: ignore[assignment]
-    snapshot = module._fetch_issue_snapshot("acdeff11-2222-3333-4444-555555555555", repo_root=tmp_path)
+    snapshot = module._fetch_issue_snapshot("acdeff11-2222-3333-4444-555555555555")
     assert snapshot is not None
     assert snapshot.id_prefix_upper == "PIXO"
 
@@ -620,7 +616,7 @@ def test_scan_folder_for_new_events_ignores_baseline_and_picks_new(tmp_path: Pat
 
 def test_watch_poll_step_returns_logs_and_notices(tmp_path: Path):
     module = _load_demo_module()
-    module.subprocess.run = lambda *args, **kwargs: SimpleNamespace(returncode=1, stdout="")  # type: ignore[assignment]
+    module.subprocess.run = lambda *args, **kwargs: SimpleNamespace(returncode=1, stdout="", stderr="")  # type: ignore[assignment]
     events_dir = tmp_path / "project" / "events"
     events_dir.mkdir(parents=True)
     event_path = events_dir / "2026-03-04T00:00:01.000Z__new.json"
@@ -640,12 +636,46 @@ def test_watch_poll_step_returns_logs_and_notices(tmp_path: Path):
         failures=failures,
         do_rescan=False,
         max_failures=5,
+        kbs_root=tmp_path,
     )
 
     assert len(notices) == 1
     assert notices[0].header.startswith("KANBUS")
     assert any("watcher: event issue_created" in line for line in logs)
     assert event_path.name in tracked[events_dir.resolve()]
+
+
+def test_watch_poll_step_skips_ambiguous_identifiers(tmp_path: Path):
+    module = _load_demo_module()
+
+    def _fake_run(*args, **kwargs):
+        return SimpleNamespace(returncode=1, stdout="", stderr="ambiguous identifier")
+
+    module.subprocess.run = _fake_run  # type: ignore[assignment]
+    events_dir = tmp_path / "project" / "events"
+    events_dir.mkdir(parents=True)
+    event_path = events_dir / "2026-03-04T00:00:01.000Z__new.json"
+    _write_event(
+        event_path,
+        event_type="issue_created",
+        issue_id="kanbus-watch-2",
+        occurred_at="2026-03-04T00:00:01.000Z",
+        payload={"title": "watch", "status": "open", "issue_type": "task"},
+    )
+
+    tracked: dict[Path, set[str]] = {events_dir.resolve(): set()}
+    failures: dict[Path, int] = {}
+    logs, notices = module._watch_poll_step(
+        root=tmp_path,
+        tracked=tracked,
+        failures=failures,
+        do_rescan=False,
+        max_failures=5,
+        kbs_root=tmp_path,
+    )
+
+    assert notices == []
+    assert any("ambiguous identifier" in line for line in logs)
 
 
 def test_merge_new_event_dirs_adds_dirs_after_startup(tmp_path: Path):
@@ -943,7 +973,7 @@ def test_live_issue_fetch_called_for_each_event(monkeypatch):
 
     assert len(calls) == 3
     assert all(call[0][:3] == ["kbs", "show", call[0][2]] for call in calls)
-    assert all(call[1] == str(Path("/tmp/demo-repo").resolve()) for call in calls)
+    assert all(call[1] is None for call in calls)
 
 
 def test_parent_fetch_only_when_parent_present(monkeypatch):

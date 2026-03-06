@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-cd141666-31b6-487f-bd73-e37bf4249864",
+  "title": "Kanbus clock: workspace kbs show fails on invalid configs",
+  "description": "When kanbus_clock runs kbs from the workspace root, kbs show fails if any nested repo has an invalid .kanbus.yml (e.g., legacy external_projects). This causes NO DESCRIPTION in cards.\n\nFix: workspace discovery should skip invalid configs and continue, while single-project root remains strict.",
+  "type": "bug",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "a19f3418-b686-4f2c-9326-66111b19c32a",
+      "author": "ryan.porter",
+      "text": "Diagnosed: kbs show from workspace root fails due to invalid .kanbus.yml in nested repo; need workspace discovery to skip invalid configs while keeping strict single-project root.",
+      "created_at": "2026-03-05T14:09:16.122263Z"
+    },
+    {
+      "id": "8996247b-9206-4ced-b0d4-4de9be969a95",
+      "author": "ryan.porter",
+      "text": "Investigating NO DESCRIPTION: kbs show from workspace root is erroring when a discovered project lacks an issues directory. Will make Kanbus workspace discovery/issue lookup tolerant (skip missing issues dir) and then verify kanbus_clock shows descriptions. Added debug mode to print kbs stdout/stderr.",
+      "created_at": "2026-03-05T14:13:26.502353Z"
+    },
+    {
+      "id": "de29219c-21f9-4f38-af58-ea22b80a9152",
+      "author": "ryan.porter",
+      "text": "Fixed root cause: added kbs show --project-root support in Kanbus and wired kanbus_clock to pass event.repo_root. kbs show now resolves beads-mode projects without ambiguity. PyPixoo tests pass. Ready for you to restart clock and verify descriptions are no longer NO DESCRIPTION.",
+      "created_at": "2026-03-05T14:34:41.248695Z"
+    }
+  ],
+  "created_at": "2026-03-05T14:09:11.001311Z",
+  "updated_at": "2026-03-05T14:34:41.248695Z",
+  "closed_at": null,
+  "custom": {}
+}

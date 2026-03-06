@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "cbafd1cb-2dbe-4d75-a804-eafcfbfe515c",
+  "issue_id": "kanbus-e5bda04b-ef65-452c-888d-b6dda96ef3bb",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T06:54:59.229Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock header prefix uses issue key before dash"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-70dc65f7-ddf4-49d4-920d-2a8dc7f74982",
+  "title": "API command matrix generator",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "9cde3f2f-b89c-4b88-ae53-c8e22b406375",
+      "author": "ryan.porter",
+      "text": "Added command matrix builder and generated docs/api/command_matrix.md from ShowDoc export.",
+      "created_at": "2026-03-05T07:16:08.350845Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:05.514676Z",
+  "updated_at": "2026-03-05T07:16:08.350845Z",
+  "closed_at": "2026-03-05T07:15:27.509872Z",
+  "custom": {}
+}

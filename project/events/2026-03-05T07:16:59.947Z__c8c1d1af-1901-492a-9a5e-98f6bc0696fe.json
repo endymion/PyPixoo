@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "c8c1d1af-1901-492a-9a5e-98f6bc0696fe",
+  "issue_id": "kanbus-67020ba0-ed7e-4ec1-b3f6-456096701a8a",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:59.947Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Phase 2: device/channel command parity"
+  }
+}

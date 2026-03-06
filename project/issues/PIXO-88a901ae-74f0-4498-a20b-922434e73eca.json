@@ -1,0 +1,49 @@
+{
+  "id": "PIXO-88a901ae-74f0-4498-a20b-922434e73eca",
+  "title": "Clock 12 marker brightness is inverted",
+  "description": "In clock demos, the 12 o'clock marker appears dimmer than other markers; it should be brighter. Update marker color/opacity logic so top marker is brighter by default.",
+  "type": "bug",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-b214e4f7-335d-4dfc-9f16-12abffa96f31",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "34c5b74c-3808-4dcf-b917-c0ebeb08afcf",
+      "author": "ryan.porter",
+      "text": "Starting fix: inspect clock marker color defaults and top-marker override path, then make 12 o'clock marker brighter than the rest.",
+      "created_at": "2026-03-05T07:16:07.103501Z"
+    },
+    {
+      "id": "bacfb404-d984-42aa-a464-7f499a073d7f",
+      "author": "ryan.porter",
+      "text": "Implemented fix: increased default top marker color intensity so 12 o'clock marker is brighter than other markers. Updated demos/clock_realtime.py default --top-marker-color to rgba(255,0,255,0.8), Storybook TimeNoSecondHand story default to same, and demos/README wording. Validation: ran clock demo on device in push mode; clock rendered and updated normally.",
+      "created_at": "2026-03-05T07:16:07.197919Z"
+    },
+    {
+      "id": "cdc454ac-ee65-4c4d-8fa7-e631f136ee43",
+      "author": "ryan.porter",
+      "text": "Reopened: awaiting user visual confirmation on real device. Agent will not close visual demo bugs/tests without explicit user confirmation of expected on-screen behavior.",
+      "created_at": "2026-03-05T07:16:07.293484Z"
+    },
+    {
+      "id": "30a66804-3b03-4bdf-b9ad-8136c5f86097",
+      "author": "ryan.porter",
+      "text": "Still in progress during active visual clock validation; no closure until explicit user confirmation.",
+      "created_at": "2026-03-05T07:16:07.389371Z"
+    },
+    {
+      "id": "1b310eca-96a5-4fae-bd3b-4bb69ba39587",
+      "author": "ryan.porter",
+      "text": "User confirmed this is already fixed during manual device validation; closing bug.",
+      "created_at": "2026-03-05T07:16:07.483840Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:04.890881Z",
+  "updated_at": "2026-03-05T07:16:07.483840Z",
+  "closed_at": "2026-03-05T07:15:26.871094Z",
+  "custom": {}
+}

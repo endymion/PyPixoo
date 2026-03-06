@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "665217d7-c0ce-4999-905b-bd626257280e",
+  "issue_id": "kanbus-76c7449a-407a-45e7-9ec0-b3655bbf9e7c",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:01.479Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "open",
+    "title": "Acceptance test: single_pixel_test.py"
+  }
+}

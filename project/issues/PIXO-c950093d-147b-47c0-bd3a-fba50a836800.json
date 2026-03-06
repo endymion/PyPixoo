@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-c950093d-147b-47c0-bd3a-fba50a836800",
+  "title": "Kanbus: recursive workspace discovery and unique fragment lookup",
+  "description": "As a Kanbus user\nI want kbs run from a workspace root to discover all nested .kanbus.yml projects\nSo that issue lookups work across nested repos without per-project cwd logic.\n\nFeature: Workspace discovery via .kanbus.yml\n\nScenario: Workspace root discovers nested projects\n  Given a workspace root without a .kanbus.yml file\n  And it contains nested repos each with .kanbus.yml\n  When project directories are discovered\n  Then all nested projects are included\n\nScenario: Single project root does not recurse\n  Given a repo root with a .kanbus.yml file\n  When project directories are discovered\n  Then only that project is included\n\nScenario: Show by fragment requires uniqueness\n  Given a workspace with multiple projects\n  And two issues share the same fragment\n  When I run \"kanbus show <fragment>\"\n  Then the command should fail with \"ambiguous identifier\"\n  And it should instruct to use full key+short hash",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-1742ec6d-696a-4bf7-98a5-78a0a9d0dbad",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "03284436-9998-4a88-a332-b27cd5ab62e2",
+      "author": "ryan.porter",
+      "text": "Starting Kanbus discovery work: reviewing current discovery functions and specs; will implement recursive .kanbus.yml workspace discovery and unique-only fragment lookup.",
+      "created_at": "2026-03-05T13:01:19.482967Z"
+    },
+    {
+      "id": "f92f627f-afcd-41c4-90ed-5955960f332f",
+      "author": "ryan.porter",
+      "text": "Implemented recursive .kanbus.yml discovery (Python + Rust), removed upward config search, and updated project/discovery BDD steps to use workspace + config-based fixtures. Next: finish specs, run tests, and validate issue show ambiguity behavior.",
+      "created_at": "2026-03-05T13:14:15.712927Z"
+    },
+    {
+      "id": "fe663780-9d5b-4eba-89eb-cfeb30dfdeac",
+      "author": "ryan.porter",
+      "text": "BDD run complete: project_utilities, project_discovery, issue_show, daemon_error_handling all green after workspace discovery changes.",
+      "created_at": "2026-03-05T13:16:09.227757Z"
+    }
+  ],
+  "created_at": "2026-03-05T13:01:00.154992Z",
+  "updated_at": "2026-03-05T13:18:15.912577Z",
+  "closed_at": "2026-03-05T13:18:15.912577Z",
+  "custom": {}
+}

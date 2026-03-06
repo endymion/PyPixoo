@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-b3da20be-eec9-4ecc-bd51-260312d3615a",
+  "title": "Kanbus clock: show issue description on transition cards",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "740475ce-ed09-40f7-9d14-81c055e0f2ab",
+      "author": "ryan.porter",
+      "text": "Implementing transition-card body update: include issue description line between ID and FROM/TO fields, with wrapping/clipping safeguards.",
+      "created_at": "2026-03-05T07:16:20.907454Z"
+    },
+    {
+      "id": "5a2931c4-8f37-4e85-9bf9-30887c518ab1",
+      "author": "ryan.porter",
+      "text": "Implemented transition-card summary line above FROM/TO: uses payload title/description first, then kbs show fallback (cached), wrapped to fit display. Updated dynamic styling indices and tests. Validation: py_compile + tests/test_kanbus_clock.py (17 passed).",
+      "created_at": "2026-03-05T07:16:21.001889Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:13.652886Z",
+  "updated_at": "2026-03-05T07:16:21.001889Z",
+  "closed_at": "2026-03-05T07:15:35.102494Z",
+  "custom": {}
+}

@@ -1,0 +1,55 @@
+{
+  "id": "PIXO-6db04ee9-dc79-4633-8593-a4fce8e1ceca",
+  "title": "pixooclock: lighten default hands one step and extend default lengths by 2px",
+  "description": "",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "83ceca93-1caa-42f9-adb4-33bd9022d7bc",
+      "author": "ryan.porter",
+      "text": "Applying default hand style tweak: +1 Radix level for hour/minute/second and +2px default lengths for all hands; update tests accordingly.",
+      "created_at": "2026-03-05T07:16:51.447694Z"
+    },
+    {
+      "id": "e76f42f6-79e1-4be9-85d5-18f1231b38f1",
+      "author": "ryan.porter",
+      "text": "Implemented default hand style update in pixooclock: colors lightened by one Radix step (hour 10, minute 11, second 6) and default lengths increased by 2px (18/25/30). Updated parser/color expectations in tests. Validation: uv run python -m py_compile demos/pixooclock.py demos/kanbus_clock.py; uv run pytest tests/test_demo_three_hand_clock.py tests/test_kanbus_clock.py -q (35 passed). Pending your visual confirmation before closing.",
+      "created_at": "2026-03-05T07:16:51.536572Z"
+    },
+    {
+      "id": "642fc909-d41f-4295-8d16-6581b3aa28cb",
+      "author": "ryan.porter",
+      "text": "Adjustment requested: change hand-length defaults from +2px to +1px over baseline (17/24/29). Updating code/tests now.",
+      "created_at": "2026-03-05T07:16:51.627654Z"
+    },
+    {
+      "id": "c432777a-c195-452a-a879-b88bfbb99add",
+      "author": "ryan.porter",
+      "text": "Adjusted per request: default hand lengths are now +1px over baseline (17/24/29), not +2px. Validation: uv run python -m py_compile demos/pixooclock.py; uv run pytest tests/test_demo_three_hand_clock.py tests/test_kanbus_clock.py -q (35 passed). Pending your visual confirmation before closure.",
+      "created_at": "2026-03-05T07:16:51.717632Z"
+    },
+    {
+      "id": "345ab1c6-9273-4504-b515-0e54b71a8a7b",
+      "author": "ryan.porter",
+      "text": "Correction: user wants hand lengths +4px from original baseline (16/23/28 -> 20/27/32). Applying now.",
+      "created_at": "2026-03-05T07:16:51.807228Z"
+    },
+    {
+      "id": "e64958af-c82c-4542-930e-82adda16c29f",
+      "author": "ryan.porter",
+      "text": "Applied correction: default hand lengths are now +4px vs original baseline (hour/minute/second = 20/27/32). Validation: uv run python -m py_compile demos/pixooclock.py; uv run pytest tests/test_demo_three_hand_clock.py tests/test_kanbus_clock.py -q (35 passed).",
+      "created_at": "2026-03-05T07:16:51.896091Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:26.501476Z",
+  "updated_at": "2026-03-05T07:16:51.896091Z",
+  "closed_at": null,
+  "custom": {}
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "7eeeb325-65f9-4555-803b-6c522c2b74ee",
+  "issue_id": "kanbus-a4fb98b8-8d18-483d-8b25-6fd2a55d3b0c",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:05.629Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "story",
+    "status": "closed",
+    "title": "Explicit GIF ID reserve/reset semantics"
+  }
+}

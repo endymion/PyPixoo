@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-64ff225e-3664-49d6-a0a2-bee0dc17fa0c",
+  "title": "Fix cli scene run double asyncio.run event loop usage",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "8081e778-e701-43b1-aaef-72f2eb02f520",
+      "author": "ryan.porter",
+      "text": "Reproduced code-level defect in cmd_scene_run: two sequential asyncio.run calls. Implementing single-coroutine flow matching cmd_scene_enqueue/cmd_scene_demo pattern.",
+      "created_at": "2026-03-05T07:16:23.822255Z"
+    },
+    {
+      "id": "a3511828-14cc-4a7a-954b-b27ae9d6b7bc",
+      "author": "ryan.porter",
+      "text": "Fixed cmd_scene_run to use a single coroutine and one asyncio.run() call (same pattern as enqueue/demo). Verified with tests: test_cli_v3 and test_cli pass.",
+      "created_at": "2026-03-05T07:16:23.916911Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:15.603121Z",
+  "updated_at": "2026-03-05T07:16:23.916911Z",
+  "closed_at": "2026-03-05T07:15:37.006945Z",
+  "custom": {}
+}

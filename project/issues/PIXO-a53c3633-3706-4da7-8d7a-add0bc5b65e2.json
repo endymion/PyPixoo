@@ -1,0 +1,61 @@
+{
+  "id": "PIXO-a53c3633-3706-4da7-8d7a-add0bc5b65e2",
+  "title": "Display list text does not render on device (black screen)",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "39a983ea-a6f4-4cde-9df3-9b6f96917388",
+      "author": "ryan.porter",
+      "text": "During acceptance run, weather was not visible after tools demo; likely mode/channel state interaction. Retesting with explicit tool shutdown + channel reset + weather commands.",
+      "created_at": "2026-03-05T07:16:15.511310Z"
+    },
+    {
+      "id": "eec1018d-cca5-40b1-af79-de8be98b38e2",
+      "author": "ryan.porter",
+      "text": "Running muted late-night retest: make display-list demo configurable and default text color to dark.sand5 for low brightness verification.",
+      "created_at": "2026-03-05T07:16:15.605523Z"
+    },
+    {
+      "id": "22306f1f-af3d-4943-8917-8d90732abec2",
+      "author": "ryan.porter",
+      "text": "Retest attempt: display-list demo now uses font-id 6 (from live font registry) and forces channel index 3 before Draw/SendHttpItemList; reran with muted color dark.sand5 for on-device validation.",
+      "created_at": "2026-03-05T07:16:15.703675Z"
+    },
+    {
+      "id": "145fd4e0-50be-44f2-92e3-4d04b12dea73",
+      "author": "ryan.porter",
+      "text": "Root cause confirmed on-device: text display list must use type=22 with TextString. Updated demo_display_list defaults to item-type 22 and reran successfully (user saw HELLO).",
+      "created_at": "2026-03-05T07:16:15.800365Z"
+    },
+    {
+      "id": "9a7b60b2-d48b-42db-a95b-7aab7a5b6927",
+      "author": "ryan.porter",
+      "text": "Reopened: intermittent/blank still observed after prior close. Implementing reliability fix to match known-good payload (type=22, font=2, frame_by_frame base upload, no forced channel switch).",
+      "created_at": "2026-03-05T07:16:15.894267Z"
+    },
+    {
+      "id": "d212547f-8808-4eff-aa7b-fda013653192",
+      "author": "ryan.porter",
+      "text": "Implemented SDK parity fix: DisplayItem now includes align (default 1) and send_display_list now sends align in ItemList payload, matching official SendHttpItemList examples. Unit test updated/passing.",
+      "created_at": "2026-03-05T07:16:15.989248Z"
+    },
+    {
+      "id": "b03ab4ed-e968-459e-8954-915f290ddf7d",
+      "author": "ryan.porter",
+      "text": "Closing based on real-device acceptance in this session: user confirmed display-list text visible on device after payload parity fixes (type=22/TextString path with align support).",
+      "created_at": "2026-03-05T07:16:16.086757Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:10.150678Z",
+  "updated_at": "2026-03-05T07:16:16.086757Z",
+  "closed_at": "2026-03-05T07:15:31.550844Z",
+  "custom": {}
+}

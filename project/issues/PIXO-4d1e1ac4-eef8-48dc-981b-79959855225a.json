@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-4d1e1ac4-eef8-48dc-981b-79959855225a",
+  "title": "Kanbus clock: center and dim issue_created type/status line",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "298ecfa7-359f-4f30-8e1d-f895a524e50b",
+      "author": "ryan.porter",
+      "text": "Implementing: issue_created second line (TYPE STATUS) centered and color-matched to ID line.",
+      "created_at": "2026-03-05T07:16:10.573057Z"
+    },
+    {
+      "id": "59427af5-7b1b-4442-9108-6a0a67103692",
+      "author": "ryan.porter",
+      "text": "Implemented created-card typography update: second line (TYPE STATUS) is now centered and darkened to match the ID line. Added renderer/test coverage. Validation: py_compile + tests/test_kanbus_clock.py (18 passed).",
+      "created_at": "2026-03-05T07:16:10.673426Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:07.386218Z",
+  "updated_at": "2026-03-05T07:16:10.673426Z",
+  "closed_at": "2026-03-05T07:15:29.118972Z",
+  "custom": {}
+}

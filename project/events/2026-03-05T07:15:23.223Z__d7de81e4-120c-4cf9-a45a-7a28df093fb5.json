@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "d7de81e4-120c-4cf9-a45a-7a28df093fb5",
+  "issue_id": "PIXO-39e01022-a2c7-4193-a68f-9a3b6a52f2b4",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:23.223Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Phase 1: fonts and overlays implementation"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "386fed3c-e7d5-4e0f-9864-2d6fe436b8ed",
+  "issue_id": "PIXO-9b22b961-8669-494b-a620-1a4042407ed0",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:05.768Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus Clock Header Prefix Check 2"
+  }
+}

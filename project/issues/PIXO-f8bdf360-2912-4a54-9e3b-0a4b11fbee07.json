@@ -1,0 +1,49 @@
+{
+  "id": "PIXO-f8bdf360-2912-4a54-9e3b-0a4b11fbee07",
+  "title": "Kanbus clock watcher test issue",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "84c7da01-8aa2-4c7a-bfb7-ef377c09f176",
+      "author": "ryan.porter",
+      "text": "Display verification burst 1: comment event for restarted watcher.",
+      "created_at": "2026-03-05T07:16:24.118459Z"
+    },
+    {
+      "id": "84a36830-db40-4bc1-a74f-e4d58ab05a8a",
+      "author": "ryan.porter",
+      "text": "Unified layout visual test: verify centered dim issue ID and bytesized dim header.",
+      "created_at": "2026-03-05T07:16:24.217025Z"
+    },
+    {
+      "id": "34f12b41-45c2-475f-80ff-2b1b036d02eb",
+      "author": "ryan.porter",
+      "text": "Try-it burst: verify TRANSITION spacing, dim header/ID match, and centered ID line.",
+      "created_at": "2026-03-05T07:16:24.314482Z"
+    },
+    {
+      "id": "fb097aad-66c5-408d-9f3a-845a81e91672",
+      "author": "ryan.porter",
+      "text": "Demo burst C: existing issue transition+comment path.",
+      "created_at": "2026-03-05T07:16:24.409034Z"
+    },
+    {
+      "id": "d827c2dd-274f-40c4-8478-b8d576c76a05",
+      "author": "ryan.porter",
+      "text": "Done: watcher test issue used for live transition/comment verification and now complete.",
+      "created_at": "2026-03-05T07:16:24.503156Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:15.859546Z",
+  "updated_at": "2026-03-05T07:16:24.503156Z",
+  "closed_at": "2026-03-05T07:15:37.277365Z",
+  "custom": {}
+}

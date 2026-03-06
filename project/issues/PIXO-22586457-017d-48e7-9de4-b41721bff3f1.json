@@ -1,0 +1,43 @@
+{
+  "id": "PIXO-22586457-017d-48e7-9de4-b41721bff3f1",
+  "title": "Acceptance test: storybook_clock.py",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "37293387-a8bd-4e0d-b23f-29b25be19c06",
+      "author": "ryan.porter",
+      "text": "Starting manual acceptance test on real device: running demos/storybook_clock.py. Awaiting user visual confirmation before closure.",
+      "created_at": "2026-03-05T07:16:35.334386Z"
+    },
+    {
+      "id": "679b4d35-8c88-485f-b568-b40ad8b9701c",
+      "author": "ryan.porter",
+      "text": "User-confirmed failure: display stuck at 12:00 and not changing. Linked bug opened: kanbus-9ff5ef. Fix in progress.",
+      "created_at": "2026-03-05T07:16:35.432699Z"
+    },
+    {
+      "id": "ab2bf68a-c068-463b-96d7-66edf5c33e8c",
+      "author": "ryan.porter",
+      "text": "Acceptance confirmation run command: python demos/clock_realtime.py --mode native_clock --sync-utc --poll-seconds 3. Expected display: device-native clock face (ClockId=0 default) updating continuously in real time without browser burst/stall behavior.",
+      "created_at": "2026-03-05T07:16:35.526059Z"
+    },
+    {
+      "id": "138eb57e-c230-45f3-aca8-46a141eff1ab",
+      "author": "ryan.porter",
+      "text": "Superseded by the new three-hand clock acceptance track; historical storybook_clock acceptance item no longer active. Closing.",
+      "created_at": "2026-03-05T07:16:35.620423Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:21.461928Z",
+  "updated_at": "2026-03-05T07:16:35.620423Z",
+  "closed_at": "2026-03-05T07:15:42.563158Z",
+  "custom": {}
+}

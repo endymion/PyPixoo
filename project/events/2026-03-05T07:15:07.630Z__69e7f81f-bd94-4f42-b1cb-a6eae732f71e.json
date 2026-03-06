@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "69e7f81f-bd94-4f42-b1cb-a6eae732f71e",
+  "issue_id": "PIXO-d48e12bf-ac5d-4814-8d16-482712451f16",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:07.630Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Headless browser rendering"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "3308582e-f2e3-4130-8807-9ba8c9b50f75",
+  "issue_id": "PIXO-f8bdf360-2912-4a54-9e3b-0a4b11fbee07",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:15.859Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock watcher test issue"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "85a7eba6-ff5f-42fb-a8d2-c71007a2880a",
+  "issue_id": "PIXO-b6f96726-4e89-4154-8caf-d19af4d6070e",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:14.429Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: black_band_transparent.py"
+  }
+}

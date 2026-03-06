@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "bd68e56a-e0ae-415e-86ba-c55221eb3ffd",
+  "issue_id": "kanbus-52f2ab71-e717-4b50-92d8-d2afe39c79f6",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:58.739Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "epic",
+    "status": "closed",
+    "title": "V2 native HttpGif upload protocol"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "dcbb548f-6727-449c-8a7d-f71bd8899869",
+  "issue_id": "PIXO-3281bfa3-51f4-4ec4-bc09-b69fde81e84f",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:23.483Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Phase 3: apps/tools command parity"
+  }
+}

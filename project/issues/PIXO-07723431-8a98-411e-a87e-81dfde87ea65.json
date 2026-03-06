@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-07723431-8a98-411e-a87e-81dfde87ea65",
+  "title": "Acceptance test: browser_mixed.py",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "fbe70683-ae70-4113-a02c-18060d4d05fd",
+      "author": "ryan.porter",
+      "text": "Starting manual acceptance test on real device: running demos/browser_mixed.py and validating mixed static/web playback.",
+      "created_at": "2026-03-05T07:16:24.595942Z"
+    },
+    {
+      "id": "3d8e04bf-370e-4ff3-8830-08bb86749eb7",
+      "author": "ryan.porter",
+      "text": "Failure captured: ImportError for AnimationPlayer from pypixoo. Linked bug opened: kanbus-7e70d8. Fix in progress.",
+      "created_at": "2026-03-05T07:16:24.686540Z"
+    },
+    {
+      "id": "819df4a2-22f6-4057-960c-771fc5528907",
+      "author": "ryan.porter",
+      "text": "Acceptance test PASSED after bug fix. Ran demos/browser_mixed.py on device; mixed static+web sequence uploaded and displayed as expected.",
+      "created_at": "2026-03-05T07:16:24.776609Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:15.981323Z",
+  "updated_at": "2026-03-05T07:16:24.776609Z",
+  "closed_at": "2026-03-05T07:15:37.408882Z",
+  "custom": {}
+}

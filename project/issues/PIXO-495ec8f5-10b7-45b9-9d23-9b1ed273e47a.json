@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-495ec8f5-10b7-45b9-9d23-9b1ed273e47a",
+  "title": "Public API exports only V2 animation model",
+  "description": "Feature: Public API exports only V2 animation model\nScenario: Top-level imports expose V2 native API\nGiven the pypixoo package is imported\nWhen a consumer imports from pypixoo\nThen legacy animation symbols are absent and V2 symbols are available",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-8b4a374b-8d84-4656-8b49-f9496fa2cb15",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "bcec313f-92d4-471f-b279-9d95ed0fedb8",
+      "author": "ryan.porter",
+      "text": "Top-level API now exports only V2-native animation/sequencing symbols; legacy animation exports removed.",
+      "created_at": "2026-03-05T07:16:18.958740Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:12.401896Z",
+  "updated_at": "2026-03-05T07:16:18.958740Z",
+  "closed_at": "2026-03-05T07:15:33.673737Z",
+  "custom": {}
+}

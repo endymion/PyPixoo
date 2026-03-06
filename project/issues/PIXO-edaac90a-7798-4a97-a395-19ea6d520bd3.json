@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-edaac90a-7798-4a97-a395-19ea6d520bd3",
+  "title": "ShowDoc export tooling",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "4eb52a8e-08bf-4253-95e5-bf21b0ca18cc",
+      "author": "ryan.porter",
+      "text": "Implemented ShowDoc export script and generated docs/api/showdoc (index, raw, markdown).",
+      "created_at": "2026-03-05T07:16:08.040637Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:05.268897Z",
+  "updated_at": "2026-03-05T07:16:08.040637Z",
+  "closed_at": "2026-03-05T07:15:27.253066Z",
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "f4fd1105-f782-491e-a6f4-2d561e6dd361",
+  "issue_id": "PIXO-a50b8465-e3a3-4ce5-b683-1abfaff2d079",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:13.407Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: transition FROM/TO status line overflow"
+  }
+}

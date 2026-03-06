@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-e7150e8a-764b-41e1-baed-8b53f0e9ec94",
+  "title": "Sphinx documentation setup",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "b64024ef-8560-4a50-9171-dad8812bb74f",
+      "author": "ryan.porter",
+      "text": "Added Sphinx config under docs/sphinx with furo theme and API pages; updated README with build instructions; gitignored docs/_build.",
+      "created_at": "2026-03-05T07:16:27.400562Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:18.610905Z",
+  "updated_at": "2026-03-05T07:16:27.400562Z",
+  "closed_at": "2026-03-05T07:15:39.787986Z",
+  "custom": {}
+}

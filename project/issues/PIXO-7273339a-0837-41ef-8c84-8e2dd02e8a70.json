@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-7273339a-0837-41ef-8c84-8e2dd02e8a70",
+  "title": "Kanbus clock demo burst item",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "4a9ab5b7-3387-48ab-bfa9-a61f9ec617e8",
+      "author": "ryan.porter",
+      "text": "Demo burst A: created + comment + transitions for visual verification.",
+      "created_at": "2026-03-05T07:16:07.759604Z"
+    },
+    {
+      "id": "b59dd9f1-80c4-4438-8275-023e000dcd11",
+      "author": "ryan.porter",
+      "text": "Demo burst B: second comment to test wrapping and spacing consistency across cards.",
+      "created_at": "2026-03-05T07:16:07.855870Z"
+    },
+    {
+      "id": "1d5e0e36-4298-4192-bca2-aca556b2f57c",
+      "author": "ryan.porter",
+      "text": "Done: demo burst issue completed; created/comment/transition events verified on device.",
+      "created_at": "2026-03-05T07:16:07.948840Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:05.143074Z",
+  "updated_at": "2026-03-05T07:16:07.948840Z",
+  "closed_at": "2026-03-05T07:15:27.127690Z",
+  "custom": {}
+}

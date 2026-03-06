@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "c40d6b08-2ba7-4187-ab99-fa9ef63a5936",
+  "issue_id": "PIXO-ea97a7bd-edee-4852-9a35-65efb8963e5d",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:12.276Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Phase 2: device/channel command parity"
+  }
+}

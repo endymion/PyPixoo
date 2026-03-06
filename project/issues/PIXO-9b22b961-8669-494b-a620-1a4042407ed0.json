@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-9b22b961-8669-494b-a620-1a4042407ed0",
+  "title": "Kanbus Clock Header Prefix Check 2",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "fe8030ce-a453-48c1-a019-0052979fda52",
+      "author": "ryan.porter",
+      "text": "Comment for header prefix check 2",
+      "created_at": "2026-03-05T07:16:08.447590Z"
+    },
+    {
+      "id": "a21c3b88-f183-443c-8ab1-76e5c7bb0962",
+      "author": "ryan.porter",
+      "text": "Second comment for header prefix check 2",
+      "created_at": "2026-03-05T07:16:08.542177Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:05.768840Z",
+  "updated_at": "2026-03-05T07:16:08.542177Z",
+  "closed_at": "2026-03-05T07:15:27.756290Z",
+  "custom": {}
+}

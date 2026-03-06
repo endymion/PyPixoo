@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-192a7276-18ee-4ecb-af4d-39ba503f17c5",
+  "title": "Manual acceptance matrix",
+  "description": "Define manual device verification matrix for raster + scene transitions.",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "6db5dc5d-fee0-467c-9c73-c90721a2b9ff",
+      "author": "ryan.porter",
+      "text": "Started implementation for v3 layered architecture.",
+      "created_at": "2026-03-05T07:16:42.409807Z"
+    },
+    {
+      "id": "c48b0dae-6fdb-4b57-a278-f111441427e0",
+      "author": "ryan.porter",
+      "text": "Acceptance checklist documented in docs/api/scene_acceptance_matrix.md; awaiting real-device confirmations.",
+      "created_at": "2026-03-05T07:16:42.504166Z"
+    },
+    {
+      "id": "4957a03e-5da8-4eed-882d-94b745976f41",
+      "author": "ryan.porter",
+      "text": "Closure gate: each raster and transition row requires explicit user visual confirmation on real device before marking closed.",
+      "created_at": "2026-03-05T07:16:42.597994Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:25.266033Z",
+  "updated_at": "2026-03-05T07:16:42.597994Z",
+  "closed_at": "2026-03-05T07:15:46.146523Z",
+  "custom": {}
+}

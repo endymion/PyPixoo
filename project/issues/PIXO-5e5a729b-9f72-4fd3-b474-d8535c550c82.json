@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-5e5a729b-9f72-4fd3-b474-d8535c550c82",
+  "title": "InfoScene/DSL migration",
+  "description": "Rewire scene components and info DSL to use shared font renderer/profiles only.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:22.691336Z",
+  "updated_at": "2026-03-05T07:16:03.189843Z",
+  "closed_at": "2026-03-05T07:15:43.632143Z",
+  "custom": {}
+}

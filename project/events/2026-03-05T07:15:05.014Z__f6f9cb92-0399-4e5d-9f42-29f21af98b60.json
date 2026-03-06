@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "f6f9cb92-0399-4e5d-9f42-29f21af98b60",
+  "issue_id": "PIXO-66a00684-658d-44bc-829b-ab0518bb51f4",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:05.014Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Fix black_band demos background thread exception on shutdown"
+  }
+}

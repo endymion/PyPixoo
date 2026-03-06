@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "1d90e282-b616-4194-8f61-edacbf914f31",
+  "issue_id": "kanbus-30d82b4c-6594-408a-b7ec-1f02a9c0c93b",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:55.479Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Add BDD specs for cycle engine"
+  }
+}

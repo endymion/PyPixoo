@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "ec6a0c4c-66b6-408a-8512-595316a64936",
+  "issue_id": "PIXO-2b182b4f-0980-4bfe-b610-c6c05580673f",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:18.854Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Build and validate demo_three_hand_clock.py using bounded stitched upload + phase-locked segments. Includes manual visual acceptance.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Three-hand stitched clock demo"
+  }
+}

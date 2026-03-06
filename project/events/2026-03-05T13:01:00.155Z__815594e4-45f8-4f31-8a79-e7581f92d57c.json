@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "815594e4-45f8-4f31-8a79-e7581f92d57c",
+  "issue_id": "PIXO-c950093d-147b-47c0-bd3a-fba50a836800",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T13:01:00.155Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "As a Kanbus user\nI want kbs run from a workspace root to discover all nested .kanbus.yml projects\nSo that issue lookups work across nested repos without per-project cwd logic.\n\nFeature: Workspace discovery via .kanbus.yml\n\nScenario: Workspace root discovers nested projects\n  Given a workspace root without a .kanbus.yml file\n  And it contains nested repos each with .kanbus.yml\n  When project directories are discovered\n  Then all nested projects are included\n\nScenario: Single project root does not recurse\n  Given a repo root with a .kanbus.yml file\n  When project directories are discovered\n  Then only that project is included\n\nScenario: Show by fragment requires uniqueness\n  Given a workspace with multiple projects\n  And two issues share the same fragment\n  When I run \"kanbus show <fragment>\"\n  Then the command should fail with \"ambiguous identifier\"\n  And it should instruct to use full key+short hash",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "PIXO-1742ec6d-696a-4bf7-98a5-78a0a9d0dbad",
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus: recursive workspace discovery and unique fragment lookup"
+  }
+}

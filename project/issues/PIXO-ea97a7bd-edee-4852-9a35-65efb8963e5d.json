@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-ea97a7bd-edee-4852-9a35-65efb8963e5d",
+  "title": "Phase 2: device/channel command parity",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "8b7fbb96-73e3-48bf-9c99-0f8a5aa5a971",
+      "author": "ryan.porter",
+      "text": "Added Pixoo64 device/channel command wrappers (brightness, channel select, time zone, UTC, rotation, mirror, highlight, white balance, weather, clock select, reboot, etc.) plus system.feature coverage.",
+      "created_at": "2026-03-05T07:16:18.861654Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:12.276491Z",
+  "updated_at": "2026-03-05T07:16:18.861654Z",
+  "closed_at": "2026-03-05T07:15:33.520929Z",
+  "custom": {}
+}

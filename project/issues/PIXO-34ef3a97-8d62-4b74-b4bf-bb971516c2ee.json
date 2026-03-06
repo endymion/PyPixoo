@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-34ef3a97-8d62-4b74-b4bf-bb971516c2ee",
+  "title": "System/device controls and raw command",
+  "description": "",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "c475d700-d5ca-4505-83a6-3253f94cb242",
+      "author": "ryan.porter",
+      "text": "Feature: System and device controls\n  Scenario: Raw command passthrough\n    Given a Pixoo at IP \"192.168.0.37\"\n    And I connect\n    When I send raw command \"Device/SetBrightness\" with payload\n    Then the last command should be \"Device/SetBrightness\"",
+      "created_at": "2026-03-05T07:16:12.754256Z"
+    },
+    {
+      "id": "e479e19c-3569-4f95-9aeb-110b6aaba13e",
+      "author": "ryan.porter",
+      "text": "Closing as obsolete per user request during board cleanup.",
+      "created_at": "2026-03-05T07:16:12.848633Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:08.128056Z",
+  "updated_at": "2026-03-05T07:16:12.848633Z",
+  "closed_at": "2026-03-05T07:15:29.881811Z",
+  "custom": {}
+}

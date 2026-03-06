@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "b3171b65-4540-4deb-8e81-a9cbbc9fc4c3",
+  "issue_id": "PIXO-026238b5-2fdb-4c4a-8208-073c311f29f6",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:16.511Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Update InfoScene to render InfoLayout rows (text/table) with deterministic host-raster layout.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "InfoScene renderer update"
+  }
+}

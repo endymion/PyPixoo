@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "e3e97b4f-7318-41aa-9054-f1d5b16533c7",
+  "issue_id": "PIXO-07723431-8a98-411e-a87e-81dfde87ea65",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:15.981Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: browser_mixed.py"
+  }
+}

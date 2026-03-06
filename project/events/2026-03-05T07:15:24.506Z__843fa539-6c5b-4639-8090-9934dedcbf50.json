@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "843fa539-6c5b-4639-8090-9934dedcbf50",
+  "issue_id": "PIXO-69aa7992-ef2b-457e-b868-47b411a35eb4",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:24.506Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: demo_text_overlay.py"
+  }
+}

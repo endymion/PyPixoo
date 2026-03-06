@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-32d5c0d7-62a2-444b-8483-8a8751a9d9db",
+  "title": "V2 native GIF playback + text overlay rules",
+  "description": "Device/PlayTFGif + SendHttpText/ClearHttpText behavior",
+  "type": "epic",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c464c182-cd21-445d-b2d6-081fb0d454ac",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "32c218a3-d22e-442e-9bc1-c21318ec51c2",
+      "author": "ryan.porter",
+      "text": "Core E2 implementation complete (PlayTFGif + overlay rules + BDD). Remaining open item: demos/docs polish task (kanbus-363023).",
+      "created_at": "2026-03-05T07:16:14.621648Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:08.626017Z",
+  "updated_at": "2026-03-05T07:16:14.621648Z",
+  "closed_at": "2026-03-05T07:15:30.277302Z",
+  "custom": {}
+}

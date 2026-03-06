@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-eebb8b51-d0b6-42f3-b88b-1299c1252786",
+  "title": "clock capability matrix",
+  "description": "",
+  "type": "sub-task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-22586457-017d-48e7-9de4-b41721bff3f1",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "70d0feea-6959-4737-9b1f-518cee1e98d8",
+      "author": "ryan.porter",
+      "text": "Starting clock capability matrix documentation update.",
+      "created_at": "2026-03-05T07:16:51.258066Z"
+    },
+    {
+      "id": "9c04d419-7746-4fe9-b50a-10aa31c52a52",
+      "author": "ryan.porter",
+      "text": "Added docs/api/clock_capability_matrix.md with command mapping, expected/observed behavior, stability ratings, and mode truth rules. Linked from docs/api/README.md.",
+      "created_at": "2026-03-05T07:16:51.355246Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:26.382316Z",
+  "updated_at": "2026-03-05T07:16:51.355246Z",
+  "closed_at": "2026-03-05T07:15:46.925223Z",
+  "custom": {}
+}

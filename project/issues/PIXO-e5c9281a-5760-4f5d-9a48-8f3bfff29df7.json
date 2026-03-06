@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-e5c9281a-5760-4f5d-9a48-8f3bfff29df7",
+  "title": "CLI uses .env PIXOO_DEVICE_IP",
+  "description": "Feature: CLI IP resolution from .env\n\nScenario: Use .env when --ip not set\n  Given a .env file with PIXOO_DEVICE_IP set\n  And the CLI is run without --ip\n  When the command resolves the target IP\n  Then it uses the PIXOO_DEVICE_IP value\n\nScenario: --ip overrides .env\n  Given a .env file with PIXOO_DEVICE_IP set\n  When the CLI is run with --ip 192.168.0.99\n  Then it uses 192.168.0.99",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "08625a23-2712-4d0a-b97e-883c567cd2fc",
+      "author": "ryan.porter",
+      "text": "Implemented .env support via python-dotenv; CLI resolves IP from PIXOO_DEVICE_IP (fallback PIXOO_IP, then default) and README updated. Added pytest coverage for resolution. Tests not run.",
+      "created_at": "2026-03-05T07:16:41.041939Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:24.383430Z",
+  "updated_at": "2026-03-05T07:16:41.041939Z",
+  "closed_at": "2026-03-05T07:15:45.367952Z",
+  "custom": {}
+}

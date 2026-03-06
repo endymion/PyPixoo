@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "a88f2a39-5980-4408-b2ed-60ce85c9eec3",
+  "issue_id": "PIXO-c464c182-cd21-445d-b2d6-081fb0d454ac",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:16.796Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "initiative",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "PyPixoo image and animation platform"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "ec5be224-c7cd-4c1f-a18f-97add9a63ebb",
+  "issue_id": "kanbus-a968e77f-6814-45cb-b4a7-9af48989f13a",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:06.285Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Sphinx documentation setup"
+  }
+}

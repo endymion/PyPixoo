@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "e50260e6-2af7-4887-8162-304e9e799b37",
+  "issue_id": "PIXO-c9aa4d14-f8a7-4f86-bc44-0f8eb705388f",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:05.638Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Implement contiguous table-block column width metrics and aligned cell rendering.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Table block layout engine"
+  }
+}

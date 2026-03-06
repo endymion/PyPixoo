@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-a7963d4b-9290-42f4-b609-0ad70b35578c",
+  "title": "Kanbus clock: increase transition summary-to-FROM vertical gap to 4px",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "411e1ca9-0679-4f3d-86fc-56d930e19b66",
+      "author": "ryan.porter",
+      "text": "Implementing targeted transition layout tweak: add +2px spacer before FROM so summary->FROM gap is 4px total.",
+      "created_at": "2026-03-05T07:16:39.961123Z"
+    },
+    {
+      "id": "d60285c5-4ccd-417d-9bb3-1e00a656298c",
+      "author": "ryan.porter",
+      "text": "Implemented targeted transition spacing: added pre-line spacer support and set +2px before FROM in transition notices, yielding 4px summary->FROM gap. Validation: py_compile + tests/test_kanbus_clock.py (19 passed).",
+      "created_at": "2026-03-05T07:16:40.055998Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:23.738523Z",
+  "updated_at": "2026-03-05T07:16:40.055998Z",
+  "closed_at": "2026-03-05T07:15:44.713825Z",
+  "custom": {}
+}

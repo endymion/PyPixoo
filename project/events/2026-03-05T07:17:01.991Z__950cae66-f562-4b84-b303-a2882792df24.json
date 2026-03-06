@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "950cae66-f562-4b84-b303-a2882792df24",
+  "issue_id": "kanbus-7e70d8fb-11e8-4fd9-9780-c100e7114ee4",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:01.991Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "bug",
+    "status": "closed",
+    "title": "Fix demo browser_mixed.py for V2 API"
+  }
+}

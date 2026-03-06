@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-5ae449b4-8eda-4aff-92f9-7ee9a69767fe",
+  "title": "Kanbus clock end-to-end visual test",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "51d2142e-7809-4591-bbfb-7a8cc89bbcaa",
+      "author": "ryan.porter",
+      "text": "Visual lifecycle test comment for kanbus clock card layout and spacing.",
+      "created_at": "2026-03-05T07:16:35.713867Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:21.600987Z",
+  "updated_at": "2026-03-05T07:16:35.713867Z",
+  "closed_at": "2026-03-05T07:15:42.706324Z",
+  "custom": {}
+}

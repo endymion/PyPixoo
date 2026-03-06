@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "109b4ece-9256-46e3-aea5-a89cbbc62891",
+  "issue_id": "PIXO-3af572c1-9ac7-47b5-b168-92337b6c2a7f",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:25.509Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Implement generalized InfoScene with centered header title and body renderer hook.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "InfoScene implementation with header row"
+  }
+}

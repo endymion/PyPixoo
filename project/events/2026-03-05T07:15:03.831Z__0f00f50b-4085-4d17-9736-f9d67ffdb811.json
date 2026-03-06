@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "0f00f50b-4085-4d17-9736-f9d67ffdb811",
+  "issue_id": "PIXO-81b58aaa-6535-4628-bada-149f632d92c5",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:03.831Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Add FrameSink, PixooFrameSink, RasterClient, AsyncRasterClient with pacing and stats.",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "L1 raster API (sync + async)"
+  }
+}

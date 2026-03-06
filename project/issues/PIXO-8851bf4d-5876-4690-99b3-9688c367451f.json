@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-8851bf4d-5876-4690-99b3-9688c367451f",
+  "title": "Kanbus clock: unify card layout and centered dim issue IDs",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "bfd8c4df-2e16-4961-89e9-e45e189e45a0",
+      "author": "ryan.porter",
+      "text": "Implementing requested unified card typography/layout: bytesized headers for all cards, dimmed header tone equal to dim issue-ID tone, centered issue IDs on all event cards (including COMMENT), and consistent vertical spacing restoration for transition/event lines.",
+      "created_at": "2026-03-05T07:16:23.440116Z"
+    },
+    {
+      "id": "7e866375-4316-455b-97a3-9da777089f87",
+      "author": "ryan.porter",
+      "text": "Implemented unified card layout pass: default bytesized header/body, dimmed headers matched to dimmed issue-ID line, centered first-line IDs for event cards, and consistent compact spacing across transition/comment/created cards. Validation: py_compile + tests/test_kanbus_clock.py (14 passed).",
+      "created_at": "2026-03-05T07:16:23.533301Z"
+    },
+    {
+      "id": "8be6900d-d0ec-4fd8-a91b-0b8a88906f74",
+      "author": "ryan.porter",
+      "text": "Done: unified event-card typography/layout applied and validated live (bytesized dim headers, centered dim issue-ID line, compact spacing).",
+      "created_at": "2026-03-05T07:16:23.630928Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:14.813134Z",
+  "updated_at": "2026-03-05T07:16:23.630928Z",
+  "closed_at": "2026-03-05T07:15:36.189699Z",
+  "custom": {}
+}

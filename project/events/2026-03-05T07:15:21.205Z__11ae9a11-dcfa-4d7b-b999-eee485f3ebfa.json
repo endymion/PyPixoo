@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "11ae9a11-dcfa-4d7b-b999-eee485f3ebfa",
+  "issue_id": "PIXO-f49f9008-a3d6-4bf2-b1f2-cd00fa8b7b3c",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:21.205Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Apps/tools commands"
+  }
+}

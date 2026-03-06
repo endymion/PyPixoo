@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "f4da8b13-d21f-4fbf-bdae-7404eb676cba",
+  "issue_id": "PIXO-32d5c0d7-62a2-444b-8483-8a8751a9d9db",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:08.626Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Device/PlayTFGif + SendHttpText/ClearHttpText behavior",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "V2 native GIF playback + text overlay rules"
+  }
+}

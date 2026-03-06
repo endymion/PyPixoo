@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-3281bfa3-51f4-4ec4-bc09-b69fde81e84f",
+  "title": "Phase 3: apps/tools command parity",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "f215a240-88f1-4a0f-aa24-4c7589356ca8",
+      "author": "ryan.porter",
+      "text": "Added tools/animation command wrappers (timer, stopwatch, scoreboard, noise, buzzer, display list, send remote, HTTP command source) and apps.feature coverage.",
+      "created_at": "2026-03-05T07:16:39.673444Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:23.483829Z",
+  "updated_at": "2026-03-05T07:16:39.673444Z",
+  "closed_at": "2026-03-05T07:15:44.454312Z",
+  "custom": {}
+}

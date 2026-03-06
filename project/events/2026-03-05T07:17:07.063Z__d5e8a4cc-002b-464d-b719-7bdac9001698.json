@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "d5e8a4cc-002b-464d-b719-7bdac9001698",
+  "issue_id": "kanbus-af0457a8-c7ca-4d41-a906-a171e55eb38d",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:07.063Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Remove PIXOO_REAL_DEVICE gating"
+  }
+}

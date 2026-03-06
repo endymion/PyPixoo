@@ -1,0 +1,43 @@
+{
+  "id": "PIXO-b6f96726-4e89-4154-8caf-d19af4d6070e",
+  "title": "Acceptance test: black_band_transparent.py",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "3899ece8-6148-4afb-852e-371268f69d30",
+      "author": "ryan.porter",
+      "text": "Starting manual acceptance test on real device: running demos/black_band_transparent.py and validating expected transparent blend behavior.",
+      "created_at": "2026-03-05T07:16:21.892477Z"
+    },
+    {
+      "id": "874494a2-4cd0-49c5-bfd7-7d0a7cf9c7bf",
+      "author": "ryan.porter",
+      "text": "Failure captured: startup error ModuleNotFoundError for pypixoo.animation. Linked bug opened: kanbus-cb7add. Fix in progress.",
+      "created_at": "2026-03-05T07:16:21.990197Z"
+    },
+    {
+      "id": "42270dca-7160-4f33-9d73-45bd7f794227",
+      "author": "ryan.porter",
+      "text": "Acceptance test currently BLOCKED: device connection timed out (192.168.0.37) during run. Linked bug kanbus-cb7add contains the V2 migration fix; pending rerun once device connectivity is restored.",
+      "created_at": "2026-03-05T07:16:22.086381Z"
+    },
+    {
+      "id": "3036509c-c725-42e4-b784-ea06cc69f674",
+      "author": "ryan.porter",
+      "text": "Acceptance test PASSED after rerun on reachable device.  completed successfully with expected output.",
+      "created_at": "2026-03-05T07:16:22.181221Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:14.429176Z",
+  "updated_at": "2026-03-05T07:16:22.181221Z",
+  "closed_at": "2026-03-05T07:15:35.794971Z",
+  "custom": {}
+}

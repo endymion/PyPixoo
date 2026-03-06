@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-c9cc123c-cf55-446f-ba33-2e4c96802dc2",
+  "title": "PyPixoo: kanbus_clock uses single kbs root",
+  "description": "As a PyPixoo operator\nI want kanbus_clock to run all kbs commands from a single root\nSo that Kanbus handles nested project discovery and IDs are correct.\n\nFeature: Single-root kbs execution\n\nScenario: kbs show is executed from --root\n  Given kanbus_clock is started with --root /path\n  When it fetches issue details\n  Then kbs show is executed with cwd=/path\n\nScenario: Header prefix uses canonical issue key from kbs show\n  Given kbs show returns id \"PIXO-123abc\"\n  When a card is rendered\n  Then the header prefix is \"PIXO\"",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-1742ec6d-696a-4bf7-98a5-78a0a9d0dbad",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "1a692b7e-0479-42a5-a483-622a298ad3fe",
+      "author": "ryan.porter",
+      "text": "Starting PyPixoo changes: will remove per-event cwd logic in kanbus_clock and run all kbs commands from a single root (default to --root).",
+      "created_at": "2026-03-05T13:01:22.495690Z"
+    },
+    {
+      "id": "2a5b22e6-480f-44c1-a220-b984a54d65b1",
+      "author": "ryan.porter",
+      "text": "Updated kanbus_clock to use a single kbs root, removed per-event repo config lookup, and added ambiguous-id skip handling; tests updated for new behavior.",
+      "created_at": "2026-03-05T13:14:21.572891Z"
+    },
+    {
+      "id": "0fb8dfd4-8322-4fbf-91f1-3d045f72d802",
+      "author": "ryan.porter",
+      "text": "PyPixoo tests updated and green: uv run pytest tests/test_kanbus_clock.py -q (33 passed).",
+      "created_at": "2026-03-05T13:17:58.783457Z"
+    }
+  ],
+  "created_at": "2026-03-05T13:01:04.569944Z",
+  "updated_at": "2026-03-05T13:18:20.516708Z",
+  "closed_at": "2026-03-05T13:18:20.516708Z",
+  "custom": {}
+}

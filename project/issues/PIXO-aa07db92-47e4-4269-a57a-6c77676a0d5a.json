@@ -1,0 +1,49 @@
+{
+  "id": "PIXO-aa07db92-47e4-4269-a57a-6c77676a0d5a",
+  "title": "Clock palette tweak: dark Radix purple scale",
+  "description": "Set three-hand clock default colors to dark-mode Radix purple tokens: top marker purple10, markers purple7, hour purple9, minute purple7, second purple5.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "c8428f36-9e2b-485a-a6cc-bbbbf9f768c8",
+      "author": "ryan.porter",
+      "text": "Implementing default palette update in demo_three_hand_clock using dark-mode Radix purple tokens.",
+      "created_at": "2026-03-05T07:16:50.600650Z"
+    },
+    {
+      "id": "edba9945-97b0-4496-ae80-83e927dacd28",
+      "author": "ryan.porter",
+      "text": "Applied default dark Radix purple palette in demo_three_hand_clock: top marker=dark.purple10, markers=dark.purple7, hour=dark.purple9, minute=dark.purple7, second=dark.purple5. Restarted live demo for visual verification.",
+      "created_at": "2026-03-05T07:16:50.701186Z"
+    },
+    {
+      "id": "6c109057-7044-4af4-857e-1690251bfd45",
+      "author": "ryan.porter",
+      "text": "Updated default center pivot color in demo_three_hand_clock to dark.purple5 and restarted live demo for visual confirmation.",
+      "created_at": "2026-03-05T07:16:50.793684Z"
+    },
+    {
+      "id": "4342239e-76ad-45ee-bf97-b874665c716c",
+      "author": "ryan.porter",
+      "text": "Applied minute-hand motion visibility tweak: added sub-pixel minute-tip accent so minute progression is visible at 1-second cadence on the 64x64 grid. Restarted live demo for validation.",
+      "created_at": "2026-03-05T07:16:50.888323Z"
+    },
+    {
+      "id": "d2e37867-0f0f-4d58-b9d9-8a150e63c4ae",
+      "author": "ryan.porter",
+      "text": "Superseded by unified pixooclock implementation and now included in committed defaults/face-band system.",
+      "created_at": "2026-03-05T07:16:50.980834Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:25.875073Z",
+  "updated_at": "2026-03-05T07:16:50.980834Z",
+  "closed_at": "2026-03-05T07:15:46.532843Z",
+  "custom": {}
+}

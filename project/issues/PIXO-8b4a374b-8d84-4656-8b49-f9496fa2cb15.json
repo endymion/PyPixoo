@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-8b4a374b-8d84-4656-8b49-f9496fa2cb15",
+  "title": "V2 API/CLI migration and release",
+  "description": "Breaking API rollout, docs, versioning",
+  "type": "epic",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c464c182-cd21-445d-b2d6-081fb0d454ac",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "c48315c0-c2bc-4aa6-8a0f-f8da83bf858e",
+      "author": "ryan.porter",
+      "text": "Core E4 implementation complete for API break + CLI/tests/docs. Remaining open item: release execution task (kanbus-d9d01c).",
+      "created_at": "2026-03-05T07:16:08.639871Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:06.009931Z",
+  "updated_at": "2026-03-05T07:16:08.639871Z",
+  "closed_at": "2026-03-05T07:15:27.874640Z",
+  "custom": {}
+}

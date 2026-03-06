@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "51236b71-70bc-43a0-a642-5f845771c759",
+  "issue_id": "kanbus-f1f747b6-38a3-47c0-9c7d-eda89bb19498",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:13.213Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "InfoScene implementation with header row"
+  }
+}

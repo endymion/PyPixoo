@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "b458e5c3-e8b4-4959-94fd-117e205feb7f",
+  "issue_id": "kanbus-76ec8e81-ef73-42cc-a433-8c0e10348349",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T06:53:15.265Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus Clock Test"
+  }
+}

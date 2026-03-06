@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "f5c3bc8d-9b82-4977-a4f4-b4986836444c",
+  "issue_id": "kanbus-71406e6e-2410-4a2f-9fdf-57d81e544351",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:00.715Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "story",
+    "status": "closed",
+    "title": "Font engine unification for scene + demo parity"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-d33f5060-df3e-4b07-9128-18c2686cfb3f",
+  "title": "FrameSink boundary + Pixoo sink",
+  "description": "Define sink interface and reconnect behavior isolated from scene layer.",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "2af82f4e-9c72-44bd-be36-f0e933b48a06",
+      "author": "ryan.porter",
+      "text": "Started implementation for v3 layered architecture.",
+      "created_at": "2026-03-05T07:16:29.990810Z"
+    },
+    {
+      "id": "799aa103-bc28-4113-bec6-c88b6ed56464",
+      "author": "ryan.porter",
+      "text": "Completed in code with automated validation.",
+      "created_at": "2026-03-05T07:16:30.085658Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:19.247222Z",
+  "updated_at": "2026-03-05T07:16:30.085658Z",
+  "closed_at": "2026-03-05T07:15:40.313301Z",
+  "custom": {}
+}

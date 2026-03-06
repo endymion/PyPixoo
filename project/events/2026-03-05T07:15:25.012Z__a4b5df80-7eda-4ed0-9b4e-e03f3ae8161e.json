@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "a4b5df80-7eda-4ed0-9b4e-e03f3ae8161e",
+  "issue_id": "PIXO-e1f4f567-6153-4060-bf64-4a89a413de27",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:25.012Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: darken default 12-o'clock dot and set auto-info-seconds default to 30"
+  }
+}

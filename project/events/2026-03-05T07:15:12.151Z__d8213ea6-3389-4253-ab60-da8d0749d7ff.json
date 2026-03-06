@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "d8213ea6-3389-4253-ab60-da8d0749d7ff",
+  "issue_id": "PIXO-0750d56b-d652-419f-b195-9e2061566b38",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:12.151Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Feature: Block invalid overlay combinations with PlayTFGif\nScenario: Overlay is rejected after native GIF playback\nGiven a PlayTFGif playback context\nWhen send_text_overlay is called\nThen a clear ValueError is raised and no Draw/SendHttpText command is sent",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Block invalid overlay combinations with PlayTFGif"
+  }
+}

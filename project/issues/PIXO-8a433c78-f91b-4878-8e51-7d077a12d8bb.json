@@ -1,0 +1,127 @@
+{
+  "id": "PIXO-8a433c78-f91b-4878-8e51-7d077a12d8bb",
+  "title": "Kanbus clock demo: REPL plus recursive project/events watcher",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "e9527f65-c58b-403f-9e39-9b6f24a6cffe",
+      "author": "ryan.porter",
+      "text": "Starting implementation from accepted plan: new demos/kanbus_clock.py (REPL + recursive events watcher), startup folder/timestamp report, auto-info queue bridge, README update, and tests.",
+      "created_at": "2026-03-05T07:16:28.260057Z"
+    },
+    {
+      "id": "8277486c-a9f9-4123-8384-3daf1a4b15a9",
+      "author": "ryan.porter",
+      "text": "Implemented demos/kanbus_clock.py with recursive project/events discovery, startup latest-timestamp report, async polling+rescan watcher, auto-info queue bridge, and concurrent REPL commands. Added tests/test_kanbus_clock.py (8 tests) and updated demos/README.md. Targeted tests passing.",
+      "created_at": "2026-03-05T07:16:28.361849Z"
+    },
+    {
+      "id": "7bcebb1c-5d45-4f6a-b27f-5b9afbd146a6",
+      "author": "ryan.porter",
+      "text": "Fixed discovery reliability/performance: replaced Path.rglob-based event-dir scan with pruned os.walk, and moved startup scan/report before device connect so folder results always print immediately even if device connection fails/locks.",
+      "created_at": "2026-03-05T07:16:28.455297Z"
+    },
+    {
+      "id": "c4ec6492-2bef-467d-b2de-34fd81bb662c",
+      "author": "ryan.porter",
+      "text": "Crash triage: user hit PermissionError in demos/kanbus_clock.py when readline.read_history_file cannot access ~/.pypixoo/kanbus_clock_history. Implementing graceful disable path and adding regression test so startup continues.",
+      "created_at": "2026-03-05T07:16:28.545566Z"
+    },
+    {
+      "id": "9a9da299-c6e4-4896-b1ed-5f6afe15473c",
+      "author": "ryan.porter",
+      "text": "Patched history setup to treat read/write permission errors as non-fatal (history disabled with log), and added regression test test_setup_readline_history_permission_error_is_non_fatal. Validation: python -m py_compile demos/kanbus_clock.py; uv run pytest tests/test_kanbus_clock.py -q (9 passed).",
+      "created_at": "2026-03-05T07:16:28.638952Z"
+    },
+    {
+      "id": "1700858d-21f9-4f0c-80e2-2ca188eb1ede",
+      "author": "ryan.porter",
+      "text": "User validated watcher flow on-device. Implementing UX tweak: move event action/type into alert header and reformat state transitions to avoid single-line from->to overflow in body.",
+      "created_at": "2026-03-05T07:16:28.731724Z"
+    },
+    {
+      "id": "a6bcfdf7-c228-4435-9a77-5bbaa564fd22",
+      "author": "ryan.porter",
+      "text": "Implemented watcher notice format update: event action now rendered in header; state transitions split into FROM/TO lines to avoid horizontal overflow. Added test updates; tests passing.",
+      "created_at": "2026-03-05T07:16:28.823336Z"
+    },
+    {
+      "id": "9e6b8b73-7bce-4fac-b630-ab95ba8ea716",
+      "author": "ryan.porter",
+      "text": "Implementing comment notice formatting tweak: COMMENT header + issue id + wrapped comment text (max visible lines), falling back to author only when no comment text exists.",
+      "created_at": "2026-03-05T07:16:28.917862Z"
+    },
+    {
+      "id": "ec5243bf-e241-4fc6-9ebd-9c4242964070",
+      "author": "ryan.porter",
+      "text": "Updated comment-added event rendering: header fixed to COMMENT, body line 1 is short issue ID, remaining lines render wrapped comment text (up to visible limits). Fallback to BY <author> only when comment text missing. tests/test_kanbus_clock.py updated; 9 passing.",
+      "created_at": "2026-03-05T07:16:29.014390Z"
+    },
+    {
+      "id": "d5bb2de0-ef67-4a0b-9247-a752df13f5d2",
+      "author": "ryan.porter",
+      "text": "Bug fix: comment body not shown reliably because payload key varied. Updating parser to extract comment text from nested payload structures via key-priority + fallback string scan.",
+      "created_at": "2026-03-05T07:16:29.108570Z"
+    },
+    {
+      "id": "4c7751a6-5d6d-451b-8b3a-fd2e9cfe06c7",
+      "author": "ryan.porter",
+      "text": "Fixed missing COMMENT body text: if event payload lacks a substantial comment string, kanbus_clock now falls back to  and renders the latest issue comment text. Added regression test. Validation: tests/test_kanbus_clock.py = 11 passed.",
+      "created_at": "2026-03-05T07:16:29.209459Z"
+    },
+    {
+      "id": "6c7ac66e-2c5d-47cc-86ae-20096a73a879",
+      "author": "ryan.porter",
+      "text": "Fixed missing COMMENT body text: when event payload lacks substantial comment content, kanbus_clock now falls back to running kbs show ISSUE_ID --json and renders the latest issue comment text. Added regression test; tests/test_kanbus_clock.py now 11 passed.",
+      "created_at": "2026-03-05T07:16:29.310527Z"
+    },
+    {
+      "id": "80ab0733-ea94-4f1c-b453-2d5cf32c43ed",
+      "author": "ryan.porter",
+      "text": "Implementing repo-local lookup fix: derive repo root from each event path (.../project/events/*.json) and run fallback kbs show with cwd set to that repo root so cross-repo comment bodies resolve.",
+      "created_at": "2026-03-05T07:16:29.408860Z"
+    },
+    {
+      "id": "7a48a7fb-9480-4574-9bd2-5a7f99f8c7d0",
+      "author": "ryan.porter",
+      "text": "Implemented repo-local fallback lookup for comment bodies.  now derives repo root from event path, and  runs  with cwd set to that repo. Added tests for repo-root derivation and cwd propagation. Validation: py_compile + tests/test_kanbus_clock.py (12 passed). Triggered live cross-repo comment event in Korporus issue 95e8d2 for manual display verification.",
+      "created_at": "2026-03-05T07:16:29.505314Z"
+    },
+    {
+      "id": "ed255b86-d290-42b2-9471-86766bd995fc",
+      "author": "ryan.porter",
+      "text": "Implemented repo-local fallback lookup for comment bodies. load_kanbus_event now derives repo root from event path, and fetch_latest_issue_comment_text runs kbs show with cwd set to that repo. Added tests for repo-root derivation and cwd propagation. Validation: py_compile + tests/test_kanbus_clock.py (12 passed). Triggered live cross-repo comment event in Korporus issue 95e8d2 for manual display verification.",
+      "created_at": "2026-03-05T07:16:29.605300Z"
+    },
+    {
+      "id": "67c5a762-4c6b-4e3f-8040-3c51f245d16a",
+      "author": "ryan.porter",
+      "text": "Tight-wrap fix requested: comment/info body overflowed horizontally on device. Implementing stricter line wrapping in kanbus_clock and validating with tests before restart retest.",
+      "created_at": "2026-03-05T07:16:29.701423Z"
+    },
+    {
+      "id": "3af37443-1756-41f9-aaf1-46a763c69334",
+      "author": "ryan.porter",
+      "text": "Implemented tighter body wrapping: switched from character-count wrapping to pixel-width wrapping using canonical font measurement (tiny5), with trimming/ellipsis and tests. Validation: tests/test_kanbus_clock.py now 13 passed. Triggered fresh Korporus comment event for visual verification.",
+      "created_at": "2026-03-05T07:16:29.799722Z"
+    },
+    {
+      "id": "8c1bf5f5-2806-4469-8a0c-10841cac16a7",
+      "author": "ryan.porter",
+      "text": "Done: kanbus_clock now resolves comment bodies across repos by running kbs show in the event repo root (derived from <repo>/project/events path). COMMENT cards render action in header and use tighter pixel-width wrapping to prevent horizontal overflow. Validated with live device confirmation and tests (tests/test_kanbus_clock.py passing).",
+      "created_at": "2026-03-05T07:16:29.895086Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:18.980561Z",
+  "updated_at": "2026-03-05T07:16:29.895086Z",
+  "closed_at": "2026-03-05T07:15:40.178487Z",
+  "custom": {}
+}

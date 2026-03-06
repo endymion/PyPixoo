@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "5cbf38e2-7387-4c45-b1e1-e57f5a149020",
+  "issue_id": "kanbus-e2b6cfff-c811-4a9e-9ee9-4a37b9b6c762",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:12.311Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "CLI/docs updates for new APIs"
+  }
+}

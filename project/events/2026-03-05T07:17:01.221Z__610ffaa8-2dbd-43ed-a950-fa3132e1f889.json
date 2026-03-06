@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "610ffaa8-2dbd-43ed-a950-fa3132e1f889",
+  "issue_id": "kanbus-7488fb9b-cd05-4db0-980c-d0b0cbb6e22e",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:01.221Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "bug",
+    "status": "closed",
+    "title": "Three-hand clock shows device loading overlay every segment"
+  }
+}

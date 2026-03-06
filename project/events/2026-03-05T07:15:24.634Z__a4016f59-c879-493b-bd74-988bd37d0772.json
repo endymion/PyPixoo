@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "a4016f59-c879-493b-bd74-988bd37d0772",
+  "issue_id": "PIXO-a39409a3-3ffa-4794-91c8-fee41c9ca2ba",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:24.634Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "CLI/docs updates for new APIs"
+  }
+}

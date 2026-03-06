@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "6309a471-13b2-4bbe-b870-e61419612dde",
+  "issue_id": "kanbus-8cf9b86f-c3cd-4754-bcd4-77ec071c7045",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:03.532Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Kanbus clock watcher test issue"
+  }
+}

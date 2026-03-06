@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "ef29f2c9-677a-4e68-b7ed-7748db4e234f",
+  "issue_id": "kanbus-56eabd78-8a4c-4e92-b259-60d0dc1523d8",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:59.012Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "epic",
+    "status": "closed",
+    "title": "Load image into buffer"
+  }
+}

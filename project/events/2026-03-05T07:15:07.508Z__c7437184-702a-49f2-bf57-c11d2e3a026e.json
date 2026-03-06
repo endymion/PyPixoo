@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "c7437184-702a-49f2-bf57-c11d2e3a026e",
+  "issue_id": "PIXO-33663432-e13e-4372-955f-f1ae0719efe9",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:07.508Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Create one unified smooth clock entrypoint named pixooclock with face selection, second-hand toggle (default on), anti-aliasing toggle (default off), full color options, and existing face variants.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Consolidate clock demos into unified pixooclock"
+  }
+}

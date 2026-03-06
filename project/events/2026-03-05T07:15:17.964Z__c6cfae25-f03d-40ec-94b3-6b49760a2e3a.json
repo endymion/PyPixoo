@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "c6cfae25-f03d-40ec-94b3-6b49760a2e3a",
+  "issue_id": "PIXO-f036862f-9ce0-4903-a480-e09e657a3819",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:17.964Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Feature: Explicit GIF ID reserve/reset semantics\nScenario: PicID lifecycle is observable\nGiven a connected Pixoo client\nWhen get_http_gif_id and reset_http_gif_id are called\nThen the corresponding device commands are sent and return values are exposed",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Explicit GIF ID reserve/reset semantics"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-a467530d-f549-4ccc-8294-912b94183e76",
+  "title": "Acceptance test: font_showcase.py",
+  "description": "",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:11.276739Z",
+  "updated_at": "2026-03-05T07:15:53.275222Z",
+  "closed_at": null,
+  "custom": {}
+}

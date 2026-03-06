@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "b2b18a42-9ad4-4b43-a208-e5698a265294",
+  "issue_id": "PIXO-721d788b-adf6-460e-8f7f-a15c525bd2d1",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:05.393Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Remove AnimationPlayer/AnimationSequence/Frame from public API and route internals through V2 native methods.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Remove v1 animation API + update internals"
+  }
+}

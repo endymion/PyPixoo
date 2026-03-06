@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "2a10e87a-8a3e-4a0f-9b97-eade74690de7",
+  "issue_id": "kanbus-b31680b6-1514-4fc7-954c-0f22d9796591",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T04:35:19.884Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "kanbus-99533092-3106-43cb-9f0a-51b357f6dd32",
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: metadata-header + parent/issue description layout redesign"
+  }
+}

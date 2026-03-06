@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "event_id": "1a99beb5-550c-4c39-b9a0-62e2e6092996",
+  "issue_id": "PIXO-0dd0eb95-a78e-4613-922b-ae86a769fd48",
+  "event_type": "field_updated",
+  "occurred_at": "2026-03-05T07:27:46.812Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "changes": {
+      "assignee": {
+        "from": null,
+        "to": "agent"
+      }
+    }
+  }
+}

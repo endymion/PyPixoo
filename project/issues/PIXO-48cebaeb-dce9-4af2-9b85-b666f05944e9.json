@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-48cebaeb-dce9-4af2-9b85-b666f05944e9",
+  "title": "V2 native HttpGif upload protocol",
+  "description": "Draw/SendHttpGif + Draw/CommandList + PicID lifecycle",
+  "type": "epic",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c464c182-cd21-445d-b2d6-081fb0d454ac",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "81b38492-39f7-4c06-9b9d-dcc81ea61576",
+      "author": "ryan.porter",
+      "text": "Core E1 implementation complete (protocol, methods, BDD). Remaining open item: targeted @real_device smoke task (kanbus-a5e80b).",
+      "created_at": "2026-03-05T07:16:17.148746Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:11.146547Z",
+  "updated_at": "2026-03-05T07:16:17.148746Z",
+  "closed_at": "2026-03-05T07:15:32.587591Z",
+  "custom": {}
+}

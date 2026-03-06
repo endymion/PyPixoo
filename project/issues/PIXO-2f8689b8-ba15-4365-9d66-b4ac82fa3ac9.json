@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-2f8689b8-ba15-4365-9d66-b4ac82fa3ac9",
+  "title": "Release execution for breaking version",
+  "description": "Prepare breaking-release commit semantics, migration docs completion, and semantic-release major version path.",
+  "type": "task",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-8b4a374b-8d84-4656-8b49-f9496fa2cb15",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "05b5a228-b10f-4c31-ab00-5d357966cd36",
+      "author": "ryan.porter",
+      "text": "Implementation for V2 breaking redesign is complete and test/coverage gates are green locally. This task remains open for final release execution semantics and tagging flow.",
+      "created_at": "2026-03-05T07:16:39.482356Z"
+    },
+    {
+      "id": "62d2b7c4-adb8-4bde-96e6-8580ebeecdfa",
+      "author": "ryan.porter",
+      "text": "Closing as obsolete per user request during board cleanup.",
+      "created_at": "2026-03-05T07:16:39.575767Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:23.357010Z",
+  "updated_at": "2026-03-05T07:16:39.575767Z",
+  "closed_at": "2026-03-05T07:15:44.321525Z",
+  "custom": {}
+}

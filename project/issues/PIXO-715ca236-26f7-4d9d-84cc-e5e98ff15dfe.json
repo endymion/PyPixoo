@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-715ca236-26f7-4d9d-84cc-e5e98ff15dfe",
+  "title": "Migration guidance from v1.x to v2.0",
+  "description": "Feature: Migration guidance from v1.x to v2.0\nScenario: Breaking changes are documented with replacement paths\nGiven a user upgrading from v1.x\nWhen they read README and PR_FAQ migration sections\nThen they can map removed APIs to V2 alternatives",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-8b4a374b-8d84-4656-8b49-f9496fa2cb15",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "0d34111a-fdd1-4f2f-9bc0-8cd7f7347656",
+      "author": "ryan.porter",
+      "text": "Added migration-oriented documentation updates in README and PR_FAQ for v1->v2 breaking changes.",
+      "created_at": "2026-03-05T07:16:35.238978Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:21.334532Z",
+  "updated_at": "2026-03-05T07:16:35.238978Z",
+  "closed_at": "2026-03-05T07:15:42.434847Z",
+  "custom": {}
+}

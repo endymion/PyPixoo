@@ -1,0 +1,91 @@
+{
+  "id": "PIXO-2511b54b-3636-481d-97a6-74b1ba14a351",
+  "title": "Transition formatting live verify",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "c967d133-bf59-4bf2-9d4b-1de10b324613",
+      "author": "ryan.porter",
+      "text": "Transition formatting verify: FROM:/TO: labels should be darker, statuses should be indented, and IN PROGRESS should not truncate.",
+      "created_at": "2026-03-05T07:16:35.810374Z"
+    },
+    {
+      "id": "38b5158f-839c-4a68-a2f8-299e34da1bd1",
+      "author": "ryan.porter",
+      "text": "stress-1",
+      "created_at": "2026-03-05T07:16:35.912237Z"
+    },
+    {
+      "id": "caa7908b-35ae-46f3-9d19-a147fe7d8fa6",
+      "author": "ryan.porter",
+      "text": "stress-2",
+      "created_at": "2026-03-05T07:16:36.005493Z"
+    },
+    {
+      "id": "c25b0cbd-a768-47db-9cb8-8a5f2461dfa5",
+      "author": "ryan.porter",
+      "text": "stress-3",
+      "created_at": "2026-03-05T07:16:36.111073Z"
+    },
+    {
+      "id": "21bbac65-595e-4306-931c-7dcb76f92b11",
+      "author": "ryan.porter",
+      "text": "stress-4",
+      "created_at": "2026-03-05T07:16:36.213237Z"
+    },
+    {
+      "id": "fafaedce-3173-402d-bd83-62d954f235d7",
+      "author": "ryan.porter",
+      "text": "stress-5",
+      "created_at": "2026-03-05T07:16:36.307940Z"
+    },
+    {
+      "id": "5ed2a66e-dade-4bb3-9968-d6dd2e70fcf8",
+      "author": "ryan.porter",
+      "text": "stress-6",
+      "created_at": "2026-03-05T07:16:36.406161Z"
+    },
+    {
+      "id": "f9ca48c8-4b1f-400a-92d7-a309b51d10d0",
+      "author": "ryan.porter",
+      "text": "stress-7",
+      "created_at": "2026-03-05T07:16:36.504775Z"
+    },
+    {
+      "id": "75174781-ef67-4fef-91a1-7432d5be37c7",
+      "author": "ryan.porter",
+      "text": "stress-8",
+      "created_at": "2026-03-05T07:16:36.598872Z"
+    },
+    {
+      "id": "3982585f-e3bc-4011-b973-458e99ed8dba",
+      "author": "ryan.porter",
+      "text": "stress-final: check clock smoothness while cards queue.",
+      "created_at": "2026-03-05T07:16:36.690563Z"
+    },
+    {
+      "id": "4f38ef6c-f147-4618-aa07-111bc592b1ee",
+      "author": "ryan.porter",
+      "text": "Final restart verify: check transition labels/indent and no IN PROG truncation.",
+      "created_at": "2026-03-05T07:16:36.782259Z"
+    },
+    {
+      "id": "8dc953fe-123b-4c59-8376-086e7acb2369",
+      "author": "ryan.porter",
+      "text": "Done: transition formatting live verification completed on restarted process.",
+      "created_at": "2026-03-05T07:16:36.873501Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:21.739867Z",
+  "updated_at": "2026-03-05T07:16:36.873501Z",
+  "closed_at": "2026-03-05T07:15:42.834620Z",
+  "custom": {}
+}

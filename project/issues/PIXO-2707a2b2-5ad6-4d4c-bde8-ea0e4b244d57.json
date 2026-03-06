@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-2707a2b2-5ad6-4d4c-bde8-ea0e4b244d57",
+  "title": "Add targeted real-device smoke for E1",
+  "description": "Add @real_device smoke scenarios for sequence upload and batch upload behavior; record findings in Kanbus comments.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-48cebaeb-dce9-4af2-9b85-b666f05944e9",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "de6f98ef-1f12-4a1c-b416-1b801c5cc296",
+      "author": "ryan.porter",
+      "text": "Closing per user request: E1 context not clear from current issue tree, and task requires real-device smoke runs which cannot be confirmed in this context.",
+      "created_at": "2026-03-05T07:16:26.917499Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:18.094726Z",
+  "updated_at": "2026-03-05T07:16:26.917499Z",
+  "closed_at": "2026-03-05T07:15:39.258508Z",
+  "custom": {}
+}

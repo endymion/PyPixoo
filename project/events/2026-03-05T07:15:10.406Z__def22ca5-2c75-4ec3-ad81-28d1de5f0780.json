@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "def22ca5-2c75-4ec3-ad81-28d1de5f0780",
+  "issue_id": "PIXO-621c9e66-9a4c-43b4-b3d4-9bcba6db300b",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:10.406Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Buffer model and assertions"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-4060b3f8-4467-4691-9c78-5d3f604388e7",
+  "title": "Kanbus Clock Test",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "ff66a144-f699-4bf8-8bde-81687c7314f0",
+      "author": "ryan.porter",
+      "text": "Comment for Kanbus clock test",
+      "created_at": "2026-03-05T07:16:21.109336Z"
+    },
+    {
+      "id": "18ef005f-c1db-43cc-8c28-392625234ba0",
+      "author": "ryan.porter",
+      "text": "Second comment for Kanbus clock test",
+      "created_at": "2026-03-05T07:16:21.208962Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:13.901667Z",
+  "updated_at": "2026-03-05T07:16:21.208962Z",
+  "closed_at": "2026-03-05T07:15:35.241992Z",
+  "custom": {}
+}

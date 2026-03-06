@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "c45d87d7-6859-4791-bd9a-6768cc5f78a8",
+  "issue_id": "kanbus-9ff5efd9-ed56-485f-803a-82b838839fc1",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:04.974Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "bug",
+    "status": "closed",
+    "title": "storybook_clock frozen at 12:00"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "92ebd771-a900-44db-a4dd-7cca41ccb69c",
+  "issue_id": "PIXO-156e621c-0de9-463a-9113-0b4eed8c8a0b",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:17.455Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Cycle multiple sequence types with async control",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "V2 sequence cycling orchestration"
+  }
+}

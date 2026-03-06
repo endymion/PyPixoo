@@ -1,0 +1,43 @@
+{
+  "id": "PIXO-0dd0eb95-a78e-4613-922b-ae86a769fd48",
+  "title": "Kanbus clock header spacing pixels",
+  "description": "Adjust header spacing for ID/type/status to exact pixel gaps and preserve status word gaps as 2px spacers.",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": "agent",
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "7d44c78e-5bc2-4f6d-af08-7e1fc555ab33",
+      "author": "ryan.porter",
+      "text": "Implemented header spacing with explicit pixel spacers (3px between parts, 2px for status word gaps) via TextSpan.advance_px. Updated Kanbus clock header rendering + prefix selection. Tests: uv run pytest tests/test_info_dsl.py tests/test_kanbus_clock.py -q",
+      "created_at": "2026-03-05T07:31:24.374592Z"
+    },
+    {
+      "id": "706df761-d962-4c05-8405-9a938d7edd73",
+      "author": "ryan.porter",
+      "text": "Added repo project_key fallback for header prefix when kbs show fails; status spacing uses 2px word gaps and 3px separators. Tests: uv run pytest tests/test_info_dsl.py tests/test_kanbus_clock.py -q",
+      "created_at": "2026-03-05T07:35:45.457467Z"
+    },
+    {
+      "id": "bd677361-2e35-4edc-b846-adcceb7220a0",
+      "author": "ryan.porter",
+      "text": "Fixed prefix selection to prefer repo project_key when kbs show returns an ID with that prefix, even if requested id is UUID fragment. Tests: uv run pytest tests/test_kanbus_clock.py -q",
+      "created_at": "2026-03-05T07:42:37.505572Z"
+    },
+    {
+      "id": "3d6c3a0c-8b5d-4cc2-9c5d-4f27c5588d8b",
+      "author": "ryan.porter",
+      "text": "Verified on device: header prefix shows project key and spacing is correct.",
+      "created_at": "2026-03-05T07:44:08.156855Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:27:43.382846Z",
+  "updated_at": "2026-03-05T07:44:08.247825Z",
+  "closed_at": "2026-03-05T07:44:08.247825Z",
+  "custom": {}
+}

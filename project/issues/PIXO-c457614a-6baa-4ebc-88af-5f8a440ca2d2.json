@@ -1,0 +1,43 @@
+{
+  "id": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "title": "API parity with official docs",
+  "description": "",
+  "type": "epic",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c464c182-cd21-445d-b2d6-081fb0d454ac",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "dc28902f-7e71-4043-97a3-d4188b35eaab",
+      "author": "ryan.porter",
+      "text": "As a developer, I want PyPixoo aligned with the official Pixoo API, so that native capabilities (including built-in fonts) are supported and documented. Definition of done: ShowDoc export + command matrix, built-in font registry and overlay APIs, additional device/channel/app commands as per matrix, CLI/docs updates, and 100% spec coverage.",
+      "created_at": "2026-03-05T07:16:22.277831Z"
+    },
+    {
+      "id": "0ac307f0-0b72-4eab-8052-acbd1736e32f",
+      "author": "ryan.porter",
+      "text": "Progress update: Added ShowDoc export + generated markdown/raw/index; built command matrix; implemented built-in font registry, overlay sequencing, and new system/apps features; added Pixoo64 device/channel/tool wrappers and CLI/docs updates; updated tests. Behave run failed locally due to missing editable install; pytest tests added and passing.",
+      "created_at": "2026-03-05T07:16:22.376271Z"
+    },
+    {
+      "id": "35868638-9e68-4926-8398-a65a5652c4b7",
+      "author": "ryan.porter",
+      "text": "Added Sphinx docs (docs/sphinx), expanded docstrings for device/client paths, added per-capability real-device demos, updated README/demos docs, and gitignored docs/_build + docs/api/showdoc. Removed ShowDoc exports from repo (kept command matrix).",
+      "created_at": "2026-03-05T07:16:22.475370Z"
+    },
+    {
+      "id": "508a943d-c0f8-4eae-95d2-3aadfc456543",
+      "author": "ryan.porter",
+      "text": "Closing as obsolete per user request during board cleanup.",
+      "created_at": "2026-03-05T07:16:22.569031Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:14.555943Z",
+  "updated_at": "2026-03-05T07:16:22.569031Z",
+  "closed_at": "2026-03-05T07:15:35.928558Z",
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "121f9011-0ed7-4e1c-9390-95e2f129d7d5",
+  "issue_id": "PIXO-4d1e1ac4-eef8-48dc-981b-79959855225a",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:07.386Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: center and dim issue_created type/status line"
+  }
+}

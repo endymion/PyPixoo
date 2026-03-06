@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "4a3f0337-0c2a-4eba-9a72-efe631828846",
+  "issue_id": "kanbus-347ddc27-dd66-4820-92a1-1d86ca9ecad8",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:55.873Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Parity tests + device acceptance"
+  }
+}

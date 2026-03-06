@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-c45cea19-4c9b-443d-b7c1-ae9f1f3b5862",
+  "title": "Buffer visible for assertions",
+  "description": "",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-621c9e66-9a4c-43b4-b3d4-9bcba6db300b",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "cc52b307-99c5-4699-ab3b-074d4556c664",
+      "author": "ryan.porter",
+      "text": "Implemented: scenario extended with 'the buffer should be 64 by 64' and 'the buffer at 0 0 should be RGB 255 0 68'. All steps pass.",
+      "created_at": "2026-03-05T07:16:14.926626Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:09.517842Z",
+  "updated_at": "2026-03-05T07:16:14.926626Z",
+  "closed_at": "2026-03-05T07:15:30.906441Z",
+  "custom": {}
+}

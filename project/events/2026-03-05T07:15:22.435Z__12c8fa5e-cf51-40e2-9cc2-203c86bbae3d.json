@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "12c8fa5e-cf51-40e2-9cc2-203c86bbae3d",
+  "issue_id": "PIXO-423204bf-7749-43f2-9e68-d0ad1dc57981",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:22.435Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Watcher smoke: status transition ping"
+  }
+}

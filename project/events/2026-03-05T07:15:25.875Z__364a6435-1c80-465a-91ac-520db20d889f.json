@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "364a6435-1c80-465a-91ac-520db20d889f",
+  "issue_id": "PIXO-aa07db92-47e4-4269-a57a-6c77676a0d5a",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:25.875Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Set three-hand clock default colors to dark-mode Radix purple tokens: top marker purple10, markers purple7, hour purple9, minute purple7, second purple5.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Clock palette tweak: dark Radix purple scale"
+  }
+}

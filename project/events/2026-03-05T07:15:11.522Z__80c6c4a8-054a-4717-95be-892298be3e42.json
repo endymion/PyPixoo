@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "80c6c4a8-054a-4717-95be-892298be3e42",
+  "issue_id": "PIXO-da29ca43-3dd7-4b84-9da3-5f942fe12e10",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:11.522Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: COMMENT body uses Bytesized compact layout"
+  }
+}

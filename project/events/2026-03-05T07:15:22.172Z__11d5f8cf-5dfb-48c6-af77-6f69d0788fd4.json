@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "11d5f8cf-5dfb-48c6-af77-6f69d0788fd4",
+  "issue_id": "PIXO-b214e4f7-335d-4dfc-9f16-12abffa96f31",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:22.172Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: clock_realtime.py"
+  }
+}

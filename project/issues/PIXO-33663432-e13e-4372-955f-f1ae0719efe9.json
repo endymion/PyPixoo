@@ -1,0 +1,103 @@
+{
+  "id": "PIXO-33663432-e13e-4372-955f-f1ae0719efe9",
+  "title": "Consolidate clock demos into unified pixooclock",
+  "description": "Create one unified smooth clock entrypoint named pixooclock with face selection, second-hand toggle (default on), anti-aliasing toggle (default off), full color options, and existing face variants.",
+  "type": "task",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "c0ac0566-38b0-4d8d-8e99-d916a8e92287",
+      "author": "ryan.porter",
+      "text": "In progress: implementing unified pixooclock entrypoint with face presets, second-hand toggle, anti-aliasing toggle, and full color options. Will wire console script and keep smooth push delivery default.",
+      "created_at": "2026-03-05T07:16:10.784178Z"
+    },
+    {
+      "id": "f197c96a-9531-498d-ab5f-07a33823b886",
+      "author": "ryan.porter",
+      "text": "Starting implementation: consolidate clock demos into single pixooclock entrypoint with named faces, second-hand toggle (default on), anti-aliasing toggle (default off), and full color options.",
+      "created_at": "2026-03-05T07:16:10.878641Z"
+    },
+    {
+      "id": "1702a2da-11b1-458c-9847-4927c593ddff",
+      "author": "ryan.porter",
+      "text": "New request added: implement --demo mode in pixooclock to cycle every 5s through all face names and second-hand/anti-aliasing combinations; run live on device for iterative visual testing.",
+      "created_at": "2026-03-05T07:16:10.974971Z"
+    },
+    {
+      "id": "9989fd71-fc0b-4a20-81fc-e8252caf1b9d",
+      "author": "ryan.porter",
+      "text": "Implemented unified pixooclock demo with explicit face selection, second-hand toggle, anti-aliasing toggle, and color controls. Added --demo mode (5s cadence) cycling full combination space: color band x face x second-hand x anti-aliasing. Added --band for intensity-slot remapping (e.g., tomato7/10/9/7/5). Updated docs + tests and verified test slices pass.",
+      "created_at": "2026-03-05T07:16:11.073629Z"
+    },
+    {
+      "id": "70a556cf-a983-4994-ace9-ae83abeb292f",
+      "author": "ryan.porter",
+      "text": "Visual acceptance confirmed by user: dot12 + sand + anti-aliasing + no second hand now shows minute/hour updates without 5-10s stalls.",
+      "created_at": "2026-03-05T07:16:11.176778Z"
+    },
+    {
+      "id": "62ca5241-0c14-4b3a-8493-ae7cdebd1546",
+      "author": "ryan.porter",
+      "text": "Applying user-approved visual preset as new defaults: face=dot12, band=sand, anti_aliasing=true, second_hand=false, and verify default run path.",
+      "created_at": "2026-03-05T07:16:11.279549Z"
+    },
+    {
+      "id": "c80168f7-d446-4378-9b60-ffcc62fcc5cd",
+      "author": "ryan.porter",
+      "text": "Set pixooclock defaults to approved preset and verified live default run: face=dot12, band=sand, anti_aliasing=true, second_hand=false, fps=3. Added regression assertions in test_demo_three_hand_clock parser-default test.",
+      "created_at": "2026-03-05T07:16:11.381315Z"
+    },
+    {
+      "id": "43e0198d-624c-41f9-b4bb-9f54a9f42a47",
+      "author": "ryan.porter",
+      "text": "Implementing requested option: add configurable dot anti-aliasing in pixooclock (marker/center dots), with CLI flag and tests.",
+      "created_at": "2026-03-05T07:16:11.472878Z"
+    },
+    {
+      "id": "523bcfe3-c363-4e7b-a486-68c0cb901198",
+      "author": "ryan.porter",
+      "text": "Added --dot-anti-aliasing option to pixooclock and wired it to marker/center dot rendering (separate from hand anti-aliasing). Added parser/render tests and docs examples. Relaunched live with --dot-anti-aliasing for visual check.",
+      "created_at": "2026-03-05T07:16:11.567756Z"
+    },
+    {
+      "id": "ea922f2e-b6ef-4fd6-9932-5468923a6b36",
+      "author": "ryan.porter",
+      "text": "User approved dot anti-aliasing as default; updating pixooclock defaults accordingly and validating via tests + live default run.",
+      "created_at": "2026-03-05T07:16:11.661026Z"
+    },
+    {
+      "id": "1870c6c4-5ad6-4074-ad85-fd3ecaf99c25",
+      "author": "ryan.porter",
+      "text": "Made dot anti-aliasing default (parser default true), updated README default preset text, updated parser-default test assertion, and relaunched pixooclock with no args to verify live default behavior.",
+      "created_at": "2026-03-05T07:16:11.759973Z"
+    },
+    {
+      "id": "b79407aa-edfc-4ce3-85d3-2b9e27ac5cb2",
+      "author": "ryan.porter",
+      "text": "Starting full manual acceptance sweep: running pixooclock in --demo mode across all bands/faces/toggles for visual verification.",
+      "created_at": "2026-03-05T07:16:11.853904Z"
+    },
+    {
+      "id": "8be1b43a-276e-4f7b-b242-6c9b90c80f69",
+      "author": "ryan.porter",
+      "text": "Adjusted demo sweep behavior so --demo uses --demo-bands regardless of default band preset; restarted full sweep now showing 744 variations (31 bands x 6 faces x second-hand x anti-aliasing).",
+      "created_at": "2026-03-05T07:16:11.948996Z"
+    },
+    {
+      "id": "392716fc-98ca-4b4d-9504-f87c3dab8633",
+      "author": "ryan.porter",
+      "text": "Moving on from clock: starting manual acceptance for next demo group beginning with demo_upload_sequence.py.",
+      "created_at": "2026-03-05T07:16:12.050417Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:07.508083Z",
+  "updated_at": "2026-03-05T07:16:12.050417Z",
+  "closed_at": "2026-03-05T07:15:29.249936Z",
+  "custom": {}
+}

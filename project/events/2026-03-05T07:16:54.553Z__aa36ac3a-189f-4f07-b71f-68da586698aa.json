@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "aa36ac3a-189f-4f07-b71f-68da586698aa",
+  "issue_id": "kanbus-288f7117-f689-4e21-82dc-202e4fcb1f3f",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:54.553Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Demo: smooth sequence switching experiment"
+  }
+}

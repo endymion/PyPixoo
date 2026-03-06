@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-1742ec6d-696a-4bf7-98a5-78a0a9d0dbad",
+  "title": "Workspace-root Kanbus discovery + single-root kbs usage",
+  "description": "Goal: move nested project discovery into Kanbus and make PyPixoo kanbus_clock call kbs from a single root.\n\nScope: Kanbus recursive .kanbus.yml discovery (breaking), unique-only fragment resolution, PyPixoo update to use single kbs root.\n\nDone when: BDD specs pass, PyPixoo tests pass, and manual clock acceptance confirmed.",
+  "type": "epic",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T13:00:53.494076Z",
+  "updated_at": "2026-03-05T13:18:25.828957Z",
+  "closed_at": "2026-03-05T13:18:25.828957Z",
+  "custom": {}
+}

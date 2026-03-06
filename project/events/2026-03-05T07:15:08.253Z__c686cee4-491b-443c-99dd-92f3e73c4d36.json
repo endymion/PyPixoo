@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "c686cee4-491b-443c-99dd-92f3e73c4d36",
+  "issue_id": "PIXO-a2555d4d-6e78-4248-9ea1-0ffd01d3e5a3",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:08.253Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: demo_upload_sequence.py"
+  }
+}

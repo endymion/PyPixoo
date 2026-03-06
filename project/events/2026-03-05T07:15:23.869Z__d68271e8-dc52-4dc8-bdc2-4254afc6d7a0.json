@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "d68271e8-dc52-4dc8-bdc2-4254afc6d7a0",
+  "issue_id": "PIXO-1b911ec8-4b23-4800-ad2d-52de8121cf3e",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:23.869Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "User reports second hand is stalled or updates in bursts/jumps. Need to reproduce, fix demo timing/path, and validate visually with explicit user confirmation before close.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Clock second hand stalls / spurts instead of continuous update"
+  }
+}

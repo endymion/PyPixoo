@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "a72bfaac-de05-4299-a3e1-d74aeb0ee515",
+  "issue_id": "PIXO-90062e42-18d0-42eb-9f57-6eff857864e9",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:07.258Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Alerting clock REPL demo with alert/warn/info commands"
+  }
+}

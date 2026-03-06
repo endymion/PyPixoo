@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "e3f1947f-2d2a-43ac-84c3-f559484aed86",
+  "issue_id": "kanbus-a3994ce9-b4d4-4085-9e5d-19d38028a81a",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:05.496Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Kanbus clock comment-gap visual test"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-b333c03a-6b18-4969-82f0-2e49b8eb8ecd",
+  "title": "React + Storybook on Pixoo",
+  "description": "",
+  "type": "epic",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c464c182-cd21-445d-b2d6-081fb0d454ac",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "5d64cae4-f7b7-48bc-8db4-e4c327295343",
+      "author": "ryan.porter",
+      "text": "Use Storybook to construct and preview React components on the computer; run the same components on the Pixoo. Components support time parameter for frame rendering (timestamp), enabling gsap/Framer Motion with easing. Variable frame rate: device may not sustain high FPS, but animation timing remains correct when driven by time.",
+      "created_at": "2026-03-05T07:16:16.278509Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:10.526961Z",
+  "updated_at": "2026-03-05T07:16:16.278509Z",
+  "closed_at": "2026-03-05T07:15:31.941272Z",
+  "custom": {}
+}

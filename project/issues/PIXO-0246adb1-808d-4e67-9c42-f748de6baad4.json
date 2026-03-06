@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-0246adb1-808d-4e67-9c42-f748de6baad4",
+  "title": "Parity tests + device acceptance",
+  "description": "Add/adjust tests for profile/renderer parity and keep task open until manual visual confirmation.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "da52fbe8-ba99-4d07-b542-5d795faf405f",
+      "author": "ryan.porter",
+      "text": "Ready for manual acceptance run: verify tiny5/micro5/bytesized/jersey10/jersey15 parity between font_showcase and scene_transitions InfoScene.",
+      "created_at": "2026-03-05T07:16:12.944660Z"
+    },
+    {
+      "id": "c662b6a0-0362-48ea-8aec-e7658ca4b828",
+      "author": "ryan.porter",
+      "text": "Manual acceptance confirmed by user: unified scene renderer now displays correctly (including Micro5) with no blur/noise artifacts. Marking parity acceptance complete for this task.",
+      "created_at": "2026-03-05T07:16:13.046390Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:08.383068Z",
+  "updated_at": "2026-03-05T07:16:13.046390Z",
+  "closed_at": "2026-03-05T07:15:30.014844Z",
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "fd6bc054-db3e-4715-acc4-a9af14989f05",
+  "issue_id": "PIXO-5bdac332-7f69-44b9-a132-97d8ea59d711",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:10.645Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Implement send_text_overlay, clear_text_overlay, and guard against incompatible PlayTFGif overlay usage.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Implement overlay APIs and compatibility guard"
+  }
+}

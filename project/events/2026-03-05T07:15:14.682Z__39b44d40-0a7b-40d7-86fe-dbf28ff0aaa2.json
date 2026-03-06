@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "39b44d40-0a7b-40d7-86fe-dbf28ff0aaa2",
+  "issue_id": "PIXO-3b70ec55-8957-45cb-804b-c2bd2ffe2e17",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:14.682Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: return transition should exit notice left and bring clock from right"
+  }
+}

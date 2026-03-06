@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "bc431601-97d8-493a-98da-77ee2e00cf0f",
+  "issue_id": "PIXO-5e5a729b-9f72-4fd3-b474-d8535c550c82",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:22.691Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Rewire scene components and info DSL to use shared font renderer/profiles only.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "InfoScene/DSL migration"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "PIXO-5c47c620-1070-48f4-b98a-2594d2bb1dc0",
+  "title": "Web font demo output is blurry on device",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "7d80cc6b-7950-48f6-bd57-f4b6511d0f02",
+      "author": "ryan.porter",
+      "text": "Fixing web font blur by forcing pixel-aligned render path: integer-positioned text in fixture + 64x64 viewport with device_scale_factor=1 and nearest sampling.",
+      "created_at": "2026-03-05T07:16:41.429962Z"
+    },
+    {
+      "id": "d644896d-3c5d-45bb-bc9d-a6719950a78c",
+      "author": "ryan.porter",
+      "text": "Acceptance note: user reported text visible but blurry on-device; targeting deterministic pixel-grid rendering.",
+      "created_at": "2026-03-05T07:16:41.527222Z"
+    },
+    {
+      "id": "8c731eea-1e26-44cb-8325-6ffc839408f7",
+      "author": "ryan.porter",
+      "text": "Switched web_font_demo fixture from Google-hosted Tiny5 to local @font-face Tiny5-Regular.ttf for deterministic glyph output.",
+      "created_at": "2026-03-05T07:16:41.623962Z"
+    },
+    {
+      "id": "ca7ff72c-88e0-4d0d-a5c4-a5e5094dd1a2",
+      "author": "ryan.porter",
+      "text": "Working now: switch web-font demo to known-good Tiny5 render path and set color to Radix sand-5 for visual confirmation on device.",
+      "created_at": "2026-03-05T07:16:41.717930Z"
+    },
+    {
+      "id": "c616f04d-68a2-423e-8482-cd269fd82db2",
+      "author": "ryan.porter",
+      "text": "Updated demo_web_fonts to use tinytext_192 fixture (same path as font_showcase), default variant=single_a, font=tiny5, and text color default dark.sand5; uploaded to device for visual verification.",
+      "created_at": "2026-03-05T07:16:41.814448Z"
+    },
+    {
+      "id": "21649963-0773-46cd-bff8-ae27a847af3f",
+      "author": "ryan.porter",
+      "text": "User confirmed on device: Tiny5 render now correct with Radix sand-5 color.",
+      "created_at": "2026-03-05T07:16:41.912152Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:24.884864Z",
+  "updated_at": "2026-03-05T07:16:41.912152Z",
+  "closed_at": "2026-03-05T07:15:45.756527Z",
+  "custom": {}
+}

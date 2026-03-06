@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "c8db1656-8803-418b-9079-02f5d0718a0c",
+  "issue_id": "kanbus-87a54d32-2b01-4bff-9bb0-4acca9dfc1a4",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:02.636Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "DSL types + validation"
+  }
+}

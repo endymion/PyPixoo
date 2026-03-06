@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "7aadadd9-a0e1-4513-a282-0c8b0d5e8505",
+  "issue_id": "PIXO-e02d19bc-1ed9-43c8-b2fd-8515671a15ea",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:13.528Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Current stitched segment uploads trigger loading animation every segment boundary. Need default no-loading delivery path for continuous clock display.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Three-hand clock shows device loading overlay every segment"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-762c0ab2-1c49-416b-91bb-cc5f58cbfba4",
+  "title": "Rename CLI command to pixoo",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "1f286e10-1a63-4ea7-9d5d-c68d49281d56",
+      "author": "ryan.porter",
+      "text": "Starting change: switch console script entrypoint from pypixoo to pixoo and update docs/examples.",
+      "created_at": "2026-03-05T07:16:30.554379Z"
+    },
+    {
+      "id": "12482ed7-24fc-4f38-90ed-323ff789b14c",
+      "author": "ryan.porter",
+      "text": "Implemented rename: console script entrypoint is now 'pixoo' (was pypixoo), CLI parser program name updated, and README command examples switched to pixoo. Validation: pytest tests/test_cli.py tests/test_cli_native_extra.py -q (35 passed).",
+      "created_at": "2026-03-05T07:16:30.645627Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:19.777203Z",
+  "updated_at": "2026-03-05T07:16:30.645627Z",
+  "closed_at": "2026-03-05T07:15:40.844989Z",
+  "custom": {}
+}

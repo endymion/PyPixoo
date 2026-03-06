@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-ec24b701-0803-41ee-9bb9-3f6f608d359d",
+  "title": "Acceptance test: demo_web_fonts.py",
+  "description": "",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:16.118297Z",
+  "updated_at": "2026-03-05T07:15:57.625886Z",
+  "closed_at": null,
+  "custom": {}
+}

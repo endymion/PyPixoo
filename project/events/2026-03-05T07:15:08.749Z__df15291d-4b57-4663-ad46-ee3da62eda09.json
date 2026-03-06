@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "df15291d-4b57-4663-ad46-ee3da62eda09",
+  "issue_id": "PIXO-a5347806-fb49-479f-8780-1278dcdad824",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:08.749Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: push_letter_a.py"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "7f8212d8-e2d2-4a81-936f-c8c3d11a0235",
+  "issue_id": "PIXO-e8bfdb0b-8ab0-4763-b81a-48f357676b3a",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:10.278Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Registry-driven scene font listing/registration and HeaderConfig validation.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Scene font registry + validation"
+  }
+}

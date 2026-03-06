@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "577e8fdb-0076-476b-9e05-20dc545ee1d2",
+  "issue_id": "PIXO-38750a8f-f6db-4d8c-9415-7eea18f61da7",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:16.384Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Clock adaptive default palette by sunrise/sunset"
+  }
+}

@@ -54,13 +54,22 @@ _FILENAME_TS_RE = re.compile(
 _SHORT_SECONDS_RE = re.compile(r"^-s(\d+(?:\.\d+)?)$")
 _ISSUE_KEY_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9]*-\d+)\b")
 _PROJECT_KEY_FULL_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-\d+$")
-_PROJECT_KEY_LINE_RE = re.compile(r"^\s*project_key\s*:\s*([A-Za-z0-9_-]+)\s*$", re.MULTILINE)
 MIN_TS = datetime(1970, 1, 1, tzinfo=timezone.utc)
+_DEBUG_KBS = False
 
 try:
     import readline
 except ImportError:  # pragma: no cover - platform-dependent
     readline = None  # type: ignore[assignment]
+
+
+class KbsShowAmbiguous(RuntimeError):
+    """Raised when kbs show reports an ambiguous identifier."""
+
+
+def _debug_kbs(message: str) -> None:
+    if _DEBUG_KBS:
+        print(message)
 
 
 @dataclass(frozen=True)
@@ -328,13 +337,21 @@ def _extract_comment_text(payload: dict[str, Any]) -> str:
     return best_text
 
 
-def _run_kbs_show_json(issue_id: str, repo_root: Optional[Path] = None) -> Optional[dict[str, Any]]:
+def _run_kbs_show_json(
+    issue_id: str, kbs_root: Optional[Path] = None, project_root: Optional[Path] = None
+) -> Optional[dict[str, Any]]:
     if not issue_id:
         return None
+    cwd = str(kbs_root) if kbs_root else None
+    project_hint = f" project_root={project_root}" if project_root else ""
+    _debug_kbs(f"kbs: show {issue_id} --json (cwd={cwd or 'default'}){project_hint}")
+    command = ["kbs", "show", issue_id, "--json"]
+    if project_root is not None:
+        command.extend(["--project-root", str(project_root)])
     try:
         proc = subprocess.run(
-            ["kbs", "show", issue_id, "--json"],
-            cwd=str(repo_root) if repo_root else None,
+            command,
+            cwd=cwd,
             capture_output=True,
             text=True,
             check=False,
@@ -342,29 +359,24 @@ def _run_kbs_show_json(issue_id: str, repo_root: Optional[Path] = None) -> Optio
         )
     except Exception:
         return None
-    if proc.returncode != 0 or not proc.stdout:
+    _debug_kbs(f"kbs: exit={proc.returncode}")
+    stdout_text = getattr(proc, "stdout", "") or ""
+    stderr_text = getattr(proc, "stderr", "") or ""
+    if stdout_text:
+        _debug_kbs(f"kbs stdout:\n{stdout_text.strip()}")
+    if stderr_text:
+        _debug_kbs(f"kbs stderr:\n{stderr_text.strip()}")
+    if proc.returncode != 0:
+        if "ambiguous identifier" in stderr_text.lower():
+            raise KbsShowAmbiguous("ambiguous identifier")
+        return None
+    if not stdout_text:
         return None
     try:
-        parsed = json.loads(proc.stdout)
+        parsed = json.loads(stdout_text)
     except Exception:
         return None
     return parsed if isinstance(parsed, dict) else None
-
-
-def _project_key_from_repo_root(repo_root: Optional[Path]) -> str:
-    if repo_root is None:
-        return ""
-    config_path = repo_root / ".kanbus.yml"
-    if not config_path.is_file():
-        return ""
-    try:
-        text = config_path.read_text(encoding="utf-8")
-    except Exception:
-        return ""
-    match = _PROJECT_KEY_LINE_RE.search(text)
-    if match is None:
-        return ""
-    return match.group(1).strip().upper()
 
 
 def _issue_id_prefix_upper(issue_id: str) -> str:
@@ -485,10 +497,14 @@ def _pick_issue_key_for_prefix(
         value = issue.get(key)
         if isinstance(value, str) and value.strip():
             candidates.insert(0, value.strip())
+    if issue_id_value:
+        issue_prefix = issue_id_value.split("-", 1)[0]
+        if issue_prefix and issue_prefix[:1].isalpha() and not issue_id_value.lower().startswith("kanbus-"):
+            candidates.insert(0, issue_id_value)
+        else:
+            candidates.append(issue_id_value)
     if requested_issue_id:
         candidates.append(requested_issue_id.strip())
-    if issue_id_value:
-        candidates.append(issue_id_value)
 
     requested = requested_issue_id.strip()
 
@@ -556,14 +572,17 @@ def _extract_parent_id(issue: dict[str, Any]) -> Optional[str]:
 
 
 def _fetch_issue_snapshot(
-    issue_id: str, repo_root: Optional[Path] = None, payload: Optional[dict[str, Any]] = None
+    issue_id: str,
+    kbs_root: Optional[Path] = None,
+    payload: Optional[dict[str, Any]] = None,
+    project_root: Optional[Path] = None,
 ) -> Optional[IssueSnapshot]:
-    issue = _run_kbs_show_json(issue_id, repo_root)
+    issue = _run_kbs_show_json(issue_id, kbs_root, project_root)
     if issue is None:
         return None
-    repo_prefix = _project_key_from_repo_root(repo_root)
     issue_id_value = str(issue.get("id") or "").strip()
-    if repo_prefix and issue_id_value.startswith(f"{repo_prefix}-"):
+    issue_prefix = issue_id_value.split("-", 1)[0] if issue_id_value else ""
+    if issue_prefix and issue_prefix[:1].isalpha() and not issue_id_value.lower().startswith("kanbus-"):
         issue_key_for_prefix = issue_id_value
     else:
         issue_key_for_prefix = _pick_issue_key_for_prefix(issue, issue_id, payload)
@@ -584,8 +603,10 @@ def _fetch_issue_snapshot(
     )
 
 
-def _fetch_parent_snapshot(parent_id: str, repo_root: Optional[Path] = None) -> Optional[ParentSnapshot]:
-    issue = _run_kbs_show_json(parent_id, repo_root)
+def _fetch_parent_snapshot(
+    parent_id: str, kbs_root: Optional[Path] = None, project_root: Optional[Path] = None
+) -> Optional[ParentSnapshot]:
+    issue = _run_kbs_show_json(parent_id, kbs_root, project_root)
     if issue is None:
         return None
     title = _normalize_space(str(issue.get("title") or issue.get("name") or ""))
@@ -1031,14 +1052,13 @@ def latest_event_timestamp(folder: Path) -> tuple[int, Optional[str]]:
     return len(files), latest.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def summarize_event(event: KanbusEvent) -> AutoNotice:
+def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Optional[AutoNotice]:
     etype = event.event_type
     payload = event.payload
-    repo_root = event.repo_root or _repo_root_from_event_path(event.path)
     payload_prefix = _payload_prefix_override(payload)
-    repo_prefix = _project_key_from_repo_root(repo_root)
+    project_root = event.repo_root
 
-    snapshot = _fetch_issue_snapshot(event.issue_id, repo_root, payload)
+    snapshot = _fetch_issue_snapshot(event.issue_id, kbs_root, payload, project_root)
     payload_type = _normalize_space(str(payload.get("issue_type") or payload.get("type") or "ISSUE")).upper()
     payload_status = _format_status_text(payload.get("status") or "OPEN")
     payload_description = _normalize_space(
@@ -1047,7 +1067,7 @@ def summarize_event(event: KanbusEvent) -> AutoNotice:
     if snapshot is None:
         snapshot = IssueSnapshot(
             issue_id=event.issue_id,
-            id_prefix_upper=payload_prefix or repo_prefix or _issue_id_prefix_upper(event.issue_id),
+            id_prefix_upper=payload_prefix or _issue_id_prefix_upper(event.issue_id),
             issue_type_upper=payload_type or "ISSUE",
             status_upper=payload_status or "OPEN",
             description=payload_description,
@@ -1078,23 +1098,14 @@ def summarize_event(event: KanbusEvent) -> AutoNotice:
             parent_id=snapshot.parent_id,
             latest_comment_text=snapshot.latest_comment_text,
         )
-    elif repo_prefix and snapshot.id_prefix_upper.isdigit():
-        snapshot = IssueSnapshot(
-            issue_id=snapshot.issue_id,
-            id_prefix_upper=repo_prefix,
-            issue_type_upper=snapshot.issue_type_upper,
-            status_upper=snapshot.status_upper,
-            description=snapshot.description,
-            title=snapshot.title,
-            parent_id=snapshot.parent_id,
-            latest_comment_text=snapshot.latest_comment_text,
-        )
     header_parts = _issue_meta_header_parts(snapshot)
     header_text = " ".join(header_parts)
 
     if etype == "issue_created":
         parent_snapshot = (
-            _fetch_parent_snapshot(snapshot.parent_id, repo_root) if snapshot.parent_id else None
+            _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
+            if snapshot.parent_id
+            else None
         )
         if parent_snapshot is not None:
             top_lines = _fixed_rows(_wrap_desc(parent_snapshot.description, max_lines=3), 3)
@@ -1120,7 +1131,9 @@ def summarize_event(event: KanbusEvent) -> AutoNotice:
 
     if etype == "state_transition":
         parent_snapshot = (
-            _fetch_parent_snapshot(snapshot.parent_id, repo_root) if snapshot.parent_id else None
+            _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
+            if snapshot.parent_id
+            else None
         )
         if parent_snapshot is not None:
             top_lines = _fixed_rows(_wrap_desc(parent_snapshot.description, max_lines=3), 3)
@@ -1237,6 +1250,7 @@ def _watch_poll_step(
     failures: dict[Path, int],
     do_rescan: bool,
     max_failures: int,
+    kbs_root: Optional[Path],
 ) -> tuple[list[str], list[AutoNotice]]:
     """Run one synchronous watcher poll pass.
 
@@ -1263,7 +1277,17 @@ def _watch_poll_step(
             max_failures=max_failures,
         )
         for event in events:
-            notices.append(summarize_event(event))
+            try:
+                notice = summarize_event(event, kbs_root)
+            except KbsShowAmbiguous:
+                logs.append(
+                    f"watcher: ambiguous identifier for {event.issue_id}, skipping"
+                )
+                continue
+            if notice is None:
+                logs.append(f"watcher: skipped event {event.event_type} {event.issue_id}")
+                continue
+            notices.append(notice)
             logs.append(f"watcher: event {event.event_type} {event.issue_id}")
 
     return logs, notices
@@ -1384,6 +1408,7 @@ async def _watch_events_loop(
     poll_seconds: float,
     rescan_seconds: float,
     max_failures: int = 5,
+    kbs_root: Optional[Path] = None,
 ) -> None:
     failures: dict[Path, int] = {}
     next_rescan = time.monotonic() + max(0.5, rescan_seconds)
@@ -1398,6 +1423,7 @@ async def _watch_events_loop(
             failures=failures,
             do_rescan=do_rescan,
             max_failures=max_failures,
+            kbs_root=kbs_root,
         )
         for line in logs:
             print(line)
@@ -1624,6 +1650,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--rescan-seconds", type=float, default=10.0)
     parser.add_argument("--auto-info-seconds", type=float, default=30.0)
     parser.add_argument("--history-file", default=str(DEFAULT_HISTORY_FILE))
+    parser.add_argument("--debug", action="store_true", help="print kbs commands and responses")
     return parser
 
 
@@ -1637,7 +1664,10 @@ async def run(
     rescan_seconds: float,
     auto_info_seconds: float,
     history_file: Path,
+    debug: bool,
 ) -> None:
+    global _DEBUG_KBS
+    _DEBUG_KBS = debug
     print(f"kanbus-watch: scanning for project/events under {root}")
     discovered = discover_event_dirs(root)
     tracked = _startup_report(root, discovered)
@@ -1667,6 +1697,7 @@ async def run(
                 stop_event=stop_event,
                 poll_seconds=poll_seconds,
                 rescan_seconds=rescan_seconds,
+                kbs_root=root,
             )
         )
         consumer = asyncio.create_task(
@@ -1706,6 +1737,7 @@ def main() -> None:
                 rescan_seconds=max(0.5, args.rescan_seconds),
                 auto_info_seconds=max(0.1, args.auto_info_seconds),
                 history_file=Path(args.history_file).expanduser(),
+                debug=bool(args.debug),
             )
         )
     except KeyboardInterrupt:

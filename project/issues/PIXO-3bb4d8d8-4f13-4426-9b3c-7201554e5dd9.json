@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-3bb4d8d8-4f13-4426-9b3c-7201554e5dd9",
+  "title": "Storybook coverage for kanbus_clock card variants",
+  "description": "Add Storybook stories for Kanbus notification card layouts used by demos/kanbus_clock.py, including created/transition/comment/unknown, parent/no-parent, long-header, wrapping, and issue-type color variants.",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "b66d6f14-e0d2-4535-b93f-9e6b97f03031",
+      "author": "ryan.porter",
+      "text": "Started implementation. Next: inspect current Storybook structure/components, then add a dedicated Kanbus card stories file grouped by event type + edge cases used in kanbus_clock.",
+      "created_at": "2026-03-06T01:24:36.121053Z"
+    },
+    {
+      "id": "a7b26759-e895-4cff-bcbf-86b28a44a81e",
+      "author": "ryan.porter",
+      "text": "Implemented Storybook Kanbus card coverage: added reusable KanbusCard component + Pixoo/KanbusClockCards stories for created/transition/comment/unknown, parent/no-parent, long-header overflow, and issue-type color variants. Storybook build passes.",
+      "created_at": "2026-03-06T01:26:01.391011Z"
+    }
+  ],
+  "created_at": "2026-03-06T01:24:25.478825Z",
+  "updated_at": "2026-03-06T01:26:01.391011Z",
+  "closed_at": null,
+  "custom": {}
+}

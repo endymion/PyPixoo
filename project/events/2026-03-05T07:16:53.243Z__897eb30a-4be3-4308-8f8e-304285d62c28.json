@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "897eb30a-4be3-4308-8f8e-304285d62c28",
+  "issue_id": "kanbus-189e5435-06a2-435c-94c4-08196a4e94b5",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:53.243Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "open",
+    "title": "Acceptance test: screen_test.py"
+  }
+}

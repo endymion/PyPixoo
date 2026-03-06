@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-82686885-67e1-4119-834e-59391a201209",
+  "title": "Kanbus clock visual smoke test issue",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "d773fab6-ae8f-4951-be51-ad2fd5fe0f2a",
+      "author": "ryan.porter",
+      "text": "Visual test comment for Kanbus Clock: verify COMMENT card layout and wrapping.",
+      "created_at": "2026-03-05T07:16:18.291393Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:11.643930Z",
+  "updated_at": "2026-03-05T07:16:18.291393Z",
+  "closed_at": "2026-03-05T07:15:32.970534Z",
+  "custom": {}
+}

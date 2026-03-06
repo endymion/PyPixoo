@@ -1,0 +1,49 @@
+{
+  "id": "PIXO-16cd8412-6a16-4261-a4fe-542322c992f4",
+  "title": "Font engine unification for scene + demo parity",
+  "description": "Unify font rendering/profile logic into one Python engine and make InfoScene match font showcase visuals.",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "cb834e9c-be98-4e98-b2a8-47e7fba0e8d2",
+      "author": "ryan.porter",
+      "text": "Started implementation: introducing canonical font profiles and shared renderer, then migrating scene + showcase paths and tests.",
+      "created_at": "2026-03-05T07:16:19.553356Z"
+    },
+    {
+      "id": "42b3f635-d03c-4461-90ec-a21a4e849e44",
+      "author": "ryan.porter",
+      "text": "Implemented canonical font profiles + shared renderer and migrated scene/info + showcase to consume shared profile data. Automated tests passing; awaiting manual device parity confirmation for each font in info scene.",
+      "created_at": "2026-03-05T07:16:19.657075Z"
+    },
+    {
+      "id": "23dc1bc3-89f3-4acb-900d-99a1749b2a93",
+      "author": "ryan.porter",
+      "text": "Continuing in-progress: replacing scene text rasterization internals with single canonical glyph-atlas renderer path to eliminate blur/noise divergence from validated font demo. Acceptance target: info scene text visually matches font showcase on-device.",
+      "created_at": "2026-03-05T07:16:19.755849Z"
+    },
+    {
+      "id": "fe4421df-916a-4914-a1ba-0e47d75c6774",
+      "author": "ryan.porter",
+      "text": "Implemented renderer rewrite: scene text now uses cached per-glyph atlas composition (high-res glyph -> nearest downsample -> threshold -> compose) matching the font showcase method. Targeted font/info/scene/cli tests are passing; proceeding to real-device visual verification.",
+      "created_at": "2026-03-05T07:16:19.855406Z"
+    },
+    {
+      "id": "f53e7dd1-9afd-4e0e-af0f-7f28bcc32ea3",
+      "author": "ryan.porter",
+      "text": "User confirmed visual fix on real device and Micro5 switch works. Story criteria met for unified renderer parity.",
+      "created_at": "2026-03-05T07:16:19.954078Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:13.014139Z",
+  "updated_at": "2026-03-05T07:16:19.954078Z",
+  "closed_at": "2026-03-05T07:15:34.414598Z",
+  "custom": {}
+}

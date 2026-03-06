@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "0578aa23-f830-48c2-aff7-29398a8132e4",
+  "issue_id": "PIXO-18a6ef57-684c-4e5a-b836-b78339e83a1b",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:14.032Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Implement CLI dotenv support"
+  }
+}

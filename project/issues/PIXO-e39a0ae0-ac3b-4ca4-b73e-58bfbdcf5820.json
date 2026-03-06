@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-e39a0ae0-ac3b-4ca4-b73e-58bfbdcf5820",
+  "title": "Canonical font profile source",
+  "description": "Add shared font profile data + loader module used by all render paths.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:15.340145Z",
+  "updated_at": "2026-03-05T07:15:56.983082Z",
+  "closed_at": "2026-03-05T07:15:36.738985Z",
+  "custom": {}
+}

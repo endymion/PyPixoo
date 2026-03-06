@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "64003861-e223-4ccc-8741-e7ddbe635529",
+  "issue_id": "kanbus-bfb7bc98-ea45-40e9-bd22-33a6757bbf81",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:08.637Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Implement Pixoo V2 upload and ID methods"
+  }
+}

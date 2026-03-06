@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "890fb094-b55a-4bdc-96c4-f9f6d2a01220",
+  "issue_id": "kanbus-30de3da9-ef03-4734-900c-6b4e84457db3",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:55.604Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "story",
+    "status": "closed",
+    "title": "System/device controls and raw command"
+  }
+}

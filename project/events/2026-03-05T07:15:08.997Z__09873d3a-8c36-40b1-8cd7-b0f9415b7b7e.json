@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "09873d3a-8c36-40b1-8cd7-b0f9415b7b7e",
+  "issue_id": "PIXO-3bc8c405-5d22-4f32-aea8-1bcd1864a740",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:08.997Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Async fire-and-forget animation"
+  }
+}

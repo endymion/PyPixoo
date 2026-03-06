@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "08641e98-630e-41fe-bfd6-4ad719c35fba",
+  "issue_id": "PIXO-dc9a42e4-271d-4ae1-97db-a81f5004565f",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:19.376Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Remove PIXOO_REAL_DEVICE gating"
+  }
+}

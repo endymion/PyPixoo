@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "c6b2d514-d5ad-409a-b806-48b58ad4f3d0",
+  "issue_id": "kanbus-8f7830a4-6eac-4473-a58f-652ee965d687",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:03.666Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Acceptance test: browser_mixed.py"
+  }
+}

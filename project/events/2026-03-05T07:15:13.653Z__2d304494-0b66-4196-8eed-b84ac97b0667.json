@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "2d304494-0b66-4196-8eed-b84ac97b0667",
+  "issue_id": "PIXO-b3da20be-eec9-4ecc-bd51-260312d3615a",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:13.653Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: show issue description on transition cards"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "4a1e2174-ee57-494d-ac2a-2865d8eca726",
+  "issue_id": "kanbus-3d5fad38-0d29-41f5-8343-516651325e7f",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:56.793Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "initiative",
+    "status": "open",
+    "title": "PyPixoo acceptance testing"
+  }
+}

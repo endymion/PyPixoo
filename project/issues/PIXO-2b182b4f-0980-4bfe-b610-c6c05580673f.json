@@ -1,0 +1,61 @@
+{
+  "id": "PIXO-2b182b4f-0980-4bfe-b610-c6c05580673f",
+  "title": "Three-hand stitched clock demo",
+  "description": "Build and validate demo_three_hand_clock.py using bounded stitched upload + phase-locked segments. Includes manual visual acceptance.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "8708a5e0-7c9f-4944-aead-d670cbb779e6",
+      "author": "ryan.porter",
+      "text": "In progress: implementing demo_three_hand_clock.py with phase-locked segments, bounded frame budget, and upload fallback handling.",
+      "created_at": "2026-03-05T07:16:27.595008Z"
+    },
+    {
+      "id": "b2151529-a1f2-42ec-b038-8fe58bfe265f",
+      "author": "ryan.porter",
+      "text": "Implemented demo_three_hand_clock.py + tests/docs. Smoke run on real device succeeded with --once --fps 4 --segment-seconds 10 (uploaded 40 frames; no retries). Next: user visual confirmation for continuous second-hand motion and time correctness.",
+      "created_at": "2026-03-05T07:16:27.688503Z"
+    },
+    {
+      "id": "2411140b-3b0a-4daf-ba92-ba622c520e39",
+      "author": "ryan.porter",
+      "text": "Updated three-hand clock demo to default no-loading push delivery; stitched remains optional. Awaiting user visual confirmation that loading flashes are gone.",
+      "created_at": "2026-03-05T07:16:27.785032Z"
+    },
+    {
+      "id": "76a23da0-ee5b-4e63-a0a5-b753b3ce6908",
+      "author": "ryan.porter",
+      "text": "Applying visual polish tweak: default hand colors updated to hour=60% gray, minute=50% gray, second=40% gray for demo_three_hand_clock.",
+      "created_at": "2026-03-05T07:16:27.878465Z"
+    },
+    {
+      "id": "e30d87ad-3baf-4a51-bf5f-18572e0e41cf",
+      "author": "ryan.porter",
+      "text": "Completed hand color default change in demo_three_hand_clock: hour=(153,153,153), minute=(128,128,128), second=(102,102,102). Restarted live demo for visual confirmation.",
+      "created_at": "2026-03-05T07:16:27.973991Z"
+    },
+    {
+      "id": "57c30123-0f4e-48a6-81b8-6c2b6bc6fa4b",
+      "author": "ryan.porter",
+      "text": "Added Radix color token support for clock styling workflow so hand/dial colors can use tokens like gray11, dark.gray11, and grayDark11.",
+      "created_at": "2026-03-05T07:16:28.071605Z"
+    },
+    {
+      "id": "441724ce-106b-4856-b7a8-082745a10bc8",
+      "author": "ryan.porter",
+      "text": "Completed: three-hand clock demo implemented, no-loading push delivery defaulted, hand color tuning applied, and Radix color token support integrated. Closing task.",
+      "created_at": "2026-03-05T07:16:28.166265Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:18.854191Z",
+  "updated_at": "2026-03-05T07:16:28.166265Z",
+  "closed_at": "2026-03-05T07:15:40.046211Z",
+  "custom": {}
+}

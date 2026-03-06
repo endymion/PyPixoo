@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "23d3e5fa-dca0-4f60-b0bf-51117f7a6ed6",
+  "issue_id": "PIXO-c21abe21-7664-4635-887e-0ee4bb19020b",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:06.393Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Demo fails with ModuleNotFoundError: pypixoo.animation. Migrate black_band_opaque.py to V2 API and verify real-device execution.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Fix demo black_band_opaque.py for V2 API"
+  }
+}

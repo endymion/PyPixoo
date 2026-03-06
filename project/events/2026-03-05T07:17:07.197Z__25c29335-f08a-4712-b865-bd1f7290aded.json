@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "25c29335-f08a-4712-b865-bd1f7290aded",
+  "issue_id": "kanbus-afcb7f1d-855f-4f0b-9ef7-98579b660310",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:07.197Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "story",
+    "status": "closed",
+    "title": "Send and clear text overlays on HttpGif playback"
+  }
+}

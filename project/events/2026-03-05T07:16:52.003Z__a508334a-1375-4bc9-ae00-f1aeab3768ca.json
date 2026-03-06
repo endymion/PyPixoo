@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "a508334a-1375-4bc9-ae00-f1aeab3768ca",
+  "issue_id": "kanbus-00526b08-6751-4cc3-ac40-ec7cc732c4d0",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:52.003Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "story",
+    "status": "closed",
+    "title": "L1 raster API (sync + async)"
+  }
+}

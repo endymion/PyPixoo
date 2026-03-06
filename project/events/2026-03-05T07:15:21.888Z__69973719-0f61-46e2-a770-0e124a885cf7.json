@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "69973719-0f61-46e2-a770-0e124a885cf7",
+  "issue_id": "PIXO-ca2480c5-2f72-40b4-abc4-22506b194dc4",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:21.888Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: issue_created should default missing status to OPEN"
+  }
+}

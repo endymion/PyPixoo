@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-ec20fdf5-fa88-47a8-9c5f-ff12ac29b048",
+  "title": "DSL types + validation",
+  "description": "Add src/pypixoo/info_dsl.py dataclasses, validation, font checks, and helpers.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:14.943946Z",
+  "updated_at": "2026-03-05T07:15:56.736650Z",
+  "closed_at": "2026-03-05T07:15:36.331539Z",
+  "custom": {}
+}

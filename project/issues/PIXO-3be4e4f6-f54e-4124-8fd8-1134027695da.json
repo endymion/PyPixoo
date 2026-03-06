@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-3be4e4f6-f54e-4124-8fd8-1134027695da",
+  "title": "Acceptance test: demo_weather.py",
+  "description": "",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:22.306507Z",
+  "updated_at": "2026-03-05T07:16:02.796739Z",
+  "closed_at": null,
+  "custom": {}
+}

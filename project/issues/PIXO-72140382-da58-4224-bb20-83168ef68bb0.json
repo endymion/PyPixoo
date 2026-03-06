@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-72140382-da58-4224-bb20-83168ef68bb0",
+  "title": "Real-device demos per capability",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "a8f45d82-4eb9-4d7e-86f8-7c459f8048be",
+      "author": "ryan.porter",
+      "text": "Added per-capability demos in demos/ (upload, URL GIF, overlay, display list, tools, device settings, weather, web fonts) and updated demos/README.md.",
+      "created_at": "2026-03-05T07:16:14.823534Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:09.126261Z",
+  "updated_at": "2026-03-05T07:16:14.823534Z",
+  "closed_at": "2026-03-05T07:15:30.651129Z",
+  "custom": {}
+}

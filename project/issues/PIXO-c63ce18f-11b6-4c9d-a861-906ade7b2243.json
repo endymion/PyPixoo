@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-c63ce18f-11b6-4c9d-a861-906ade7b2243",
+  "title": "Docstring expansion for device/web paths",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "e3b88f30-1f7e-439b-bcc0-5d0494d929b7",
+      "author": "ryan.porter",
+      "text": "Expanded docstrings in pixoo/native/fonts/browser to explain device vs client paths, overlays, and font distinctions.",
+      "created_at": "2026-03-05T07:16:26.625744Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:17.708650Z",
+  "updated_at": "2026-03-05T07:16:26.625744Z",
+  "closed_at": "2026-03-05T07:15:38.857996Z",
+  "custom": {}
+}

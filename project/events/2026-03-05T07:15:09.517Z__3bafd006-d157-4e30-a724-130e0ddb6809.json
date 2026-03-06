@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "3bafd006-d157-4e30-a724-130e0ddb6809",
+  "issue_id": "PIXO-c45cea19-4c9b-443d-b7c1-ae9f1f3b5862",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:09.517Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Buffer visible for assertions"
+  }
+}

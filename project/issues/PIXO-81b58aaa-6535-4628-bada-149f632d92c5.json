@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-81b58aaa-6535-4628-bada-149f632d92c5",
+  "title": "L1 raster API (sync + async)",
+  "description": "Add FrameSink, PixooFrameSink, RasterClient, AsyncRasterClient with pacing and stats.",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "537496f8-0d32-4752-8476-ecb614365754",
+      "author": "ryan.porter",
+      "text": "Started implementation for v3 layered architecture.",
+      "created_at": "2026-03-05T07:16:06.727704Z"
+    },
+    {
+      "id": "f048cd36-9f7d-43e2-bd62-7bc7fed7091c",
+      "author": "ryan.porter",
+      "text": "Completed in code with automated validation.",
+      "created_at": "2026-03-05T07:16:06.821003Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:03.831121Z",
+  "updated_at": "2026-03-05T07:16:06.821003Z",
+  "closed_at": "2026-03-05T07:15:26.627140Z",
+  "custom": {}
+}

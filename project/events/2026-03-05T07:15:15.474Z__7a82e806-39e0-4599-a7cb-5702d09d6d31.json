@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "7a82e806-39e0-4599-a7cb-5702d09d6d31",
+  "issue_id": "PIXO-8a7e5bfd-c771-45f7-b7cd-eef9259f03a4",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:15.474Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock end-to-end visual test 2"
+  }
+}

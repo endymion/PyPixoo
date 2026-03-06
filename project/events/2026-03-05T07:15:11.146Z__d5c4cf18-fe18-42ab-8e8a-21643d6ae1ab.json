@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "d5c4cf18-fe18-42ab-8e8a-21643d6ae1ab",
+  "issue_id": "PIXO-48cebaeb-dce9-4af2-9b85-b666f05944e9",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:11.146Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Draw/SendHttpGif + Draw/CommandList + PicID lifecycle",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "V2 native HttpGif upload protocol"
+  }
+}

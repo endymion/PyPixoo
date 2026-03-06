@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "7c342bac-f9b5-46c2-acb9-dc2fbf190e4a",
+  "issue_id": "kanbus-608e95e7-079a-487a-b4fb-1fb5b2f4f325",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:59.425Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Add BDD specs + step defs for E1"
+  }
+}

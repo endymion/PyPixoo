@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "e6a53142-964b-4b86-a06e-6b570b053e88",
+  "issue_id": "PIXO-3614e5bb-a75d-4bc2-a06f-917fe28d28c1",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:15.730Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Final restart verification burst"
+  }
+}

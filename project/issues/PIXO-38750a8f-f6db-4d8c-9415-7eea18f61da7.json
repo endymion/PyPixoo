@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-38750a8f-f6db-4d8c-9415-7eea18f61da7",
+  "title": "Clock adaptive default palette by sunrise/sunset",
+  "description": "",
+  "type": "epic",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "2cf16ca3-2544-4a0b-a404-512931a6c2f7",
+      "author": "ryan.porter",
+      "text": "Checkpoint committed and pushed before adaptive palette work: d6b0e0d (chore: checkpoint current clock/demo WIP before adaptive palette work).",
+      "created_at": "2026-03-05T07:16:25.069393Z"
+    },
+    {
+      "id": "6e7ebe74-f385-4d70-95ed-5cce0235ccc5",
+      "author": "ryan.porter",
+      "text": "Adaptive palette work completed and pushed: planning commit 665c7ba, feature commit 6141163.",
+      "created_at": "2026-03-05T07:16:25.167418Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:16.384738Z",
+  "updated_at": "2026-03-05T07:16:25.167418Z",
+  "closed_at": "2026-03-05T07:15:37.670198Z",
+  "custom": {}
+}

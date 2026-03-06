@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-ff8ae0f2-68ca-4389-b08b-c5b38947b6c9",
+  "title": "storybook_clock frozen at 12:00",
+  "description": "Acceptance test failure: demos/storybook_clock.py displays frozen 12:00 and does not progress. Fix clock URL/story args so rendered frames represent advancing current time.",
+  "type": "bug",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-22586457-017d-48e7-9de4-b41721bff3f1",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "83569716-bf6d-473d-bc57-7284e8cad4b7",
+      "author": "ryan.porter",
+      "text": "Implemented fix: storybook_clock now renders per-frame Storybook URLs with explicit hour/minute/second args derived from wall-clock time (instead of static default story + t param). Validation: demo runs successfully after patch and enters push loop; awaiting user visual confirmation that clock time now advances on device.",
+      "created_at": "2026-03-05T07:16:25.660121Z"
+    },
+    {
+      "id": "b5581e2a-c37e-4790-bbde-c4c8718890f2",
+      "author": "ryan.porter",
+      "text": "User observed intermittent freeze after initial smooth motion. Root cause likely precomputed-frame replay without continuous time refresh in push mode. Applying fix to regenerate frame window from current time continuously.",
+      "created_at": "2026-03-05T07:16:25.763565Z"
+    },
+    {
+      "id": "a1b17bc5-9d0b-41ad-8520-f7095c138177",
+      "author": "ryan.porter",
+      "text": "User confirmed the original frozen-at-12:00 issue is resolved. Closing this bug. Further clock demo redesign/perf work continues under acceptance task kanbus-c5ae3b.",
+      "created_at": "2026-03-05T07:16:25.856134Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:17.327949Z",
+  "updated_at": "2026-03-05T07:16:25.856134Z",
+  "closed_at": "2026-03-05T07:15:38.464697Z",
+  "custom": {}
+}

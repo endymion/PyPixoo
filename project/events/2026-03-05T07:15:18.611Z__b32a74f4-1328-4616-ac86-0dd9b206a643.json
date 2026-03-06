@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "b32a74f4-1328-4616-ac86-0dd9b206a643",
+  "issue_id": "PIXO-e7150e8a-764b-41e1-baed-8b53f0e9ec94",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:18.611Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Sphinx documentation setup"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "1a13c5bf-52cf-4606-8d94-fe38a561bfbd",
+  "issue_id": "PIXO-d3675fe1-f931-416d-bc16-a93f485b24c0",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:07.753Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "sub-task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "shared clock core"
+  }
+}

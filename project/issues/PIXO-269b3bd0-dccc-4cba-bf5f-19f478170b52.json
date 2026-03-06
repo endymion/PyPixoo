@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-269b3bd0-dccc-4cba-bf5f-19f478170b52",
+  "title": "Demo + CLI integration (Info DSL)",
+  "description": "Use InfoLayout in scene_transitions demo and add --info-layout-json path/inline support in CLI scene commands.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:09.393114Z",
+  "updated_at": "2026-03-05T07:15:51.687574Z",
+  "closed_at": "2026-03-05T07:15:30.781857Z",
+  "custom": {}
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "a5ceea96-b590-4771-9674-42ab912ec12c",
+  "issue_id": "kanbus-5162f7f7-340c-4856-b7ac-b45aa1a84416",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:58.607Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "story",
+    "status": "closed",
+    "title": "CLI v3 commands"
+  }
+}

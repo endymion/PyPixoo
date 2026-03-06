@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "583f0e24-d133-4ee4-ae3a-1132699fc96f",
+  "issue_id": "PIXO-dde0a968-f76f-4c87-84ac-3dd1459b7959",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:08.871Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Wire scene_transitions demo and pixoo scene commands to InfoScene header options.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Demo + CLI integration for InfoScene"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "39e83432-c596-4c24-956b-338c734fc477",
+  "issue_id": "PIXO-5ab4eb1a-9389-4488-9fb3-c9bd49e86c95",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:20.311Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: add 4px gap under ID on COMMENT slides"
+  }
+}

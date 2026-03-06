@@ -1,0 +1,217 @@
+{
+  "id": "PIXO-fe452d75-6420-403f-abfa-5eb3c20bb319",
+  "title": "Kanbus clock: metadata-header + parent/issue description layout redesign",
+  "description": "",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "004b3a06-f4d0-449f-a79b-13abca8f5af3",
+      "author": "ryan.porter",
+      "text": "Starting implementation: add live issue/parent snapshot fetch + metadata-header card layouts for created/transition/comment events.",
+      "created_at": "2026-03-05T07:16:30.741134Z"
+    },
+    {
+      "id": "b3ba593f-7f04-4c24-9c71-b35f9b428068",
+      "author": "ryan.porter",
+      "text": "Data-fetch layer complete: each event now resolves live issue metadata via kbs show --json, with parent lookup only when parent exists and ID-prefix/type/status header normalization.",
+      "created_at": "2026-03-05T07:16:30.832592Z"
+    },
+    {
+      "id": "588bf69e-c3ed-4b52-a38b-acd9ad3bb8b6",
+      "author": "ryan.porter",
+      "text": "Applying follow-up visual tweaks: parent section fixed to 3 lines and metadata header changed to left-justified with un-abbreviated status (allow right-edge overflow).",
+      "created_at": "2026-03-05T07:16:30.925199Z"
+    },
+    {
+      "id": "24f996af-0999-44c4-939d-290eb2c44cb2",
+      "author": "ryan.porter",
+      "text": "Follow-up tweak applied: metadata header is now left-justified with 3px gaps and full status text (no abbreviation/truncation). Parent section remains 3 lines. tests/test_kanbus_clock.py passes.",
+      "created_at": "2026-03-05T07:16:31.019760Z"
+    },
+    {
+      "id": "776295ba-5015-4cec-a53e-aafc6f14f425",
+      "author": "ryan.porter",
+      "text": "Implementing issue-type-based card palettes: task=blue, epic=indigo, story=yellow, bug=red, including comment cards. Header ID/type will be one notch lighter than status.",
+      "created_at": "2026-03-05T07:16:31.116921Z"
+    },
+    {
+      "id": "47e0bbef-3608-4c95-9dac-02e12f013f98",
+      "author": "ryan.porter",
+      "text": "Issue-type palette update complete for Kanbus cards (including comments): task=blue, epic=indigo, story=yellow, bug=red; ID+type use band-9, status uses band-8, background uses band-2. tests/test_kanbus_clock.py now passes (22 passed).",
+      "created_at": "2026-03-05T07:16:31.214142Z"
+    },
+    {
+      "id": "8c848dd3-3fba-4b75-8316-6228c60d24e5",
+      "author": "ryan.porter",
+      "text": "Fixing header prefix source bug: derive prefix from issue key/external key or original event issue key, not internal Kanbus ID.",
+      "created_at": "2026-03-05T07:16:31.312257Z"
+    },
+    {
+      "id": "009ff920-638b-4cbc-8bf7-83ce24ec0d6e",
+      "author": "ryan.porter",
+      "text": "Prefix-source bug fixed in code: header prefix now prefers key/external_id/event issue key before internal kanbus UUID IDs. Added regression tests for BIBS-1234 and key-field cases.",
+      "created_at": "2026-03-05T07:16:31.408914Z"
+    },
+    {
+      "id": "77601314-fc3e-4cdb-ba87-c9dd40c2c578",
+      "author": "ryan.porter",
+      "text": "Applying visual tweak: metadata header row gets 1px left padding while preserving current field separation.",
+      "created_at": "2026-03-05T07:16:31.500894Z"
+    },
+    {
+      "id": "06e7b960-4eae-496c-83a5-8f53a4965d7c",
+      "author": "ryan.porter",
+      "text": "Applying header status formatting tweak: remove whitespace from status token (e.g., IN PROGRESS -> INPROGRESS).",
+      "created_at": "2026-03-05T07:16:31.594974Z"
+    },
+    {
+      "id": "73ca6929-c694-4f71-a859-221a7052e328",
+      "author": "ryan.porter",
+      "text": "Investigating remaining KANBUS prefix bug: expanding prefix-source detection to include payload/custom key fields and key-pattern extraction before any internal ID fallback.",
+      "created_at": "2026-03-05T07:16:31.687453Z"
+    },
+    {
+      "id": "c79803d6-424a-4771-b7db-a1625779e55c",
+      "author": "ryan.porter",
+      "text": "Prefix resolution hardened: now checks key/external/custom/payload fields plus issue-key pattern extraction before internal IDs. Added regression tests; tests/test_kanbus_clock.py now passes (25). Please verify on device that non-KANBUS project prefixes display correctly.",
+      "created_at": "2026-03-05T07:16:31.781987Z"
+    },
+    {
+      "id": "6ebd4e3d-d00b-4ee7-ad8f-90e57dfe0be4",
+      "author": "ryan.porter",
+      "text": "Applying intensity swap: header ID/type to medium, main lower description block to brightest, parent/top section remains dimmer.",
+      "created_at": "2026-03-05T07:16:31.883018Z"
+    },
+    {
+      "id": "c85aff15-3003-4d78-b5b7-5570705a80c5",
+      "author": "ryan.porter",
+      "text": "Fixing regression: header prefix must always derive from full issue key (ABC-123 -> ABC), never numeric suffix/short-id values.",
+      "created_at": "2026-03-05T07:16:31.985708Z"
+    },
+    {
+      "id": "d48e81fa-db9e-40e0-a160-2353c154b327",
+      "author": "ryan.porter",
+      "text": "Updated prefix rendering for internal kanbus-* IDs: now shows a short handle from the next segment (e.g., kanbus-b31680... -> B31680) instead of KANBUS. Real keys (ABC-123) still render as ABC. tests/test_kanbus_clock.py passes (26).",
+      "created_at": "2026-03-05T07:16:32.093311Z"
+    },
+    {
+      "id": "38f454bc-51f9-41a6-bf73-4c8cc9e457fa",
+      "author": "ryan.porter",
+      "text": "Prefix demo: this comment should show B31680 in the header prefix, not KANBUS.",
+      "created_at": "2026-03-05T07:16:32.201614Z"
+    },
+    {
+      "id": "57badf55-d525-46a5-92ea-28a16c55d085",
+      "author": "ryan.porter",
+      "text": "Hardened prefix selection with explicit scoring: full project keys (ABC-1234) always beat numeric short IDs; internal kanbus-* IDs map to a short handle. tests/test_kanbus_clock.py passes (26).",
+      "created_at": "2026-03-05T07:16:32.304596Z"
+    },
+    {
+      "id": "e79e8590-93ea-4ecb-aad1-abf16897e996",
+      "author": "ryan.porter",
+      "text": "Prefix verification after hardening: this should show B31680 (or real project key prefix), not 1234 or KANBUS.",
+      "created_at": "2026-03-05T07:16:32.398274Z"
+    },
+    {
+      "id": "6632551f-f0c7-4c08-8e5a-29929ba72012",
+      "author": "ryan.porter",
+      "text": "Restarted demo check: verify header prefix is not numeric suffix and not KANBUS.",
+      "created_at": "2026-03-05T07:16:32.488985Z"
+    },
+    {
+      "id": "cebc5061-fa2b-4a0e-99af-1e6a70ff8ed5",
+      "author": "ryan.porter",
+      "text": "Prefix precedence updated: event.issue_id now wins when it carries a meaningful key/alias, guaranteeing ABC-1234 -> ABC in header even if kbs show returns numeric/internal IDs. Added regression test; tests/test_kanbus_clock.py now passes (27).",
+      "created_at": "2026-03-05T07:16:32.583045Z"
+    },
+    {
+      "id": "3c09a87e-ae98-4802-b963-0f38d60bd632",
+      "author": "ryan.porter",
+      "text": "Event-prefix precedence verification: ABC-1234 style keys should now show ABC; internal IDs should never degrade to numeric suffix.",
+      "created_at": "2026-03-05T07:16:32.678973Z"
+    },
+    {
+      "id": "17ccaac4-42ff-4973-b5ce-75c63c1da982",
+      "author": "ryan.porter",
+      "text": "Restarted verification run: prefix should match event key rule.",
+      "created_at": "2026-03-05T07:16:32.774659Z"
+    },
+    {
+      "id": "3d57c697-e83c-4da2-b93b-5d06cdc8261f",
+      "author": "ryan.porter",
+      "text": "Second verification comment for prefix display check.",
+      "created_at": "2026-03-05T07:16:32.867418Z"
+    },
+    {
+      "id": "669b61f7-1b4b-4727-9977-3f5c462d0b05",
+      "author": "ryan.porter",
+      "text": "Applied strict event-prefix rule: header prefix uses event.issue_id-derived prefix first, and numeric-only prefixes are rejected. This guarantees ABC-1234 -> ABC and blocks 1234-only prefixes. tests/test_kanbus_clock.py passes (28).",
+      "created_at": "2026-03-05T07:16:32.960435Z"
+    },
+    {
+      "id": "ea0133bf-ab45-402a-b5f1-90708fd6269d",
+      "author": "ryan.porter",
+      "text": "Prefix verification after strict rule: should never show numeric-only prefix; ABC-1234 style should render ABC.",
+      "created_at": "2026-03-05T07:16:33.057028Z"
+    },
+    {
+      "id": "881ee2e5-20fa-4d0c-a589-db0ceb171e79",
+      "author": "ryan.porter",
+      "text": "Restarted verification burst: prefix should use key prefix before dash.",
+      "created_at": "2026-03-05T07:16:33.173095Z"
+    },
+    {
+      "id": "95935816-b4c5-47a8-97da-d1ff0ed490af",
+      "author": "ryan.porter",
+      "text": "Verification burst 2/2.",
+      "created_at": "2026-03-05T07:16:33.266549Z"
+    },
+    {
+      "id": "bb7fe64f-8b1c-43e1-911c-8772bf1c1a4d",
+      "author": "ryan.porter",
+      "text": "Applied strict before-dash prefix rule: _issue_id_prefix_upper no longer uses any after-dash fallback for kanbus-* identifiers. Prefix is always substring before first dash. Updated tests accordingly (28 passing).",
+      "created_at": "2026-03-05T07:16:33.360135Z"
+    },
+    {
+      "id": "e311c953-3319-40e0-b716-c6f3016f8f9d",
+      "author": "ryan.porter",
+      "text": "Prefix rule verification after strict before-dash change.",
+      "created_at": "2026-03-05T07:16:33.454648Z"
+    },
+    {
+      "id": "0fffd574-23fb-480c-b442-523736b2b783",
+      "author": "ryan.porter",
+      "text": "Added payload-prefix override path: if event id is numeric/internal but payload carries a real key (e.g., issue_key=ABC-1234), header prefix now uses ABC. Also disabled kanbus-* event-id override. tests/test_kanbus_clock.py now 30 passing.",
+      "created_at": "2026-03-05T07:16:33.548910Z"
+    },
+    {
+      "id": "e6c0e2e7-1eed-4113-b34a-520acb3c62e0",
+      "author": "ryan.porter",
+      "text": "Post-fix verification: payload/event key prefix should display before-dash segment only.",
+      "created_at": "2026-03-05T07:16:33.639703Z"
+    },
+    {
+      "id": "d2eab00a-5f44-4ef7-9654-0c5c2ab87836",
+      "author": "ryan.porter",
+      "text": "Post-fix verification 2/2.",
+      "created_at": "2026-03-05T07:16:33.737129Z"
+    },
+    {
+      "id": "4b068151-ea71-4371-84de-e18e1611432a",
+      "author": "ryan.porter",
+      "text": "Investigating NO DESCRIPTION on Kanbus clock cards; suspect kbs binary not updated for workspace discovery. Rebuilding/installing kbs, then re-testing via kbs show from workspace root.",
+      "created_at": "2026-03-05T13:55:17.255135Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:19.904782Z",
+  "updated_at": "2026-03-05T13:55:17.255135Z",
+  "closed_at": null,
+  "custom": {}
+}

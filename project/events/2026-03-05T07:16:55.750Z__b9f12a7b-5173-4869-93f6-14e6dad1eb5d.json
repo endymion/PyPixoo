@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "b9f12a7b-5173-4869-93f6-14e6dad1eb5d",
+  "issue_id": "kanbus-3432bacc-415e-437f-a562-68585ba87157",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:55.750Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "open",
+    "title": "Acceptance test: demo_upload_sequence.py"
+  }
+}

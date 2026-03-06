@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-8a7e5bfd-c771-45f7-b7cd-eef9259f03a4",
+  "title": "Kanbus clock end-to-end visual test 2",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "b7bbc666-f4fd-4c63-bc25-955cb517d044",
+      "author": "ryan.porter",
+      "text": "Visual lifecycle test comment run #2 for kanbus clock.",
+      "created_at": "2026-03-05T07:16:23.727521Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:15.474496Z",
+  "updated_at": "2026-03-05T07:16:23.727521Z",
+  "closed_at": "2026-03-05T07:15:36.872040Z",
+  "custom": {}
+}

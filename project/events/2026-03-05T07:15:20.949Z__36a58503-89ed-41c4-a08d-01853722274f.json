@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "36a58503-89ed-41c4-a08d-01853722274f",
+  "issue_id": "PIXO-a5f15dc2-0c28-4059-b268-efac4c09de85",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:20.949Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Implement get_http_gif_id, reset_http_gif_id, upload_sequence(mode=frame_by_frame|command_list, chunk_size=40) and refactor push/push_buffer through V2 transport.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Implement Pixoo V2 upload and ID methods"
+  }
+}

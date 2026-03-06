@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-b214e4f7-335d-4dfc-9f16-12abffa96f31",
+  "title": "Acceptance test: clock_realtime.py",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "7529e790-22fa-46c2-9b01-2cd45db61c0d",
+      "author": "ryan.porter",
+      "text": "Starting manual acceptance test on real device: running demos/clock_realtime.py and validating realtime clock update behavior.",
+      "created_at": "2026-03-05T07:16:37.453824Z"
+    },
+    {
+      "id": "8cdd2070-85a3-427c-982e-2a138724737d",
+      "author": "ryan.porter",
+      "text": "Acceptance test PASSED. Ran demos/clock_realtime.py in push mode on real device (--fps 1 --render-lead-ms 1000 --no-second-hand --delivery push). Observed successful connect, minute-cycle clockface selection, and repeated frame pushes; stopped cleanly with Ctrl+C.",
+      "created_at": "2026-03-05T07:16:37.547354Z"
+    },
+    {
+      "id": "b5e2dc3f-7327-4fe3-a971-525242664303",
+      "author": "ryan.porter",
+      "text": "Superseded by three-hand clock acceptance work. PASS criteria for active clock validation: second hand continuously advances for 30s and hour/minute match current time, with explicit user visual confirmation.",
+      "created_at": "2026-03-05T07:16:37.649861Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:22.172529Z",
+  "updated_at": "2026-03-05T07:16:37.649861Z",
+  "closed_at": "2026-03-05T07:15:43.225434Z",
+  "custom": {}
+}

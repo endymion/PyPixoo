@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "3b681591-ac33-4844-a824-1df696f2cc04",
+  "issue_id": "kanbus-f6c037c9-1ee9-4178-b8f9-94c0b48f7d49",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:13.838Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Kanbus clock left-left transition visual check"
+  }
+}

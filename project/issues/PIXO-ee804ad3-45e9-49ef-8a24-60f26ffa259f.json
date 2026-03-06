@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-ee804ad3-45e9-49ef-8a24-60f26ffa259f",
+  "title": "Story: implement sunrise/sunset local-time band selection in pixooclock",
+  "description": "",
+  "type": "story",
+  "status": "closed",
+  "priority": 1,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-38750a8f-f6db-4d8c-9415-7eea18f61da7",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "6723824b-7771-4e5c-b781-b4c5bc222efe",
+      "author": "ryan.porter",
+      "text": "Implemented adaptive palette core: new clock_palette helper module (location resolution, ipapi cache, real sun window, seasonal timezone fallback) and pixooclock runtime integration with auto mode + periodic band refresh.",
+      "created_at": "2026-03-05T07:16:18.575969Z"
+    },
+    {
+      "id": "dc8e54a8-644a-457a-8fe7-cac14d5787be",
+      "author": "ryan.porter",
+      "text": "Feature commit pushed: 6141163. Implemented adaptive pixooclock palette with --band auto default, day/night bands, lat/lon + env + ipapi cache location resolution, and seasonal timezone fallback.",
+      "created_at": "2026-03-05T07:16:18.673100Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:11.890215Z",
+  "updated_at": "2026-03-05T07:16:18.673100Z",
+  "closed_at": "2026-03-05T07:15:33.233481Z",
+  "custom": {}
+}

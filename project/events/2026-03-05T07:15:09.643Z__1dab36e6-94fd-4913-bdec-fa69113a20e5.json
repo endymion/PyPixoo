@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "1dab36e6-94fd-4913-bdec-fa69113a20e5",
+  "issue_id": "PIXO-db4e1ee8-f4c3-4c4a-a404-d9a88ce41015",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:09.643Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock transition description test"
+  }
+}

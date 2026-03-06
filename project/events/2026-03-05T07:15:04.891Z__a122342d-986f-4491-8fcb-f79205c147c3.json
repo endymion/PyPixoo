@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "a122342d-986f-4491-8fcb-f79205c147c3",
+  "issue_id": "PIXO-88a901ae-74f0-4498-a20b-922434e73eca",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:04.891Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "In clock demos, the 12 o'clock marker appears dimmer than other markers; it should be brighter. Update marker color/opacity logic so top marker is brighter by default.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Clock 12 marker brightness is inverted"
+  }
+}

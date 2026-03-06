@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "bad8de1f-6a83-4181-b348-718fb4c96e8d",
+  "issue_id": "kanbus-9c708db9-c285-4f2b-a578-5f87a7c64dfb",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:04.722Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "bug",
+    "status": "closed",
+    "title": "Kanbus clock: transition labels, indent, and status text formatting"
+  }
+}

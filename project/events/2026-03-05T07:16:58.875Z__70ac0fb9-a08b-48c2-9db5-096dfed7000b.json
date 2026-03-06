@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "70ac0fb9-a08b-48c2-9db5-096dfed7000b",
+  "issue_id": "kanbus-54903ac8-966d-4190-a41d-27cd12de0af0",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:58.875Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "open",
+    "title": "Acceptance test: font_showcase.py"
+  }
+}

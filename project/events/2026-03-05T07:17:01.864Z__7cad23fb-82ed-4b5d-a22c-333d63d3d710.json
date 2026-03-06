@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "7cad23fb-82ed-4b5d-a22c-333d63d3d710",
+  "issue_id": "kanbus-7c4dc0be-b28a-48de-81ad-41ed6ed3f8f4",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:01.864Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Add/adjust CLI pytest coverage"
+  }
+}

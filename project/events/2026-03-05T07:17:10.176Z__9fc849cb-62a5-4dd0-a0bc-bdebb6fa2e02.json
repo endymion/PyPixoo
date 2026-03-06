@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "9fc849cb-62a5-4dd0-a0bc-bdebb6fa2e02",
+  "issue_id": "kanbus-cf99aa00-ecbb-4ae8-8dad-8f8e71b525cd",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:17:10.176Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "story",
+    "status": "closed",
+    "title": "Native fonts and overlays"
+  }
+}

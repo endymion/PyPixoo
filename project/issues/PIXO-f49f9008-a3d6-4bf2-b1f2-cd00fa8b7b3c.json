@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-f49f9008-a3d6-4bf2-b1f2-cd00fa8b7b3c",
+  "title": "Apps/tools commands",
+  "description": "",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "02654e76-ddc5-4a3f-93db-a97186bcbca1",
+      "author": "ryan.porter",
+      "text": "Feature: Apps and tools commands\n  Scenario: Application command passthrough\n    Given a Pixoo at IP \"192.168.0.37\"\n    And I connect\n    When I send raw command \"App/SomeCommand\" with payload\n    Then the last command should be \"App/SomeCommand\"",
+      "created_at": "2026-03-05T07:16:35.042599Z"
+    },
+    {
+      "id": "f0cc1105-b257-4305-b2be-852c65485f37",
+      "author": "ryan.porter",
+      "text": "Closing as obsolete per user request during board cleanup.",
+      "created_at": "2026-03-05T07:16:35.142277Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:21.205654Z",
+  "updated_at": "2026-03-05T07:16:35.142277Z",
+  "closed_at": "2026-03-05T07:15:42.302499Z",
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "571f40ca-dc68-427a-afbc-55cc780d05bc",
+  "issue_id": "PIXO-8a433c78-f91b-4878-8e51-7d077a12d8bb",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:18.980Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 1,
+    "status": "open",
+    "title": "Kanbus clock demo: REPL plus recursive project/events watcher"
+  }
+}

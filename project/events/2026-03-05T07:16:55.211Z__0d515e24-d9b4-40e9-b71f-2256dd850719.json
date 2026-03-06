@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "0d515e24-d9b4-40e9-b71f-2256dd850719",
+  "issue_id": "kanbus-2f4f0211-4531-4615-9991-2562045581b8",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:55.211Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "sub-task",
+    "status": "closed",
+    "title": "shared clock core"
+  }
+}

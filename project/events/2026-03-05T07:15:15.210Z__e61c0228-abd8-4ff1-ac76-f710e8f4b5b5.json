@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "e61c0228-abd8-4ff1-ac76-f710e8f4b5b5",
+  "issue_id": "PIXO-7d725683-dff4-4177-879b-c9a0ac2db85d",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:15.210Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Create unified PIL-based raster text renderer with measurement + clipped draw.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Shared Python font renderer"
+  }
+}

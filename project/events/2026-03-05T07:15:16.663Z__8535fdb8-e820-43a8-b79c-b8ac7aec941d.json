@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "8535fdb8-e820-43a8-b79c-b8ac7aec941d",
+  "issue_id": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:16.663Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance testing: demo checklist"
+  }
+}

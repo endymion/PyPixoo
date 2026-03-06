@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-66a00684-658d-44bc-829b-ab0518bb51f4",
+  "title": "Fix black_band demos background thread exception on shutdown",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "360c0ea6-2c1a-4b78-9b7c-1369b5419736",
+      "author": "ryan.porter",
+      "text": "Reproduced during manual acceptance: both demos/black_band_opaque.py and demos/black_band_transparent.py complete visual playback but print 'Exception in thread Thread-1 (_run_cycle)' traceback during shutdown after cycle wait/close. Likely race between cycle thread requests and pixoo.close().",
+      "created_at": "2026-03-05T07:16:07.578167Z"
+    },
+    {
+      "id": "4e6e411e-f399-47c2-a6fb-5666cb218080",
+      "author": "ryan.porter",
+      "text": "Implemented fix by removing cycle-thread usage in black_band demos and using direct upload_sequence in frame_by_frame mode. Verified both demos now finish without thread traceback and without CommandList illegal-json errors. Also hardened demo_device_settings to restore rotation/mirror in finally.",
+      "created_at": "2026-03-05T07:16:07.670112Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:05.014307Z",
+  "updated_at": "2026-03-05T07:16:07.670112Z",
+  "closed_at": "2026-03-05T07:15:27.000978Z",
+  "custom": {}
+}

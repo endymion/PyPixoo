@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-cf667f22-b7a2-4e32-94c6-96df2fc69e9e",
+  "title": "Acceptance test: screen_test.py",
+  "description": "",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-05T07:15:05.891911Z",
+  "updated_at": "2026-03-05T07:15:48.223608Z",
+  "closed_at": null,
+  "custom": {}
+}

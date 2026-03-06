@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "bc7bd460-6dfb-458f-8b97-d9bb4f244755",
+  "issue_id": "PIXO-eebb8b51-d0b6-42f3-b88b-1299c1252786",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:26.382Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "sub-task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "clock capability matrix"
+  }
+}

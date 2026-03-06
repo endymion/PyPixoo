@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "7f27338c-73bb-4a9b-842d-61c9645c1716",
+  "issue_id": "kanbus-41188b49-ac4f-4d0b-b345-e0b9143cd026",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:56.920Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "task",
+    "status": "closed",
+    "title": "Demo + CLI integration (Info DSL)"
+  }
+}

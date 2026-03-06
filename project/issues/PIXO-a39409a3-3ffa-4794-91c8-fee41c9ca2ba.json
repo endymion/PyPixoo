@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-a39409a3-3ffa-4794-91c8-fee41c9ca2ba",
+  "title": "CLI/docs updates for new APIs",
+  "description": "",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-c457614a-6baa-4ebc-88af-5f8a440ca2d2",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "81da1273-daf6-44dc-9218-661f1103ca9c",
+      "author": "ryan.porter",
+      "text": "Updated CLI with list-fonts/text-overlay/clear-text/raw-command and refreshed README/Storybook docs with native font overlay guidance.",
+      "created_at": "2026-03-05T07:16:41.139624Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:24.633943Z",
+  "updated_at": "2026-03-05T07:16:41.139624Z",
+  "closed_at": "2026-03-05T07:15:45.494555Z",
+  "custom": {}
+}

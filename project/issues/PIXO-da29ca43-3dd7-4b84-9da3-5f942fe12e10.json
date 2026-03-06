@@ -1,0 +1,79 @@
+{
+  "id": "PIXO-da29ca43-3dd7-4b84-9da3-5f942fe12e10",
+  "title": "Kanbus clock: COMMENT body uses Bytesized compact layout",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "45e735f5-9220-4320-b41a-2a29270fc96d",
+      "author": "ryan.porter",
+      "text": "Implementing request: render COMMENT body lines in bytesized font and tighten line spacing/row height to fit more message text on-device.",
+      "created_at": "2026-03-05T07:16:17.342471Z"
+    },
+    {
+      "id": "04177da1-8548-490e-a910-bc948604ba20",
+      "author": "ryan.porter",
+      "text": "Implemented compact COMMENT rendering: comment notices now carry bytesized body_font with tighter row sizing (min 7 / max 9) and up to 7 body lines. Wrapped comment text uses bytesized measurement and wider safe body width (62px) to fit more content without overflow. Validation: py_compile + tests/test_kanbus_clock.py (14 passed). Ready for restart + live visual confirmation.",
+      "created_at": "2026-03-05T07:16:17.439837Z"
+    },
+    {
+      "id": "16275fa0-3451-40e8-9eca-10bd1e219c98",
+      "author": "ryan.porter",
+      "text": "Follow-up UX tweak from live feedback: COMMENT body should be left-justified and packed tighter vertically. Implementing comment-specific body alignment=left and disabling vertical centering pad for that notice type, with tighter row-height bounds.",
+      "created_at": "2026-03-05T07:16:17.532517Z"
+    },
+    {
+      "id": "564f16d5-dd62-4ec0-95df-f6d877c458c3",
+      "author": "ryan.porter",
+      "text": "Additional refinement: COMMENT header must use bytesized and tight vertical padding (1px top + 1px bottom). Implementing header_font override and compact header height computation from measured glyph height + 2.",
+      "created_at": "2026-03-05T07:16:17.625897Z"
+    },
+    {
+      "id": "b8c44e23-fbd5-4db3-a580-c4472cb0d037",
+      "author": "ryan.porter",
+      "text": "Implemented COMMENT header styling tweak: header now uses bytesized with tight padding (height computed as measured glyph height + 2). COMMENT body remains bytesized, left-aligned, compact rows. Validation: py_compile + tests/test_kanbus_clock.py (14 passed). Triggered fresh Korporus comment event for visual check.",
+      "created_at": "2026-03-05T07:16:17.717316Z"
+    },
+    {
+      "id": "fc514fc9-3bb7-4b6a-9b09-c8ccfd9fa783",
+      "author": "ryan.porter",
+      "text": "New visual adjustments requested: reduce COMMENT line spacing to 2px (between issue ID and first comment line, and between subsequent lines) and render issue ID two intensity steps darker than comment text.",
+      "created_at": "2026-03-05T07:16:17.810958Z"
+    },
+    {
+      "id": "b165d18f-fc76-44ee-9538-5c5cdad24775",
+      "author": "ryan.porter",
+      "text": "Implemented spacing/color refinement: COMMENT rows now target measured bytesized glyph height + 2px total vertical padding (1px top + 1px bottom) to produce ~2px inter-line spacing; first body line (issue ID) is darkened by 2 intensity steps relative to comment text. Validation: py_compile + tests/test_kanbus_clock.py (14 passed).",
+      "created_at": "2026-03-05T07:16:17.910281Z"
+    },
+    {
+      "id": "a9420b5f-4755-4a32-942c-8be2af66633f",
+      "author": "ryan.porter",
+      "text": "Applying requested micro-adjustment: add 1 extra pixel below COMMENT text before the row bottom border (tight header mode), while keeping bytesized header font.",
+      "created_at": "2026-03-05T07:16:18.005764Z"
+    },
+    {
+      "id": "1608d4de-0b3c-4124-80e5-3ee060e5cbaf",
+      "author": "ryan.porter",
+      "text": "Implemented extra COMMENT header bottom spacing: tight header height now uses measured glyph height + 3 (previously +2), creating one additional pixel above the bottom border line. Updated tests accordingly; py_compile + tests/test_kanbus_clock.py pass (14). Triggered fresh Korporus comment event for visual verification.",
+      "created_at": "2026-03-05T07:16:18.098552Z"
+    },
+    {
+      "id": "2dab7af3-3232-4028-940c-6074e639133c",
+      "author": "ryan.porter",
+      "text": "Closed after live confirmation: COMMENT header/body typography now matches requested behavior (bytesized header/body, tighter vertical packing, left-justified body, darker issue-id line, and extra pixel above header border).",
+      "created_at": "2026-03-05T07:16:18.195377Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:11.522183Z",
+  "updated_at": "2026-03-05T07:16:18.195377Z",
+  "closed_at": "2026-03-05T07:15:32.841505Z",
+  "custom": {}
+}

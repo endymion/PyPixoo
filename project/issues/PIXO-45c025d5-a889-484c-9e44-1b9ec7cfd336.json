@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-45c025d5-a889-484c-9e44-1b9ec7cfd336",
+  "title": "Kanbus clock: debug kbs commands in CLI",
+  "description": "Add --debug flag to demos/kanbus_clock.py that prints kbs commands, cwd, and stdout/stderr for each lookup so we can diagnose missing descriptions.",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "75a388ca-47c4-4809-8c1f-c9f5bda8dd53",
+      "author": "ryan.porter",
+      "text": "Added --debug flag to kanbus_clock CLI to print kbs commands and stdout/stderr for each lookup; wiring through run() and kbs call path.",
+      "created_at": "2026-03-05T13:57:03.956170Z"
+    },
+    {
+      "id": "3d1aace9-d465-49e7-ad7e-4aa028a6ba5a",
+      "author": "ryan.porter",
+      "text": "Fixed debug logging to tolerate mocked subprocess without stderr; tests green again (uv run pytest tests/test_kanbus_clock.py -q).",
+      "created_at": "2026-03-05T13:57:29.019611Z"
+    }
+  ],
+  "created_at": "2026-03-05T13:55:57.883066Z",
+  "updated_at": "2026-03-05T13:57:29.019611Z",
+  "closed_at": null,
+  "custom": {}
+}

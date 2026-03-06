@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-03adbc16-60d1-469d-9782-2887f4e9cf4d",
+  "title": "Acceptance test: stripe_pattern_test.py",
+  "description": "",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "fbb18384-291f-4091-a9d9-7b0ffdd978b8",
+      "author": "ryan.porter",
+      "text": "Clock test: comment event for live display",
+      "created_at": "2026-03-05T13:34:56.793413Z"
+    },
+    {
+      "id": "6543e1f6-91f9-49ce-a9e9-297e3d534a18",
+      "author": "ryan.porter",
+      "text": "Clock test after restart",
+      "created_at": "2026-03-05T13:53:19.375032Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:19.116601Z",
+  "updated_at": "2026-03-05T13:53:19.375032Z",
+  "closed_at": null,
+  "custom": {}
+}

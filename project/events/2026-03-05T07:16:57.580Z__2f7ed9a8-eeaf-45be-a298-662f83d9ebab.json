@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "2f7ed9a8-eeaf-45be-a298-662f83d9ebab",
+  "issue_id": "kanbus-4c8cd069-fcdb-4e47-8821-e3c6dcbe91f9",
+  "event_type": "issue_deleted",
+  "occurred_at": "2026-03-05T07:16:57.580Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "issue_type": "bug",
+    "status": "closed",
+    "title": "Fix demo black_band_chained.py for V2 API"
+  }
+}

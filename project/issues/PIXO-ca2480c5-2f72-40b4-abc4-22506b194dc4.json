@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-ca2480c5-2f72-40b4-abc4-22506b194dc4",
+  "title": "Kanbus clock: issue_created should default missing status to OPEN",
+  "description": "",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "ab48711a-f05d-4c85-a366-7c9e94045b07",
+      "author": "ryan.porter",
+      "text": "Investigating regression: issue_created summary currently shows '?' when payload.status missing. Restoring semantic default OPEN and adding/adjusting tests.",
+      "created_at": "2026-03-05T07:16:36.972883Z"
+    },
+    {
+      "id": "9b4b1eb6-482d-4902-80d1-e9acaeae9c4f",
+      "author": "ryan.porter",
+      "text": "Fixed: issue_created summaries now default missing payload.status to OPEN (while preserving _format_status_text for explicit statuses). Added regression assertion in tests/test_kanbus_clock.py. Validation: python -m py_compile demos/kanbus_clock.py; uv run pytest tests/test_kanbus_clock.py -q (16 passed).",
+      "created_at": "2026-03-05T07:16:37.074209Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:21.888692Z",
+  "updated_at": "2026-03-05T07:16:37.074209Z",
+  "closed_at": "2026-03-05T07:15:42.961901Z",
+  "custom": {}
+}

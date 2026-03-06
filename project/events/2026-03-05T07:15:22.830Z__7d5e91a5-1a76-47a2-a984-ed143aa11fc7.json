@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "7d5e91a5-1a76-47a2-a984-ed143aa11fc7",
+  "issue_id": "PIXO-262a0b80-ed1a-420e-9345-b8537f908c76",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:22.830Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: black_band_chained.py"
+  }
+}

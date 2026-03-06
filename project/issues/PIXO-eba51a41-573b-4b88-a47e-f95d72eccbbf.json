@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-eba51a41-573b-4b88-a47e-f95d72eccbbf",
+  "title": "Tests + docs + acceptance checklist (Info DSL)",
+  "description": "Add/expand tests and Sphinx docs for Info DSL and update acceptance checklist references.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-67892fc3-bef5-4db8-a789-948b8d6ede3a",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "e8d405b7-bf61-40a6-a3e5-57ea7b0578c1",
+      "author": "ryan.porter",
+      "text": "Automated coverage for Info DSL landed; awaiting manual real-device acceptance for ping-pong clock/info display with multi-row/table layout before closure.",
+      "created_at": "2026-03-05T07:16:39.768299Z"
+    },
+    {
+      "id": "bc4e6dfa-1443-48b3-8300-11d75dcd8cd6",
+      "author": "ryan.porter",
+      "text": "Applying font-showcase UX tweaks from live testing: default text color to sand-8 and reorder font-list display sequence to Bytesized/Micro5/Tiny5/Jersey10/Jersey15.",
+      "created_at": "2026-03-05T07:16:39.863187Z"
+    }
+  ],
+  "created_at": "2026-03-05T07:15:23.611396Z",
+  "updated_at": "2026-03-05T07:16:39.863187Z",
+  "closed_at": "2026-03-05T07:15:44.584898Z",
+  "custom": {}
+}

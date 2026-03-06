@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "5a0e028d-27ac-452a-8268-0092a69aba7e",
+  "issue_id": "PIXO-22586457-017d-48e7-9de4-b41721bff3f1",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:21.462Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: storybook_clock.py"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "e65d9878-24bb-409f-917e-927aca8d0936",
+  "issue_id": "PIXO-cd141666-31b6-487f-bd73-e37bf4249864",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T14:09:11.001Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "When kanbus_clock runs kbs from the workspace root, kbs show fails if any nested repo has an invalid .kanbus.yml (e.g., legacy external_projects). This causes NO DESCRIPTION in cards.\n\nFix: workspace discovery should skip invalid configs and continue, while single-project root remains strict.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: workspace kbs show fails on invalid configs"
+  }
+}

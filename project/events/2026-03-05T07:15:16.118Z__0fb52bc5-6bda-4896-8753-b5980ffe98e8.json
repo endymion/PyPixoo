@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "0fb52bc5-6bda-4896-8753-b5980ffe98e8",
+  "issue_id": "PIXO-ec24b701-0803-41ee-9bb9-3f6f608d359d",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-05T07:15:16.118Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Acceptance test: demo_web_fonts.py"
+  }
+}
