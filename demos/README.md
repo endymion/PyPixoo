@@ -52,6 +52,12 @@ python demos/kanbus_clock.py
 python demos/kanbus_clock.py --root . --poll-seconds 1 --rescan-seconds 10 --auto-info-seconds 30
 # REPL history is persisted at ~/.pypixoo/kanbus_clock_history (up/down arrows)
 
+# Experimental React-backed clock/info transitions
+# Uses Storybook iframe stories as the render source, then applies ScenePlayer transitions.
+# Keep this isolated while evaluating React-as-source-of-truth behavior.
+python demos/react_storybook_clock_info.py
+python demos/react_storybook_clock_info.py --storybook-iframe http://localhost:6006/iframe.html --clock-story-id pixoo-clock--time-with-seconds --info-story-id pixoo-kanbusclockcards--comment-card
+
 # Font showcase: cycle Tiny5 text screens (alphabet, numbers, alert, warning, success, info) — 5s per screen
 # Uses local 192x192 fixture + 3x downsample (no Storybook required)
 python demos/font_showcase.py

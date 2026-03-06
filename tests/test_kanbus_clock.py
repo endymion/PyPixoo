@@ -155,13 +155,14 @@ def test_summarize_event_known_types():
                 "description": "Transition issue description block",
                 "comments": [],
             },
-            "kanbus-11223344-1111": {
-                "id": "kanbus-11223344-1111",
-                "type": "task",
-                "status": "open",
-                "description": "Issue description for comment card",
-                "comments": [{"text": "Latest fallback comment"}],
-            },
+                "kanbus-11223344-1111": {
+                    "id": "kanbus-11223344-1111",
+                    "type": "task",
+                    "status": "open",
+                    "title": "Issue title for comment card",
+                    "description": "Issue description for comment card",
+                    "comments": [{"text": "Latest fallback comment"}],
+                },
             "kanbus-abc12345-2222": {
                 "id": "kanbus-abc12345-2222",
                 "type": "task",
@@ -191,8 +192,8 @@ def test_summarize_event_known_types():
     header_text = _scene_header_text(notice.scene)
     assert header_text.startswith("KANBUS")
     assert "TASK" in header_text
-    # Parent-present layout includes top section, divider, and bottom section.
-    assert len(notice.scene.layout.rows) == 9
+    # Parent-present layout uses comment-style rows: header + 2 parent + 2 issue + 5 bottom.
+    assert len(notice.scene.layout.rows) == 10
 
     created_missing_status = module.KanbusEvent(
         path=Path("x2.json"),
@@ -228,8 +229,8 @@ def test_summarize_event_known_types():
     )
     long_title_notice = module.summarize_event(created_long_title)
     assert long_title_notice.scene is not None
-    # No parent layout: header + 7 issue rows.
-    assert len(long_title_notice.scene.layout.rows) == 8
+    # No parent layout: header + 2 issue + 7 bottom.
+    assert len(long_title_notice.scene.layout.rows) == 10
 
     transition = module.KanbusEvent(
         path=Path("y.json"),
@@ -270,12 +271,80 @@ def test_summarize_event_known_types():
     comment_notice = module.summarize_event(comment)
     assert comment_notice.scene is not None
     c_rows = comment_notice.scene.layout.rows
-    # Header + 2 issue rows + 3 comment rows.
-    assert len(c_rows) == 6
+    # Header + 2 issue + 7 comment rows (no parent).
+    assert len(c_rows) == 10
     c_body = [str(getattr(r, "content", "")) for r in c_rows[1:]]
-    assert any("Issue" in line for line in c_body[:2])
-    assert any("description" in line for line in c_body[:2])
+    assert any("Issue title" in line for line in c_body[:2])
     assert any("Deploy failed" in line for line in c_body[2:])
+
+
+def test_transition_layout_fills_viewport_and_rows():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        issue_id = args[0][2]
+        long_desc = (
+            "This is a long issue description intended to wrap across many lines "
+            "so the transition layout can be validated for row allocation."
+        )
+        fixtures = {
+            "kanbus-with-parent": {
+                "id": "kanbus-with-parent",
+                "type": "task",
+                "status": "in_progress",
+                "description": long_desc * 4,
+                "parent": "kanbus-parent",
+                "comments": [],
+            },
+            "kanbus-parent": {
+                "id": "kanbus-parent",
+                "type": "epic",
+                "status": "open",
+                "description": long_desc * 2,
+                "comments": [],
+            },
+            "kanbus-no-parent": {
+                "id": "kanbus-no-parent",
+                "type": "bug",
+                "status": "in_progress",
+                "description": long_desc * 6,
+                "comments": [],
+            },
+        }
+        payload = fixtures.get(issue_id, {"id": issue_id, "type": "issue", "status": "open", "description": ""})
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+
+    parent_transition = module.KanbusEvent(
+        path=Path("p.json"),
+        schema_version=1,
+        event_id="ep",
+        issue_id="kanbus-with-parent",
+        event_type="state_transition",
+        occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+        actor_id="tester",
+        payload={},
+    )
+    parent_notice = module.summarize_event(parent_transition)
+    assert parent_notice.scene is not None
+    rows = parent_notice.scene.layout.rows
+    assert len(rows) == 10
+
+    no_parent_transition = module.KanbusEvent(
+        path=Path("np.json"),
+        schema_version=1,
+        event_id="enp",
+        issue_id="kanbus-no-parent",
+        event_type="state_transition",
+        occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+        actor_id="tester",
+        payload={},
+    )
+    no_parent_notice = module.summarize_event(no_parent_transition)
+    assert no_parent_notice.scene is not None
+    np_rows = no_parent_notice.scene.layout.rows
+    assert len(np_rows) == 10
 
 
 def test_issue_type_palette_applies_to_cards_including_comments():
@@ -318,18 +387,23 @@ def test_issue_type_palette_applies_to_cards_including_comments():
 
     module.subprocess.run = _fake_issue  # type: ignore[assignment]
 
-    def _assert_band(scene, band: str):
+    def _assert_band(scene, band: str, *, comment: bool = False):
         header = scene.layout.rows[0]
         expected_bg = module.parse_color(f"dark.{band}2")
+        expected_header_bg = module._lighten_color(expected_bg, steps=4)
         expected_header = module.parse_color(f"dark.{band}8")
         expected_main = module.parse_color(f"dark.{band}9")
-        assert header.background_color == expected_bg
+        expected_comment = module.parse_color("dark.sand11")
+        assert header.background_color == expected_header_bg
         assert header.style.color == expected_header
         # Body rows should use the same band background.
         assert all(getattr(row, "background_color", expected_bg) == expected_bg for row in scene.layout.rows[1:])
         # Main body content should use the brightest intensity for the band.
         text_rows = [row for row in scene.layout.rows[1:] if hasattr(row, "style") and getattr(row, "content", "") != ""]
-        assert any(getattr(row.style, "color", None) == expected_main for row in text_rows)
+        if comment:
+            assert any(getattr(row.style, "color", None) == expected_comment for row in text_rows)
+        else:
+            assert any(getattr(row.style, "color", None) == expected_main for row in text_rows)
 
     task_notice = module.summarize_event(
         module.KanbusEvent(
@@ -389,7 +463,65 @@ def test_issue_type_palette_applies_to_cards_including_comments():
         )
     )
     assert bug_comment_notice.scene is not None
-    _assert_band(bug_comment_notice.scene, "red")
+    _assert_band(bug_comment_notice.scene, "red", comment=True)
+
+
+def test_comment_and_transition_use_titles_in_top_rows():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        issue_id = args[0][2]
+        fixtures = {
+            "kanbus-title-1": {
+                "id": "kanbus-title-1",
+                "type": "task",
+                "status": "open",
+                "title": "Title One",
+                "description": "Description One",
+                "comments": [],
+            }
+        }
+        payload = fixtures.get(issue_id, {"id": issue_id, "type": "issue", "status": "open", "description": ""})
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+
+    comment_notice = module.summarize_event(
+        module.KanbusEvent(
+            path=Path("c.json"),
+            schema_version=1,
+            event_id="ec",
+            issue_id="kanbus-title-1",
+            event_type="comment_added",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+            actor_id="tester",
+            payload={"comment": "comment body"},
+        )
+    )
+    assert comment_notice.scene is not None
+    comment_rows = comment_notice.scene.layout.rows
+    top_text = "\n".join(str(r.content) for r in comment_rows[1:3])
+    assert "Title One" in top_text
+    assert "Description One" not in top_text
+
+    transition_notice = module.summarize_event(
+        module.KanbusEvent(
+            path=Path("t.json"),
+            schema_version=1,
+            event_id="et",
+            issue_id="kanbus-title-1",
+            event_type="state_transition",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+            actor_id="tester",
+            payload={},
+        )
+    )
+    assert transition_notice.scene is not None
+    transition_rows = transition_notice.scene.layout.rows
+    transition_top = "\n".join(str(r.content) for r in transition_rows[1:3])
+    transition_bottom = "\n".join(str(r.content) for r in transition_rows[3:])
+    assert "Title One" in transition_top
+    assert "Description One" in transition_bottom
 
 
 def test_issue_prefix_uses_event_issue_key_when_show_returns_internal_id():

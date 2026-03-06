@@ -5,7 +5,7 @@
 import React from "react";
 import { PIXOO_SIZE } from "../pixoo";
 
-const FONT_FAMILY = "'Tiny5', monospace";
+const FONT_FAMILY = "Tiny5";
 /** Font size in pixels (integer for pixel-perfect). Tiny5 is readable at 5–6px. */
 const FONT_SIZE_PX = 5;
 /** Line height must fit font metrics (ascender + descender); too small clips the bottom of glyphs. */

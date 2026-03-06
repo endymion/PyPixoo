@@ -24,6 +24,7 @@ const meta: Meta<typeof Clock> = {
     secondHandColor: { control: "color" },
     markerColor: { control: "color" },
     topMarkerColor: { control: "color" },
+    centerDotColor: { control: "color" },
     markerMode: { control: "select", options: markerModes },
   },
 };
@@ -98,5 +99,39 @@ export const TimeNoSecondHand: Story = {
     faceFade: 1.0,
     markerMode: "dots_all_thick_quarters",
     faceColor: "black",
+  },
+};
+
+/** Parity story for the tuned Python pixooclock face (dot12, no second hand). */
+export const PixooclockDefault: Story = {
+  args: {
+    hour: 2,
+    minute: 15,
+    second: 0,
+    showSecondHand: false,
+    markerMode: "dot12",
+    faceColor: "#000000",
+    markerColor: "#5A4C47",
+    topMarkerColor: "#6F5F58",
+    hourHandColor: "#AE8C7E",
+    minuteHandColor: "#D4B3A5",
+    secondHandColor: "#493E3A",
+    centerDotColor: "#5A4C47",
+    hourLength: 20,
+    minuteLength: 27,
+    secondLength: 30,
+    markerInnerRadius: 26,
+    markerOuterRadius: 30,
+    markerRadius: 1,
+    topMarkerRadius: 2,
+    quarterMarkerRadius: 2,
+    markerTickThickness: 1,
+    topMarkerTickThickness: 2,
+    quarterMarkerTickThickness: 2,
+    hourHandThickness: 2,
+    minuteHandThickness: 2,
+    secondHandThickness: 1,
+    centerDotRadius: 1,
+    faceFade: 1.0,
   },
 };

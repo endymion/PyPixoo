@@ -5,8 +5,8 @@
 import React from "react";
 import { PIXOO_SIZE } from "../pixoo";
 
-const FONT_FAMILY = "'Tiny5', monospace";
-const FONT_SIZE_PX = 5;
+const FONT_FAMILY = "Tiny5";
+const FONT_SIZE_PX = 8;
 
 export function LetterA() {
   return (

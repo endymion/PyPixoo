@@ -46,9 +46,9 @@ class WebFrameSource(BaseModel):
         default=None,
         description="If set, write the full-resolution screenshot (e.g. 192x192) to this path before downsampling.",
     )
-    downsample_mode: Literal["maxpool", "nearest"] = Field(
+    downsample_mode: Literal["maxpool", "nearest", "box"] = Field(
         default="maxpool",
-        description="64x64 reduction mode for 2x/3x captures. maxpool preserves thin strokes; nearest preserves hard pixel grids.",
+        description="64x64 reduction mode for 2x/3x captures. maxpool preserves thin strokes; nearest preserves hard pixel grids; box preserves anti-aliased edges.",
     )
 
 
@@ -59,7 +59,7 @@ def _url_with_timestamp(base_url: str, timestamp: float, param: str) -> str:
 
 def _screenshot_to_buffer(
     screenshot_bytes: bytes,
-    downsample_mode: Literal["maxpool", "nearest"] = "maxpool",
+    downsample_mode: Literal["maxpool", "nearest", "box"] = "maxpool",
 ) -> Buffer:
     """Convert Playwright screenshot bytes to 64×64 RGB Buffer.
 
@@ -69,6 +69,10 @@ def _screenshot_to_buffer(
     text on the device.
     """
     img = Image.open(io.BytesIO(screenshot_bytes)).convert("RGB")
+    if downsample_mode == "box" and img.size != (SIZE, SIZE):
+        img = img.resize((SIZE, SIZE), Image.Resampling.BOX)
+        data = [c for pixel in img.getdata() for c in pixel]
+        return Buffer.from_flat_list(data)
     if img.size == (SIZE * 3, SIZE * 3):
         if downsample_mode == "nearest":
             img = img.resize((SIZE, SIZE), Image.Resampling.NEAREST)
@@ -146,8 +150,15 @@ def _wait_for_page_render_ready(page, timeout_ms: int = 20000) -> None:
         return
     try:
         page.wait_for_function("() => window.__pixooReady === true", timeout=timeout_ms)
-    except Exception:
-        pass
+        return
+    except Exception as exc:
+        try:
+            ready_error = page.evaluate("() => window.__pixooReadyError || null")
+        except Exception:
+            ready_error = None
+        if isinstance(ready_error, str) and ready_error.strip():
+            raise RuntimeError(f"Page render readiness failed: {ready_error}") from exc
+        return
 
 
 def _render_web_frame(
@@ -157,7 +168,7 @@ def _render_web_frame(
     device_scale_factor: int = 2,
     viewport_size: int = 64,
     save_raw_path: Optional[str] = None,
-    downsample_mode: Literal["maxpool", "nearest"] = "maxpool",
+    downsample_mode: Literal["maxpool", "nearest", "box"] = "maxpool",
 ) -> Buffer:
     """Render a single web frame using Playwright; returns Buffer."""
     from playwright.sync_api import sync_playwright
@@ -195,7 +206,7 @@ def _render_web_frames_persistent(
     device_scale_factor: int = 2,
     viewport_size: int = 64,
     save_raw_path: Optional[str] = None,
-    downsample_mode: Literal["maxpool", "nearest"] = "maxpool",
+    downsample_mode: Literal["maxpool", "nearest", "box"] = "maxpool",
 ) -> List[Buffer]:
     """Render frames using one persistent page."""
     from playwright.sync_api import sync_playwright
@@ -236,7 +247,7 @@ def _render_web_frames_per_frame(
     device_scale_factor: int = 2,
     viewport_size: int = 64,
     save_raw_path: Optional[str] = None,
-    downsample_mode: Literal["maxpool", "nearest"] = "maxpool",
+    downsample_mode: Literal["maxpool", "nearest", "box"] = "maxpool",
 ) -> List[Buffer]:
     """Render frames using a new page per frame."""
     return [

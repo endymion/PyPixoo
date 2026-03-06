@@ -16,21 +16,26 @@ import json
 import os
 import re
 import shlex
+import signal
 import subprocess
+import sys
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
+from urllib.parse import urlencode
 
 from dotenv import load_dotenv
 
 import pixooclock as clock
 from pypixoo import (
     ClockScene,
+    FrameRenderer,
     InfoLayout,
     InfoScene,
     Pixoo,
+    WebFrameSource,
     TableCell,
     TableRow,
     TextRow,
@@ -41,13 +46,15 @@ from pypixoo import (
 from pypixoo.color import parse_color
 from pypixoo.font_render import measure_text as measure_scene_text
 from pypixoo.info_dsl import BorderConfig
+from pypixoo.buffer import Buffer
 from pypixoo.raster import AsyncRasterClient, PixooFrameSink
-from pypixoo.scene import QueueItem, ScenePlayer
+from pypixoo.scene import LayerNode, QueueItem, RenderContext, ScenePlayer
 from pypixoo.transitions import TransitionSpec
 
 load_dotenv()
 DEFAULT_IP = os.environ.get("PIXOO_DEVICE_IP") or os.environ.get("PIXOO_IP") or "192.168.0.37"
 DEFAULT_HISTORY_FILE = Path(os.path.expanduser("~/.pypixoo/kanbus_clock_history"))
+DEFAULT_STORYBOOK = os.environ.get("PIXOO_STORYBOOK_URL") or "http://localhost:6006/iframe.html"
 _FILENAME_TS_RE = re.compile(
     r"^(?P<ts>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z)__"
 )
@@ -70,6 +77,129 @@ class KbsShowAmbiguous(RuntimeError):
 def _debug_kbs(message: str) -> None:
     if _DEBUG_KBS:
         print(message)
+
+
+@dataclass
+class _CachedFrame:
+    key: str
+    buffer: Buffer
+
+
+def _storybook_url(base_iframe: str, story_id: str, args: dict[str, Any]) -> str:
+    pairs: list[str] = []
+    for key, value in args.items():
+        rendered = "true" if isinstance(value, bool) and value else "false" if isinstance(value, bool) else str(value)
+        pairs.append(f"{key}:{rendered}")
+    query = {"id": story_id}
+    if pairs:
+        query["args"] = ";".join(pairs)
+    return f"{base_iframe}?{urlencode(query)}"
+
+
+def _render_story_frame(
+    url: str,
+    *,
+    t: float = 0.0,
+    browser_mode: str = "per_frame",
+) -> Buffer:
+    source = WebFrameSource(
+        url=url,
+        timestamps=[t],
+        duration_per_frame_ms=100,
+        browser_mode=browser_mode,
+        timestamp_param="t",
+        viewport_size=64,
+        device_scale_factor=3,
+        downsample_mode="box",
+    )
+    sequence = FrameRenderer([source]).precompute()
+    return sequence.frames[0].image
+
+
+class ReactClockScene:
+    name = "react-clock"
+
+    def __init__(
+        self,
+        *,
+        storybook_iframe: str,
+        story_id: str,
+        browser_mode: str,
+        show_second_hand: bool,
+    ) -> None:
+        self._storybook_iframe = storybook_iframe
+        self._story_id = story_id
+        self._browser_mode = browser_mode
+        self._show_second_hand = show_second_hand
+        self._cache: _CachedFrame | None = None
+        self._refresh_task: asyncio.Task | None = None
+        self._stop_refresh = asyncio.Event()
+
+    def _render_clock(self, epoch_s: float) -> Buffer:
+        local = time.localtime(epoch_s)
+        key = f"{local.tm_hour}:{local.tm_min}:{local.tm_sec}:{int(epoch_s)}"
+        if self._cache is not None and self._cache.key == key:
+            return self._cache.buffer
+        url = _storybook_url(
+            self._storybook_iframe,
+            self._story_id,
+            {
+                "hour": local.tm_hour % 12,
+                "minute": local.tm_min,
+                "second": local.tm_sec,
+                "showSecondHand": self._show_second_hand,
+            },
+        )
+        buf = _render_story_frame(
+            url,
+            t=(local.tm_sec % 60) / 60.0,
+            browser_mode=self._browser_mode,
+        )
+        self._cache = _CachedFrame(key=key, buffer=buf)
+        return buf
+
+    async def _refresh_loop(self) -> None:
+        while not self._stop_refresh.is_set():
+            now = time.time()
+            local = time.localtime(now)
+            key = f"{local.tm_hour}:{local.tm_min}:{local.tm_sec}:{int(now)}"
+            if self._cache is None or self._cache.key != key:
+                try:
+                    buf = await asyncio.to_thread(self._render_clock, now)
+                    self._cache = _CachedFrame(key=key, buffer=buf)
+                except Exception as exc:
+                    print(f"react-clock refresh skipped: {exc}")
+            await asyncio.sleep(0.2)
+
+    async def start(self) -> None:
+        if self._refresh_task is not None and not self._refresh_task.done():
+            return
+        self._stop_refresh.clear()
+        self._refresh_task = asyncio.create_task(self._refresh_loop())
+
+    async def stop(self) -> None:
+        self._stop_refresh.set()
+        if self._refresh_task is not None:
+            self._refresh_task.cancel()
+            await asyncio.gather(self._refresh_task, return_exceptions=True)
+            self._refresh_task = None
+
+    def layers(self, ctx: RenderContext) -> list[LayerNode]:
+        scene = self
+
+        class _Layer:
+            name = "react-clock-layer"
+
+            def render(self, render_ctx: RenderContext) -> Buffer:
+                return scene._render_clock(render_ctx.epoch_s)
+
+        return [LayerNode(id="react-clock-root", layer=_Layer(), z=0)]
+
+    def on_enter(self) -> None:
+        print("entered React clock scene")
+
+    def on_exit(self) -> None:
+        return
 
 
 @dataclass(frozen=True)
@@ -193,6 +323,13 @@ def _darken_color(color: tuple[int, int, int], *, steps: int) -> tuple[int, int,
     if steps <= 0:
         return color
     factor = 0.82**steps
+    return tuple(max(0, min(255, int(c * factor))) for c in color)
+
+
+def _lighten_color(color: tuple[int, int, int], *, steps: int) -> tuple[int, int, int]:
+    if steps <= 0:
+        return color
+    factor = 1.18**steps
     return tuple(max(0, min(255, int(c * factor))) for c in color)
 
 
@@ -342,41 +479,62 @@ def _run_kbs_show_json(
 ) -> Optional[dict[str, Any]]:
     if not issue_id:
         return None
-    cwd = str(kbs_root) if kbs_root else None
-    project_hint = f" project_root={project_root}" if project_root else ""
-    _debug_kbs(f"kbs: show {issue_id} --json (cwd={cwd or 'default'}){project_hint}")
-    command = ["kbs", "show", issue_id, "--json"]
+    
+    def _attempt(cwd_value: Optional[Path], label: str) -> Optional[dict[str, Any]]:
+        cwd = str(cwd_value) if cwd_value else None
+        _debug_kbs(f"kbs: show {issue_id} --json ({label}, cwd={cwd or 'default'})")
+        command = ["kbs", "show", issue_id, "--json"]
+        try:
+            proc = subprocess.run(
+                command,
+                cwd=cwd,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=10.0,
+            )
+        except subprocess.TimeoutExpired as exc:
+            _debug_kbs(f"kbs: timeout after {exc.timeout}s for issue {issue_id} ({label})")
+            return None
+        except Exception as exc:
+            _debug_kbs(f"kbs: exception while running show for {issue_id} ({label}): {exc}")
+            return None
+        _debug_kbs(f"kbs: exit={proc.returncode} ({label})")
+        stdout_text = getattr(proc, "stdout", "") or ""
+        stderr_text = getattr(proc, "stderr", "") or ""
+        if stdout_text:
+            _debug_kbs(f"kbs stdout ({label}):\n{stdout_text.strip()}")
+        if stderr_text:
+            _debug_kbs(f"kbs stderr ({label}):\n{stderr_text.strip()}")
+        if proc.returncode != 0:
+            if "ambiguous identifier" in stderr_text.lower():
+                raise KbsShowAmbiguous("ambiguous identifier")
+            return None
+        if not stdout_text:
+            return None
+        try:
+            parsed = json.loads(stdout_text)
+        except Exception:
+            return None
+        return parsed if isinstance(parsed, dict) else None
+
+    # Preferred behavior: query from a single workspace root.
+    workspace_result = _attempt(kbs_root, "workspace-root")
+    if workspace_result is not None:
+        return workspace_result
+
+    # Fallback: scope to the event's project root when workspace lookup is slow/failing.
     if project_root is not None:
-        command.extend(["--project-root", str(project_root)])
-    try:
-        proc = subprocess.run(
-            command,
-            cwd=cwd,
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=2.0,
-        )
-    except Exception:
-        return None
-    _debug_kbs(f"kbs: exit={proc.returncode}")
-    stdout_text = getattr(proc, "stdout", "") or ""
-    stderr_text = getattr(proc, "stderr", "") or ""
-    if stdout_text:
-        _debug_kbs(f"kbs stdout:\n{stdout_text.strip()}")
-    if stderr_text:
-        _debug_kbs(f"kbs stderr:\n{stderr_text.strip()}")
-    if proc.returncode != 0:
-        if "ambiguous identifier" in stderr_text.lower():
-            raise KbsShowAmbiguous("ambiguous identifier")
-        return None
-    if not stdout_text:
-        return None
-    try:
-        parsed = json.loads(stdout_text)
-    except Exception:
-        return None
-    return parsed if isinstance(parsed, dict) else None
+        project_result = _attempt(project_root, "project-root-fallback")
+        if project_result is not None:
+            return project_result
+
+    # Final fallback with process default cwd.
+    default_result = _attempt(None, "default-cwd-fallback")
+    if default_result is not None:
+        return default_result
+
+    return None
 
 
 def _issue_id_prefix_upper(issue_id: str) -> str:
@@ -690,11 +848,58 @@ def _payload_prefix_override(payload: dict[str, Any]) -> str:
     return ""
 
 
-def _wrap_desc(text: str, *, max_lines: int) -> list[str]:
-    wrapped = _wrap_text_lines(text, max_width_px=62, max_lines=max_lines, font_key="bytesized")
+def _wrap_text_or_placeholder(
+    text: str,
+    *,
+    max_lines: int,
+    max_width_px: int = 62,
+    placeholder: str,
+    font_key: str = "bytesized",
+) -> list[str]:
+    wrapped = _wrap_text_lines(text, max_width_px=max_width_px, max_lines=max_lines, font_key=font_key)
     if wrapped:
         return wrapped
-    return ["(no description)"]
+    return [placeholder]
+
+
+def _wrap_desc(text: str, *, max_lines: int, max_width_px: int = 62) -> list[str]:
+    return _wrap_text_or_placeholder(
+        text,
+        max_lines=max_lines,
+        max_width_px=max_width_px,
+        placeholder="(no description)",
+    )
+
+
+def _wrap_title(text: str, *, max_lines: int, max_width_px: int = 62) -> list[str]:
+    return _wrap_text_or_placeholder(
+        text,
+        max_lines=max_lines,
+        max_width_px=max_width_px,
+        placeholder="(no title)",
+    )
+
+
+def _wrap_desc_fill_rows(text: str, *, target_rows: int) -> list[str]:
+    # Reflow progressively tighter (word-wrap only) to occupy requested rows.
+    best: list[str] = []
+    for width in (54, 50, 46, 42, 38, 34):
+        wrapped = _wrap_desc(text, max_lines=target_rows, max_width_px=width)
+        best = wrapped
+        if len(wrapped) >= target_rows:
+            break
+    return _fixed_rows(best, target_rows)
+
+
+def _wrap_title_fill_rows(text: str, *, target_rows: int) -> list[str]:
+    # Reflow progressively tighter (word-wrap only) to occupy requested rows.
+    best: list[str] = []
+    for width in (54, 50, 46, 42, 38, 34):
+        wrapped = _wrap_title(text, max_lines=target_rows, max_width_px=width)
+        best = wrapped
+        if len(wrapped) >= target_rows:
+            break
+    return _fixed_rows(best, target_rows)
 
 
 def _fixed_rows(lines: list[str], count: int) -> list[str]:
@@ -712,37 +917,63 @@ def _build_card_scene_from_sections(
     bottom_lines: list[str],
     show_middle_divider: bool,
     name: str,
+    status_lighter_steps: int = 0,
+    top_section_bg: tuple[int, int, int] | None = None,
+    bottom_section_bg: tuple[int, int, int] | None = None,
+    header_section_bg: tuple[int, int, int] | None = None,
+    show_header_bottom_border: bool = False,
+    header_height_extra_px: int = 3,
+    body_row_height: int = 7,
+    fill_body_to_viewport: bool = False,
 ) -> InfoScene:
     header_fg, main_fg, top_dim_fg, bg = _issue_type_card_colors(issue_type_upper)
     header_color = header_fg
     border_color = tuple(max(0, int(c * 0.55)) for c in header_fg)
     row_font = "bytesized"
-    row_height = 7
+    row_height = max(1, int(body_row_height))
 
     header_font = "bytesized"
     header_metrics = [measure_scene_text(part, header_font)[1] for part in header_parts if part]
-    header_height = max(4, int(max(header_metrics) if header_metrics else 5) + 3)
+    header_height = max(4, int(max(header_metrics) if header_metrics else 5) + int(header_height_extra_px))
 
-    def _header_spans(text: str) -> list[TextSpan]:
+    part_colors = [header_color, header_color, _lighten_color(header_color, steps=status_lighter_steps)]
+
+    def _header_spans(text: str, color: tuple[int, int, int]) -> list[TextSpan]:
         words = [token for token in _normalize_space(text).split(" ") if token]
         spans: list[TextSpan] = []
         for idx, word in enumerate(words):
-            spans.append(TextSpan(text=word, font=header_font, color=header_color))
+            spans.append(TextSpan(text=word, font=header_font, color=color))
             if idx < len(words) - 1:
                 spans.append(TextSpan(text="", advance_px=2))
         return spans
 
     header_spans: list[TextSpan] = []
-    for part in [p for p in header_parts if p]:
+    for index, part in enumerate([p for p in header_parts if p]):
         if header_spans:
             header_spans.append(TextSpan(text="", advance_px=3))
-        header_spans.extend(_header_spans(part))
+        color = part_colors[min(index, len(part_colors) - 1)]
+        header_spans.extend(_header_spans(part, color))
+    resolved_top_bg = top_section_bg if top_section_bg is not None else bg
+    resolved_bottom_bg = bottom_section_bg if bottom_section_bg is not None else bg
+    resolved_header_bg = header_section_bg if header_section_bg is not None else bg
+
+    content_rows = len(top_lines) + len(bottom_lines) + (1 if show_middle_divider else 0)
+    trailing_fill_px = 0
+    if fill_body_to_viewport and content_rows > 0:
+        available_body = max(0, 64 - header_height)
+        row_height = max(1, available_body // content_rows)
+        trailing_fill_px = max(0, available_body - (row_height * content_rows))
+
     rows: list[Any] = [
         TextRow(
             height=header_height,
             align="left",
-            background_color=bg,
-            border=BorderConfig(enabled=True, thickness=1, color=border_color),
+            background_color=resolved_header_bg,
+            border=BorderConfig(
+                enabled=show_header_bottom_border,
+                thickness=1,
+                color=border_color,
+            ),
             style=TextStyle(font=header_font, color=header_color),
             content=header_spans,
         )
@@ -753,7 +984,7 @@ def _build_card_scene_from_sections(
             TextRow(
                 height=row_height,
                 align="left",
-                background_color=bg,
+                background_color=resolved_top_bg,
                 style=TextStyle(font=row_font, color=top_dim_fg),
                 content=line,
             )
@@ -774,13 +1005,101 @@ def _build_card_scene_from_sections(
             TextRow(
                 height=row_height,
                 align="left",
-                background_color=bg,
+                background_color=resolved_bottom_bg,
                 style=TextStyle(font=row_font, color=main_fg),
                 content=line,
             )
         )
+    if trailing_fill_px > 0:
+        rows.append(
+            TextRow(
+                height=trailing_fill_px,
+                align="left",
+                background_color=resolved_bottom_bg,
+                style=TextStyle(font=row_font, color=main_fg),
+                content="",
+            )
+        )
 
     return InfoScene(layout=InfoLayout(rows=rows, background_color=bg), name=name)
+
+
+def _build_comment_like_scene(
+    *,
+    issue_type_upper: str,
+    header_parts: tuple[str, str, str],
+    parent_lines: list[str],
+    issue_lines: list[str],
+    bottom_lines: list[str],
+    parent_text_color: tuple[int, int, int],
+    issue_text_color: tuple[int, int, int],
+    bottom_text_color: tuple[int, int, int],
+    parent_bg: tuple[int, int, int],
+    issue_bg: tuple[int, int, int],
+    bottom_bg: tuple[int, int, int],
+    header_bg: tuple[int, int, int],
+    header_text_color: tuple[int, int, int],
+    header_status_color: tuple[int, int, int] | None = None,
+    name: str,
+) -> InfoScene:
+    row_height = 6
+    header_height = 6
+    header_font = "bytesized"
+    border_color = tuple(max(0, int(c * 0.55)) for c in header_text_color)
+    header_spans: list[TextSpan] = []
+    for index, part in enumerate([p for p in header_parts if p]):
+        if header_spans:
+            header_spans.append(TextSpan(text="", advance_px=3))
+        if index < 2:
+            color = header_text_color
+        else:
+            color = header_status_color or header_text_color
+        words = [token for token in _normalize_space(part).split(" ") if token]
+        for idx, word in enumerate(words):
+            header_spans.append(TextSpan(text=word, font=header_font, color=color))
+            if idx < len(words) - 1:
+                header_spans.append(TextSpan(text="", advance_px=2))
+    rows: list[Any] = [
+        TextRow(
+            height=header_height,
+            align="left",
+            background_color=header_bg,
+            border=BorderConfig(enabled=False, thickness=1, color=border_color),
+            style=TextStyle(font=header_font, color=header_text_color),
+            content=header_spans,
+        )
+    ]
+    for line in parent_lines:
+        rows.append(
+            TextRow(
+                height=row_height,
+                align="left",
+                background_color=parent_bg,
+                style=TextStyle(font="bytesized", color=parent_text_color),
+                content=line,
+            )
+        )
+    for line in issue_lines:
+        rows.append(
+            TextRow(
+                height=row_height,
+                align="left",
+                background_color=issue_bg,
+                style=TextStyle(font="bytesized", color=issue_text_color),
+                content=line,
+            )
+        )
+    for line in bottom_lines:
+        rows.append(
+            TextRow(
+                height=row_height,
+                align="left",
+                background_color=bottom_bg,
+                style=TextStyle(font="bytesized", color=bottom_text_color),
+                content=line,
+            )
+        )
+    return InfoScene(layout=InfoLayout(rows=rows, background_color=issue_bg), name=name)
 
 
 def _message_scene(
@@ -1061,6 +1380,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
     snapshot = _fetch_issue_snapshot(event.issue_id, kbs_root, payload, project_root)
     payload_type = _normalize_space(str(payload.get("issue_type") or payload.get("type") or "ISSUE")).upper()
     payload_status = _format_status_text(payload.get("status") or "OPEN")
+    payload_title = _normalize_space(str(payload.get("title") or payload.get("name") or ""))
     payload_description = _normalize_space(
         str(payload.get("description") or payload.get("issue_description") or payload.get("title") or "")
     )
@@ -1071,7 +1391,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             issue_type_upper=payload_type or "ISSUE",
             status_upper=payload_status or "OPEN",
             description=payload_description,
-            title="",
+            title=payload_title,
             parent_id=None,
             latest_comment_text="",
         )
@@ -1082,7 +1402,18 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             issue_type_upper=snapshot.issue_type_upper or payload_type or "ISSUE",
             status_upper=snapshot.status_upper or payload_status or "OPEN",
             description=payload_description,
-            title=snapshot.title,
+            title=snapshot.title or payload_title,
+            parent_id=snapshot.parent_id,
+            latest_comment_text=snapshot.latest_comment_text,
+        )
+    elif not snapshot.title and payload_title:
+        snapshot = IssueSnapshot(
+            issue_id=snapshot.issue_id,
+            id_prefix_upper=snapshot.id_prefix_upper,
+            issue_type_upper=snapshot.issue_type_upper or payload_type or "ISSUE",
+            status_upper=snapshot.status_upper or payload_status or "OPEN",
+            description=snapshot.description,
+            title=payload_title,
             parent_id=snapshot.parent_id,
             latest_comment_text=snapshot.latest_comment_text,
         )
@@ -1100,81 +1431,138 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
         )
     header_parts = _issue_meta_header_parts(snapshot)
     header_text = " ".join(header_parts)
+    issue_title = snapshot.title
 
     if etype == "issue_created":
+        header_fg, main_fg, top_dim_fg, event_bg = _issue_type_card_colors(snapshot.issue_type_upper)
+        header_bg = _lighten_color(event_bg, steps=4)
         parent_snapshot = (
             _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
             if snapshot.parent_id
             else None
         )
+        parent_lines: list[str] = []
+        parent_title = ""
         if parent_snapshot is not None:
-            top_lines = _fixed_rows(_wrap_desc(parent_snapshot.description, max_lines=3), 3)
-            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=4), 4)
-            show_middle_divider = True
-        else:
-            top_lines = []
-            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=7), 7)
-            show_middle_divider = False
-        scene = _build_card_scene_from_sections(
+            parent_title = parent_snapshot.title
+            parent_lines = _fixed_rows(_wrap_title(parent_title, max_lines=2), 2)
+        issue_lines = _fixed_rows(_wrap_title(issue_title, max_lines=2), 2)
+        bottom_count = 5 if parent_lines else 7
+        bottom_lines = _fixed_rows(_wrap_title(issue_title, max_lines=bottom_count), bottom_count)
+        _debug_kbs(
+            f"render created: parent_title={parent_title!r} issue_title={issue_title!r} "
+            f"bottom_first={bottom_lines[0]!r}"
+        )
+        scene = _build_comment_like_scene(
             issue_type_upper=snapshot.issue_type_upper,
             header_parts=header_parts,
-            top_lines=top_lines,
+            parent_lines=parent_lines,
+            issue_lines=issue_lines,
             bottom_lines=bottom_lines,
-            show_middle_divider=show_middle_divider,
+            parent_text_color=top_dim_fg,
+            issue_text_color=top_dim_fg,
+            bottom_text_color=main_fg,
+            parent_bg=event_bg,
+            issue_bg=event_bg,
+            bottom_bg=event_bg,
+            header_bg=header_bg,
+            header_text_color=header_fg,
+            header_status_color=main_fg,
             name="created-scene",
         )
         return AutoNotice(
             header=header_text,
-            message="\n".join(top_lines + bottom_lines),
+            message="\n".join(parent_lines + issue_lines + bottom_lines),
             scene=scene,
         )
 
     if etype == "state_transition":
+        header_fg, main_fg, top_dim_fg, event_bg = _issue_type_card_colors(snapshot.issue_type_upper)
+        header_bg = _lighten_color(event_bg, steps=4)
         parent_snapshot = (
             _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
             if snapshot.parent_id
             else None
         )
+        parent_lines: list[str] = []
+        parent_title = ""
         if parent_snapshot is not None:
-            top_lines = _fixed_rows(_wrap_desc(parent_snapshot.description, max_lines=3), 3)
-            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=4), 4)
-            show_middle_divider = True
-        else:
-            top_lines = []
-            bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=7), 7)
-            show_middle_divider = False
-        scene = _build_card_scene_from_sections(
+            parent_title = parent_snapshot.title
+            parent_lines = _fixed_rows(_wrap_title(parent_title, max_lines=2), 2)
+        issue_lines = _fixed_rows(_wrap_title(issue_title, max_lines=2), 2)
+        bottom_count = 5 if parent_lines else 7
+        bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=bottom_count), bottom_count)
+        _debug_kbs(
+            f"render transition: parent_title={parent_title!r} issue_title={issue_title!r} "
+            f"bottom_first={bottom_lines[0]!r}"
+        )
+        scene = _build_comment_like_scene(
             issue_type_upper=snapshot.issue_type_upper,
             header_parts=header_parts,
-            top_lines=top_lines,
+            parent_lines=parent_lines,
+            issue_lines=issue_lines,
             bottom_lines=bottom_lines,
-            show_middle_divider=show_middle_divider,
+            parent_text_color=top_dim_fg,
+            issue_text_color=top_dim_fg,
+            bottom_text_color=main_fg,
+            parent_bg=event_bg,
+            issue_bg=event_bg,
+            bottom_bg=event_bg,
+            header_bg=header_bg,
+            header_text_color=header_fg,
+            header_status_color=main_fg,
             name="transition-scene",
         )
         return AutoNotice(
             header=header_text,
-            message="\n".join(top_lines + bottom_lines),
+            message="\n".join(parent_lines + issue_lines + bottom_lines),
             scene=scene,
         )
 
     if etype == "comment_added":
+        header_fg, main_fg, top_dim_fg, event_bg = _issue_type_card_colors(snapshot.issue_type_upper)
+        header_bg = _lighten_color(event_bg, steps=4)
         comment_text = _extract_comment_text(payload)
         if (not comment_text) or (len(comment_text) < 8) or (" " not in comment_text):
             comment_text = snapshot.latest_comment_text
 
-        issue_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=2), 2)
-        comment_lines = _fixed_rows(_wrap_desc(comment_text, max_lines=3), 3)
-        scene = _build_card_scene_from_sections(
+        parent_snapshot = (
+            _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
+            if snapshot.parent_id
+            else None
+        )
+        parent_lines: list[str] = []
+        parent_title = ""
+        if parent_snapshot is not None:
+            parent_title = parent_snapshot.title
+            parent_lines = _fixed_rows(_wrap_title(parent_title, max_lines=2), 2)
+        issue_lines = _fixed_rows(_wrap_title(issue_title, max_lines=2), 2)
+        bottom_count = 5 if parent_lines else 7
+        comment_lines = _fixed_rows(_wrap_desc(comment_text, max_lines=bottom_count), bottom_count)
+        _debug_kbs(
+            f"render comment: parent_title={parent_title!r} issue_title={issue_title!r} "
+            f"comment_first={comment_lines[0]!r}"
+        )
+        comment_fg = _safe_parse_color("dark.sand11", fallback=(181, 179, 173))
+        scene = _build_comment_like_scene(
             issue_type_upper=snapshot.issue_type_upper,
             header_parts=header_parts,
-            top_lines=issue_lines,
+            parent_lines=parent_lines,
+            issue_lines=issue_lines,
             bottom_lines=comment_lines,
-            show_middle_divider=False,
+            parent_text_color=top_dim_fg,
+            issue_text_color=top_dim_fg,
+            bottom_text_color=comment_fg,
+            parent_bg=event_bg,
+            issue_bg=event_bg,
+            bottom_bg=event_bg,
+            header_bg=header_bg,
+            header_text_color=header_fg,
             name="comment-scene",
         )
         return AutoNotice(
             header=header_text,
-            message="\n".join(issue_lines + comment_lines),
+            message="\n".join(parent_lines + issue_lines + comment_lines),
             scene=scene,
         )
 
@@ -1324,7 +1712,7 @@ async def _wait_for_queue_capacity(
 async def _enqueue_message_transition(
     *,
     player: ScenePlayer,
-    clock_scene: ClockScene,
+    clock_scene: Any,
     level: str,
     message: str,
     seconds: float,
@@ -1439,7 +1827,7 @@ async def _auto_notice_consumer(
     *,
     notices: asyncio.Queue[AutoNotice],
     player: ScenePlayer,
-    clock_scene: ClockScene,
+    clock_scene: Any,
     stop_event: asyncio.Event,
     transition_ms: int,
     auto_info_seconds: float,
@@ -1449,7 +1837,14 @@ async def _auto_notice_consumer(
             notice = await asyncio.wait_for(notices.get(), timeout=0.25)
         except asyncio.TimeoutError:
             continue
+        if _DEBUG_KBS:
+            print(
+                f"consumer: dequeued notice level={notice.level} header={notice.header!r} "
+                f"queue_depth={player.queue_depth}"
+            )
         fg, bg = _level_colors(notice.level)
+        if _DEBUG_KBS:
+            print("consumer: enqueueing transition to notice")
         await _enqueue_message_transition(
             player=player,
             clock_scene=clock_scene,
@@ -1553,7 +1948,7 @@ def _setup_readline_history(history_file: Path) -> None:
 async def _run_repl(
     *,
     player: ScenePlayer,
-    clock_scene: ClockScene,
+    clock_scene: Any,
     transition_ms: int,
 ) -> None:
     command_parsers = {
@@ -1564,7 +1959,10 @@ async def _run_repl(
 
     print("Kanbus clock ready. Type 'help' for commands.")
     while True:
-        raw = await asyncio.to_thread(input, "kanbus-clock> ")
+        try:
+            raw = await asyncio.to_thread(input, "kanbus-clock> ")
+        except EOFError:
+            break
         line = raw.strip()
         if not line:
             continue
@@ -1650,7 +2048,21 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--rescan-seconds", type=float, default=10.0)
     parser.add_argument("--auto-info-seconds", type=float, default=30.0)
     parser.add_argument("--history-file", default=str(DEFAULT_HISTORY_FILE))
+    parser.add_argument("--react-clock", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--storybook-iframe", default=DEFAULT_STORYBOOK)
+    parser.add_argument("--clock-story-id", default="pixoo-clock--pixooclock-default")
+    parser.add_argument(
+        "--clock-browser-mode",
+        choices=["persistent", "per_frame"],
+        default="per_frame",
+    )
+    parser.add_argument(
+        "--react-second-hand",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
     parser.add_argument("--debug", action="store_true", help="print kbs commands and responses")
+    parser.add_argument("--no-repl", action="store_true", help="disable interactive REPL")
     return parser
 
 
@@ -1664,7 +2076,13 @@ async def run(
     rescan_seconds: float,
     auto_info_seconds: float,
     history_file: Path,
+    react_clock: bool,
+    storybook_iframe: str,
+    clock_story_id: str,
+    clock_browser_mode: str,
+    react_second_hand: bool,
     debug: bool,
+    no_repl: bool,
 ) -> None:
     global _DEBUG_KBS
     _DEBUG_KBS = debug
@@ -1680,8 +2098,21 @@ async def run(
         raster = AsyncRasterClient(sink)
         player = ScenePlayer(raster, fps=max(1, fps))
 
-        style = clock._style_from_args(clock.build_parser(ip_default=ip).parse_args([]))
-        clock_scene = ClockScene(render_frame=lambda ts: clock.render_clock_frame(ts, style), name="clock")
+        if react_clock:
+            clock_scene = ReactClockScene(
+                storybook_iframe=storybook_iframe,
+                story_id=clock_story_id,
+                browser_mode=clock_browser_mode,
+                show_second_hand=react_second_hand,
+            )
+            await clock_scene.start()
+            print(
+                f"clock-source: react story={clock_story_id} iframe={storybook_iframe}"
+            )
+        else:
+            style = clock._style_from_args(clock.build_parser(ip_default=ip).parse_args([]))
+            clock_scene = ClockScene(render_frame=lambda ts: clock.render_clock_frame(ts, style), name="clock")
+            print("clock-source: python pixooclock")
         notices: asyncio.Queue[AutoNotice] = asyncio.Queue(maxsize=64)
         stop_event = asyncio.Event()
 
@@ -1712,12 +2143,26 @@ async def run(
         )
 
         try:
-            await _run_repl(player=player, clock_scene=clock_scene, transition_ms=transition_ms)
+            repl_enabled = (not no_repl) and sys.stdin.isatty()
+            if not repl_enabled:
+                print("repl: disabled (no tty or --no-repl)")
+            loop = asyncio.get_running_loop()
+            for sig in (signal.SIGINT, signal.SIGTERM):
+                try:
+                    loop.add_signal_handler(sig, stop_event.set)
+                except NotImplementedError:
+                    pass
+            if repl_enabled:
+                await _run_repl(player=player, clock_scene=clock_scene, transition_ms=transition_ms)
+            else:
+                await stop_event.wait()
         finally:
             stop_event.set()
             for task in (watcher, consumer):
                 task.cancel()
             await asyncio.gather(watcher, consumer, return_exceptions=True)
+            if react_clock and hasattr(clock_scene, "stop"):
+                await clock_scene.stop()
             await player.stop()
             await runner
     finally:
@@ -1737,7 +2182,13 @@ def main() -> None:
                 rescan_seconds=max(0.5, args.rescan_seconds),
                 auto_info_seconds=max(0.1, args.auto_info_seconds),
                 history_file=Path(args.history_file).expanduser(),
+                react_clock=bool(args.react_clock),
+                storybook_iframe=args.storybook_iframe,
+                clock_story_id=args.clock_story_id,
+                clock_browser_mode=args.clock_browser_mode,
+                react_second_hand=bool(args.react_second_hand),
                 debug=bool(args.debug),
+                no_repl=bool(args.no_repl),
             )
         )
     except KeyboardInterrupt:

@@ -4,6 +4,58 @@ import { Clock } from "../src/components/Clock";
 
 const PIXOO_SIZE = 64;
 
+declare global {
+  interface Window {
+    __pixooReady?: boolean;
+    __pixooReadyError?: string;
+  }
+}
+
+if (typeof window !== "undefined") {
+  window.__pixooReady = false;
+  const markReady = () => {
+    // Give the browser one paint after fonts resolve so glyph rasters settle.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.__pixooReady = true;
+      });
+    });
+  };
+  const failReady = (reason: string) => {
+    window.__pixooReadyError = reason;
+    window.__pixooReady = false;
+  };
+  const waitForPixooFonts = async () => {
+    try {
+      if (!document.fonts || !document.fonts.ready || !document.fonts.check) {
+        failReady("document.fonts API unavailable");
+        return;
+      }
+      await document.fonts.ready;
+      for (const fontName of ["Tiny5", "Bytesized"]) {
+        await Promise.race([
+          Promise.resolve(document.fonts.load(`8px "${fontName}"`)),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Timed out loading ${fontName}`)), 2000)
+          ),
+        ]);
+      }
+      if (!document.fonts.check('5px "Tiny5"')) {
+        failReady("Tiny5 font not available");
+        return;
+      }
+      if (!document.fonts.check('8px "Bytesized"')) {
+        failReady("Bytesized font not available");
+        return;
+      }
+      markReady();
+    } catch {
+      failReady("Pixoo font load failed");
+    }
+  };
+  void waitForPixooFonts();
+}
+
 /** Parse hour, minute, second (and optional colors) from URL for realtime clock demo. */
 function getClockParamsFromUrl(): {
   hour?: number;

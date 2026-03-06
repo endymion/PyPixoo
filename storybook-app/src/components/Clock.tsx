@@ -37,13 +37,44 @@ export interface ClockProps {
   markerMode?: ClockMarkerMode;
   /** Intensity multiplier for markers + hands (0.0 to 1.0). */
   faceFade?: number;
+  /** Hour hand length in pixels from center. */
+  hourLength?: number;
+  /** Minute hand length in pixels from center. */
+  minuteLength?: number;
+  /** Second hand length in pixels from center. */
+  secondLength?: number;
+  /** Marker inner radius in pixels from center (for tick modes). */
+  markerInnerRadius?: number;
+  /** Marker outer radius in pixels from center. */
+  markerOuterRadius?: number;
+  /** Base marker dot radius in pixels. */
+  markerRadius?: number;
+  /** 12 o'clock marker dot radius in pixels. */
+  topMarkerRadius?: number;
+  /** Quarter marker dot radius in pixels (dots_all_thick_quarters). */
+  quarterMarkerRadius?: number;
+  /** Base tick thickness in pixels. */
+  markerTickThickness?: number;
+  /** 12 o'clock tick thickness in pixels. */
+  topMarkerTickThickness?: number;
+  /** Quarter tick thickness in pixels (ticks_all_thick_quarters). */
+  quarterMarkerTickThickness?: number;
+  /** Hour hand stroke thickness in pixels. */
+  hourHandThickness?: number;
+  /** Minute hand stroke thickness in pixels. */
+  minuteHandThickness?: number;
+  /** Second hand stroke thickness in pixels. */
+  secondHandThickness?: number;
+  /** Center dot radius in pixels. */
+  centerDotRadius?: number;
+  /** Center dot color. */
+  centerDotColor?: string;
 }
 
 const TAU = 2 * Math.PI;
 const CX = PIXOO_SIZE / 2;
 const CY = PIXOO_SIZE / 2;
 const MARKER_ANGLES = Array.from({ length: 12 }, (_, i) => (i / 12) * TAU);
-const MARKER_OUTWARD_OFFSET = 1.8;
 
 /** Angle 0 = 12 o'clock, clockwise in radians. */
 function angleToXY(angleRad: number, length: number) {
@@ -75,16 +106,28 @@ export function Clock({
   faceColor = "black",
   markerMode = "ticks_all_thick_quarters",
   faceFade = 1.0,
+  hourLength = 17,
+  minuteLength = 26,
+  secondLength = 28,
+  markerInnerRadius = 26,
+  markerOuterRadius = 30,
+  markerRadius = 0.8,
+  topMarkerRadius = 1.25,
+  quarterMarkerRadius = 1.25,
+  markerTickThickness = 1.2,
+  topMarkerTickThickness = 1.9,
+  quarterMarkerTickThickness = 1.9,
+  hourHandThickness = 2.5,
+  minuteHandThickness = 1.5,
+  secondHandThickness = 1,
+  centerDotRadius = 1,
+  centerDotColor,
 }: ClockProps) {
   const useTimeMode = typeof hour === "number" && typeof minute === "number";
   const clampedFaceFade = Math.max(0, Math.min(1, faceFade));
   const hourStroke = hourHandColor ?? handColor ?? "white";
   const minuteStroke = minuteHandColor ?? handColor ?? "white";
-
-  const radius = (PIXOO_SIZE / 2) * 0.95;
-  const hourLength = radius * 0.55;
-  const minuteLength = radius * 0.85;
-  const secondLength = radius * 0.88;
+  const centerFill = centerDotColor ?? minuteStroke;
 
   const hourAngle =
     useTimeMode
@@ -104,9 +147,9 @@ export function Clock({
   const secondEnd =
     secondAngle !== null ? angleToXY(secondAngle, secondLength) : null;
 
-  const markerOuter = Math.min(CX - 0.25, (radius * 0.96) + MARKER_OUTWARD_OFFSET);
-  const markerInner = Math.min(CX - 0.25, (radius * 0.82) + MARKER_OUTWARD_OFFSET);
-  const markerDot = Math.min(CX - 0.25, (radius * 0.90) + MARKER_OUTWARD_OFFSET);
+  const markerOuter = markerOuterRadius;
+  const markerInner = markerInnerRadius;
+  const markerDot = markerOuterRadius;
 
   const markers = MARKER_ANGLES.map((angle, i) => {
     const quarter = isQuarterHour(i);
@@ -123,20 +166,33 @@ export function Clock({
       markerMode === "dot12" ||
       (markerMode === "dots_quarters" && quarter) ||
       markerMode === "dots_all_thick_quarters";
-    const markerStrokeColor = i === 0 ? (topMarkerColor ?? markerColor) : markerColor;
+      const markerStrokeColor = i === 0 ? (topMarkerColor ?? markerColor) : markerColor;
 
     if (shouldDrawDot) {
       const pos = angleToXY(angle, markerDot);
       const dotRadius =
         markerMode === "dots_all_thick_quarters"
-          ? quarter
-            ? 1.25
-            : 0.8
-          : 1.2;
+          ? i === 0
+            ? topMarkerRadius
+            : quarter
+              ? quarterMarkerRadius
+              : markerRadius
+          : i === 0
+            ? topMarkerRadius
+            : markerRadius;
       return <circle key={key} cx={pos.x} cy={pos.y} r={dotRadius} fill={markerStrokeColor} />;
     }
 
-    const thickTick = markerMode === "ticks_all_thick_quarters" && quarter;
+    const tickThickness =
+      markerMode === "ticks_all_thick_quarters"
+        ? i === 0
+          ? topMarkerTickThickness
+          : quarter
+            ? quarterMarkerTickThickness
+            : markerTickThickness
+        : i === 0
+          ? topMarkerTickThickness
+          : markerTickThickness;
     const start = angleToXY(angle, markerOuter);
     const end = angleToXY(angle, markerInner);
     return (
@@ -147,7 +203,7 @@ export function Clock({
         x2={end.x}
         y2={end.y}
         stroke={markerStrokeColor}
-        strokeWidth={thickTick ? 1.9 : 1.2}
+        strokeWidth={tickThickness}
         strokeLinecap="round"
       />
     );
@@ -170,7 +226,7 @@ export function Clock({
               x2={hourEnd.x}
               y2={hourEnd.y}
               stroke={hourStroke}
-              strokeWidth={2.5}
+              strokeWidth={hourHandThickness}
               strokeLinecap="round"
             />
             <line
@@ -179,7 +235,7 @@ export function Clock({
               x2={minuteEnd.x}
               y2={minuteEnd.y}
               stroke={minuteStroke}
-              strokeWidth={1.5}
+              strokeWidth={minuteHandThickness}
               strokeLinecap="round"
             />
             {secondEnd !== null && (
@@ -189,10 +245,11 @@ export function Clock({
                 x2={secondEnd.x}
                 y2={secondEnd.y}
                 stroke={secondHandColor}
-                strokeWidth={1}
+                strokeWidth={secondHandThickness}
                 strokeLinecap="round"
               />
             )}
+            <circle cx={CX} cy={CY} r={centerDotRadius} fill={centerFill} />
           </>
         ) : (
           <line
@@ -201,7 +258,7 @@ export function Clock({
             x2={minuteEnd.x}
             y2={minuteEnd.y}
             stroke={minuteStroke}
-            strokeWidth={2}
+            strokeWidth={minuteHandThickness}
             strokeLinecap="round"
           />
         )}
