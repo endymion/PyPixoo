@@ -1,0 +1,109 @@
+{
+  "id": "PIXO-336e7b83-1f6e-4466-95d5-46f2cc864222",
+  "title": "Clock activity sequence",
+  "description": "Temp issue for multi-event Kanbus clock test.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "9544ca5c-3669-493c-b5d1-26f66283482b",
+      "author": "ryan.porter",
+      "text": "Comment 1: activity series test.",
+      "created_at": "2026-03-06T12:43:35.581639Z"
+    },
+    {
+      "id": "b512223c-d3cc-42f9-a420-3afed00dc823",
+      "author": "ryan.porter",
+      "text": "Comment 2: after blocked.",
+      "created_at": "2026-03-06T12:43:44.355561Z"
+    },
+    {
+      "id": "1b7eb239-eed5-4c65-95b6-0b8dffb08bc8",
+      "author": "ryan.porter",
+      "text": "Comment 1 (brighter): activity series test.",
+      "created_at": "2026-03-06T12:46:44.077943Z"
+    },
+    {
+      "id": "3b7d9f2a-424d-42a2-a2d9-8368f7d13b9e",
+      "author": "ryan.porter",
+      "text": "Comment 2 (brighter): after blocked.",
+      "created_at": "2026-03-06T12:46:53.232571Z"
+    },
+    {
+      "id": "f0398139-7086-480b-86ed-04e993b24f55",
+      "author": "ryan.porter",
+      "text": "Comment 3 (brightest): verify attention step 11.",
+      "created_at": "2026-03-06T12:49:16.970389Z"
+    },
+    {
+      "id": "898347e5-8b62-4a30-9d14-439e9a40f099",
+      "author": "ryan.porter",
+      "text": "30s hold test: comment should stay visible.",
+      "created_at": "2026-03-06T12:51:03.634970Z"
+    },
+    {
+      "id": "d161b1fe-c4dc-42aa-8139-0f5ffcb02b84",
+      "author": "ryan.porter",
+      "text": "Breakfast test comment 1",
+      "created_at": "2026-03-06T12:55:33.457835Z"
+    },
+    {
+      "id": "23acb3ac-359f-48b2-9203-f1a646423413",
+      "author": "ryan.porter",
+      "text": "Breakfast test comment 2",
+      "created_at": "2026-03-06T12:55:33.467269Z"
+    },
+    {
+      "id": "aaf7d62a-d4b1-402d-9eb6-fe15cf8579ed",
+      "author": "ryan.porter",
+      "text": "Breakfast test comment 3",
+      "created_at": "2026-03-06T12:55:33.475575Z"
+    },
+    {
+      "id": "9fa472ff-fac7-487a-940b-47a9d0af280c",
+      "author": "ryan.porter",
+      "text": "Breakfast series B-1",
+      "created_at": "2026-03-06T13:03:11.061892Z"
+    },
+    {
+      "id": "5825be9f-9935-421b-844d-f7195aa04fc4",
+      "author": "ryan.porter",
+      "text": "Breakfast series B-2",
+      "created_at": "2026-03-06T13:03:11.072194Z"
+    },
+    {
+      "id": "ba218df1-060c-4508-9335-b2866e658315",
+      "author": "ryan.porter",
+      "text": "Breakfast series B-3",
+      "created_at": "2026-03-06T13:03:11.086917Z"
+    },
+    {
+      "id": "00bfe459-ca1d-4487-ae69-bdc98c4a15f6",
+      "author": "ryan.porter",
+      "text": "Breakfast series C-1",
+      "created_at": "2026-03-06T13:14:45.680515Z"
+    },
+    {
+      "id": "3d37bbed-ca85-43a8-aa37-16e6a5de24c0",
+      "author": "ryan.porter",
+      "text": "Breakfast series C-2",
+      "created_at": "2026-03-06T13:14:45.693229Z"
+    },
+    {
+      "id": "807e1449-5bdd-4a82-9e35-0d052be3c860",
+      "author": "ryan.porter",
+      "text": "Breakfast series C-3",
+      "created_at": "2026-03-06T13:14:45.702570Z"
+    }
+  ],
+  "created_at": "2026-03-06T12:43:23.835017Z",
+  "updated_at": "2026-03-06T13:14:45.702570Z",
+  "closed_at": "2026-03-06T12:46:57.611229Z",
+  "custom": {}
+}

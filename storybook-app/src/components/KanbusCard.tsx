@@ -3,6 +3,7 @@ import { PIXOO_SIZE } from "../pixoo";
 import { Row } from "./Row";
 import { KanbusHeader } from "./KanbusHeader";
 import { IssueDescriptionBlock } from "./IssueDescriptionBlock";
+import { radixDark, RadixBand } from "../radixColors";
 
 export type KanbusIssueType = "task" | "bug" | "story" | "epic" | "unknown";
 export type KanbusCardKind = "created" | "transition" | "comment" | "unknown";
@@ -20,79 +21,38 @@ export interface KanbusCardProps {
 }
 
 type CardPalette = {
-  header: string;
-  main: string;
+  base: string;
+  attention: string;
   dim: string;
   bg: string;
   headerBg: string;
   border: string;
 };
 
-const TYPE_PALETTES: Record<KanbusIssueType, CardPalette> = {
-  task: {
-    header: "#5BA5FF",
-    main: "#9DC9FF",
-    dim: "#3B6EA8",
-    bg: "#0A111B",
-    headerBg: "#1E3E68",
-    border: "#2A4A6E",
-  },
-  bug: {
-    header: "#FF6B70",
-    main: "#FF9DA1",
-    dim: "#A84D4F",
-    bg: "#1B0A0B",
-    headerBg: "#3A1C1F",
-    border: "#6E2A2D",
-  },
-  story: {
-    header: "#D2B24D",
-    main: "#E6CD7A",
-    dim: "#8F7837",
-    bg: "#171208",
-    headerBg: "#3A321B",
-    border: "#5B4A21",
-  },
-  epic: {
-    header: "#8F8CFF",
-    main: "#B8B5FF",
-    dim: "#5A58A8",
-    bg: "#0D0C1A",
-    headerBg: "#2B2858",
-    border: "#3A3870",
-  },
-  unknown: {
-    header: "#BFB79E",
-    main: "#D7CFB5",
-    dim: "#7F785F",
-    bg: "#11100D",
-    headerBg: "#33312B",
-    border: "#4E4A3C",
-  },
+const TYPE_BANDS: Record<KanbusIssueType, RadixBand> = {
+  task: "blue",
+  bug: "red",
+  story: "yellow",
+  epic: "indigo",
+  unknown: "sand",
 };
+
+function paletteForBand(band: RadixBand): CardPalette {
+  return {
+    base: radixDark(band, 7),
+    attention: radixDark(band, 11),
+    dim: radixDark(band, 6),
+    bg: radixDark(band, 2),
+    headerBg: radixDark(band, 4),
+    border: radixDark(band, 5),
+  };
+}
 
 const HEADER_HEIGHT = 6;
 const BODY_TOP = HEADER_HEIGHT;
 const LINE_HEIGHT = 6;
-const COMMENT_TEXT_COLOR = "#E8E0CB";
+const COMMENT_TEXT_COLOR = radixDark("sky", 11);
 const BODY_MAX_CHARS = 17;
-const STATUS_LIGHTEN_AMOUNT = 0.2;
-
-function lightenHex(hex: string, amount: number): string {
-  if (!hex.startsWith("#") || hex.length !== 7) {
-    return hex;
-  }
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  const mix = (channel: number) => Math.min(255, Math.round(channel + (255 - channel) * amount));
-  const out = [
-    mix(r).toString(16).padStart(2, "0"),
-    mix(g).toString(16).padStart(2, "0"),
-    mix(b).toString(16).padStart(2, "0"),
-  ].join("");
-  return `#${out}`;
-}
 
 function normalizeLines(lines: string[] | undefined, count: number): string[] {
   const base = (lines ?? []).slice(0, count);
@@ -213,28 +173,29 @@ function kindRows(props: KanbusCardProps): { top: string[]; bottom: string[]; di
 }
 
 export function KanbusCard(props: KanbusCardProps) {
-  const palette = TYPE_PALETTES[props.issueType] ?? TYPE_PALETTES.unknown;
+  const band = TYPE_BANDS[props.issueType] ?? "sand";
+  const palette = paletteForBand(band);
   const { top, bottom, divider } = kindRows(props);
   const headerParts = [props.idPrefix.toUpperCase(), props.issueType.toUpperCase(), props.status.toUpperCase()];
-  const statusColor =
-    props.kind === "transition" || props.kind === "created"
-      ? lightenHex(palette.main, STATUS_LIGHTEN_AMOUNT)
-      : palette.main;
+  const isAttentionHeader = props.kind === "transition" || props.kind === "created";
+  const headerBase = palette.base;
+  const issueTypeHeader = isAttentionHeader ? palette.attention : palette.base;
+  const statusColor = isAttentionHeader ? palette.attention : palette.base;
   const hasParent = (props.parentLines?.length ?? 0) > 0;
+  const parentBand =
+    props.parentType === "initiative"
+      ? "plum"
+      : props.parentType === "epic"
+        ? "indigo"
+        : band;
   const parentTextColor =
-    props.parentType === "initiative"
-      ? "#A86BB4"
-      : props.parentType === "epic"
-        ? "#7470D8"
-        : palette.dim;
-  const parentRowBg =
-    props.parentType === "initiative"
-      ? "#3B1E3F"
-      : props.parentType === "epic"
-        ? "#22254A"
-        : "#1A1A1A";
-  const issueRowBg = palette.headerBg;
-  const issueTextColor = palette.dim;
+    props.parentType === "initiative" || props.parentType === "epic"
+      ? radixDark(parentBand, 7)
+      : palette.base;
+  const bodyBg = palette.bg;
+  const parentRowBg = bodyBg;
+  const issueRowBg = bodyBg;
+  const issueTextColor = palette.base;
 
   const rows: React.ReactNode[] = [];
   let y = BODY_TOP;
@@ -321,9 +282,9 @@ export function KanbusCard(props: KanbusCardProps) {
     if (y >= PIXOO_SIZE) {
       break;
     }
-    const bottomTextColor = props.kind === "comment" ? COMMENT_TEXT_COLOR : palette.main;
+    const bottomTextColor = props.kind === "comment" ? COMMENT_TEXT_COLOR : palette.attention;
     const bottomBackgroundColor =
-      props.kind === "comment" ? "transparent" : issueRowBg;
+      props.kind === "comment" ? "transparent" : bodyBg;
     rows.push(
       <IssueDescriptionBlock
         key={`bottom-${y}`}
@@ -348,16 +309,14 @@ export function KanbusCard(props: KanbusCardProps) {
         overflow: "hidden",
       }}
     >
-      <Row
-        y={0}
-        height={HEADER_HEIGHT}
-        backgroundColor={palette.headerBg}
-      >
+      <Row y={0} height={HEADER_HEIGHT} backgroundColor={palette.headerBg}>
         <KanbusHeader
           idPrefix={headerParts[0]}
           issueType={headerParts[1]}
           status={headerParts[2]}
-          color={palette.main}
+          color={headerBase}
+          idColor={headerBase}
+          issueTypeColor={issueTypeHeader}
           statusColor={statusColor}
         />
       </Row>

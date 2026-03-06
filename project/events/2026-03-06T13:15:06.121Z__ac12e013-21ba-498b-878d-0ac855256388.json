@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "ac12e013-21ba-498b-878d-0ac855256388",
+  "issue_id": "PIXO-095296a7-0958-4599-bd3c-bd2b071a65ba",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-06T13:15:06.121Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Temp issue for create/comment/transition/close sequence.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Breakfast flow test"
+  }
+}

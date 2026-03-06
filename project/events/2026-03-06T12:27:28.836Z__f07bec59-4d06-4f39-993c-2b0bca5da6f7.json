@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "f07bec59-4d06-4f39-993c-2b0bca5da6f7",
+  "issue_id": "PIXO-81642a3d-6e8e-49a5-9d1b-20fd2c37c543",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-06T12:27:28.836Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Temporary issue for Kanbus clock notification testing.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Clock color QA test"
+  }
+}

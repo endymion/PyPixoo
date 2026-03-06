@@ -314,16 +314,34 @@ def _canonical_issue_type(issue_type_upper: str) -> str:
     return "ISSUE"
 
 
+_BASE_STEP = 7
+_ATTENTION_STEP = 11
+_DIM_STEP = 6
+
+
+def _issue_type_band(issue_type_upper: str) -> str:
+    canonical = _canonical_issue_type(issue_type_upper)
+    return _ISSUE_TYPE_BANDS.get(canonical, "sand")
+
+
 def _issue_type_card_colors(
     issue_type_upper: str,
-) -> tuple[tuple[int, int, int], tuple[int, int, int], tuple[int, int, int], tuple[int, int, int]]:
-    canonical = _canonical_issue_type(issue_type_upper)
-    band = _ISSUE_TYPE_BANDS.get(canonical, "sand")
-    header_fg = _safe_parse_color(f"dark.{band}8", fallback=(145, 145, 145))
-    main_fg = _safe_parse_color(f"dark.{band}9", fallback=(180, 180, 180))
-    top_dim_fg = _darken_color(header_fg, steps=1)
+) -> tuple[
+    tuple[int, int, int],
+    tuple[int, int, int],
+    tuple[int, int, int],
+    tuple[int, int, int],
+    tuple[int, int, int],
+    tuple[int, int, int],
+]:
+    band = _issue_type_band(issue_type_upper)
+    base_fg = _safe_parse_color(f"dark.{band}{_BASE_STEP}", fallback=(145, 145, 145))
+    attention_fg = _safe_parse_color(f"dark.{band}{_ATTENTION_STEP}", fallback=(180, 180, 180))
+    dim_fg = _safe_parse_color(f"dark.{band}{_DIM_STEP}", fallback=(120, 120, 120))
     bg = _safe_parse_color(f"dark.{band}2", fallback=(8, 8, 8))
-    return header_fg, main_fg, top_dim_fg, bg
+    header_bg = _safe_parse_color(f"dark.{band}4", fallback=(18, 18, 18))
+    border = _safe_parse_color(f"dark.{band}5", fallback=(30, 30, 30))
+    return base_fg, attention_fg, dim_fg, bg, header_bg, border
 
 
 def _darken_color(color: tuple[int, int, int], *, steps: int) -> tuple[int, int, int]:
@@ -933,9 +951,9 @@ def _build_card_scene_from_sections(
     body_row_height: int = 7,
     fill_body_to_viewport: bool = False,
 ) -> InfoScene:
-    header_fg, main_fg, top_dim_fg, bg = _issue_type_card_colors(issue_type_upper)
-    header_color = header_fg
-    border_color = tuple(max(0, int(c * 0.55)) for c in header_fg)
+    base_fg, attention_fg, dim_fg, bg, header_bg, border_color = _issue_type_card_colors(issue_type_upper)
+    header_color = base_fg
+    border_color = border_color
     row_font = "bytesized"
     row_height = max(1, int(body_row_height))
 
@@ -943,7 +961,11 @@ def _build_card_scene_from_sections(
     header_metrics = [measure_scene_text(part, header_font)[1] for part in header_parts if part]
     header_height = max(4, int(max(header_metrics) if header_metrics else 5) + int(header_height_extra_px))
 
-    part_colors = [header_color, header_color, _lighten_color(header_color, steps=status_lighter_steps)]
+    part_colors = [
+        header_color,
+        header_color,
+        attention_fg if status_lighter_steps > 0 else header_color,
+    ]
 
     def _header_spans(text: str, color: tuple[int, int, int]) -> list[TextSpan]:
         words = [token for token in _normalize_space(text).split(" ") if token]
@@ -962,7 +984,7 @@ def _build_card_scene_from_sections(
         header_spans.extend(_header_spans(part, color))
     resolved_top_bg = top_section_bg if top_section_bg is not None else bg
     resolved_bottom_bg = bottom_section_bg if bottom_section_bg is not None else bg
-    resolved_header_bg = header_section_bg if header_section_bg is not None else bg
+    resolved_header_bg = header_section_bg if header_section_bg is not None else header_bg
 
     content_rows = len(top_lines) + len(bottom_lines) + (1 if show_middle_divider else 0)
     trailing_fill_px = 0
@@ -992,7 +1014,7 @@ def _build_card_scene_from_sections(
                 height=row_height,
                 align="left",
                 background_color=resolved_top_bg,
-                style=TextStyle(font=row_font, color=top_dim_fg),
+            style=TextStyle(font=row_font, color=dim_fg),
                 content=line,
             )
         )
@@ -1046,6 +1068,7 @@ def _build_comment_like_scene(
     bottom_bg: tuple[int, int, int],
     header_bg: tuple[int, int, int],
     header_text_color: tuple[int, int, int],
+    header_issue_type_color: tuple[int, int, int] | None = None,
     header_status_color: tuple[int, int, int] | None = None,
     name: str,
 ) -> InfoScene:
@@ -1057,8 +1080,10 @@ def _build_comment_like_scene(
     for index, part in enumerate([p for p in header_parts if p]):
         if header_spans:
             header_spans.append(TextSpan(text="", advance_px=3))
-        if index < 2:
+        if index == 0:
             color = header_text_color
+        elif index == 1:
+            color = header_issue_type_color or header_text_color
         else:
             color = header_status_color or header_text_color
         words = [token for token in _normalize_space(part).split(" ") if token]
@@ -1441,8 +1466,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
     issue_title = snapshot.title
 
     if etype == "issue_created":
-        header_fg, main_fg, top_dim_fg, event_bg = _issue_type_card_colors(snapshot.issue_type_upper)
-        header_bg = _lighten_color(event_bg, steps=4)
+        base_fg, attention_fg, _dim_fg, event_bg, header_bg, _ = _issue_type_card_colors(snapshot.issue_type_upper)
         parent_snapshot = (
             _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
             if snapshot.parent_id
@@ -1466,15 +1490,16 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             parent_lines=parent_lines,
             issue_lines=issue_lines,
             bottom_lines=bottom_lines,
-            parent_text_color=top_dim_fg,
-            issue_text_color=top_dim_fg,
-            bottom_text_color=main_fg,
+            parent_text_color=base_fg,
+            issue_text_color=base_fg,
+            bottom_text_color=attention_fg,
             parent_bg=event_bg,
             issue_bg=event_bg,
             bottom_bg=event_bg,
             header_bg=header_bg,
-            header_text_color=header_fg,
-            header_status_color=main_fg,
+            header_text_color=base_fg,
+            header_issue_type_color=attention_fg,
+            header_status_color=attention_fg,
             name="created-scene",
         )
         return AutoNotice(
@@ -1484,8 +1509,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
         )
 
     if etype == "state_transition":
-        header_fg, main_fg, top_dim_fg, event_bg = _issue_type_card_colors(snapshot.issue_type_upper)
-        header_bg = _lighten_color(event_bg, steps=4)
+        base_fg, attention_fg, _dim_fg, event_bg, header_bg, _ = _issue_type_card_colors(snapshot.issue_type_upper)
         parent_snapshot = (
             _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
             if snapshot.parent_id
@@ -1509,15 +1533,16 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             parent_lines=parent_lines,
             issue_lines=issue_lines,
             bottom_lines=bottom_lines,
-            parent_text_color=top_dim_fg,
-            issue_text_color=top_dim_fg,
-            bottom_text_color=main_fg,
+            parent_text_color=base_fg,
+            issue_text_color=base_fg,
+            bottom_text_color=attention_fg,
             parent_bg=event_bg,
             issue_bg=event_bg,
             bottom_bg=event_bg,
             header_bg=header_bg,
-            header_text_color=header_fg,
-            header_status_color=main_fg,
+            header_text_color=base_fg,
+            header_issue_type_color=attention_fg,
+            header_status_color=attention_fg,
             name="transition-scene",
         )
         return AutoNotice(
@@ -1527,8 +1552,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
         )
 
     if etype == "comment_added":
-        header_fg, main_fg, top_dim_fg, event_bg = _issue_type_card_colors(snapshot.issue_type_upper)
-        header_bg = _lighten_color(event_bg, steps=4)
+        base_fg, attention_fg, _dim_fg, event_bg, header_bg, _ = _issue_type_card_colors(snapshot.issue_type_upper)
         comment_text = _extract_comment_text(payload)
         if (not comment_text) or (len(comment_text) < 8) or (" " not in comment_text):
             comment_text = snapshot.latest_comment_text
@@ -1550,21 +1574,21 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             f"render comment: parent_title={parent_title!r} issue_title={issue_title!r} "
             f"comment_first={comment_lines[0]!r}"
         )
-        comment_fg = _safe_parse_color("dark.sand11", fallback=(181, 179, 173))
+        comment_fg = _safe_parse_color(f"dark.sky{_ATTENTION_STEP}", fallback=(180, 210, 230))
         scene = _build_comment_like_scene(
             issue_type_upper=snapshot.issue_type_upper,
             header_parts=header_parts,
             parent_lines=parent_lines,
             issue_lines=issue_lines,
             bottom_lines=comment_lines,
-            parent_text_color=top_dim_fg,
-            issue_text_color=top_dim_fg,
+            parent_text_color=base_fg,
+            issue_text_color=base_fg,
             bottom_text_color=comment_fg,
             parent_bg=event_bg,
             issue_bg=event_bg,
             bottom_bg=event_bg,
             header_bg=header_bg,
-            header_text_color=header_fg,
+            header_text_color=base_fg,
             name="comment-scene",
         )
         return AutoNotice(

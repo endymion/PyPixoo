@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-095296a7-0958-4599-bd3c-bd2b071a65ba",
+  "title": "Breakfast flow test",
+  "description": "Temp issue for create/comment/transition/close sequence.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "ba391c02-e4ae-456d-8947-1859b05431d2",
+      "author": "ryan.porter",
+      "text": "Comment A: created.",
+      "created_at": "2026-03-06T13:15:14.220558Z"
+    },
+    {
+      "id": "7a742a63-e599-4574-9fb9-c49243c93d80",
+      "author": "ryan.porter",
+      "text": "Comment B: in progress.",
+      "created_at": "2026-03-06T13:15:27.061306Z"
+    },
+    {
+      "id": "088503d1-cd91-44f9-aea1-a855c449186a",
+      "author": "ryan.porter",
+      "text": "Comment C: done.",
+      "created_at": "2026-03-06T13:15:38.939341Z"
+    }
+  ],
+  "created_at": "2026-03-06T13:15:06.121258Z",
+  "updated_at": "2026-03-06T13:15:38.939341Z",
+  "closed_at": "2026-03-06T13:15:32.467113Z",
+  "custom": {}
+}

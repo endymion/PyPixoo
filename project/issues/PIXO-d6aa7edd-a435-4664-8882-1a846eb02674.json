@@ -1,0 +1,43 @@
+{
+  "id": "PIXO-d6aa7edd-a435-4664-8882-1a846eb02674",
+  "title": "State demo",
+  "description": "Temp issue to demonstrate current Kanbus clock palette + transitions.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "82e6eee5-5b1d-438a-a02c-a58ebb65a6db",
+      "author": "ryan.porter",
+      "text": "Comment A: sky attention test.",
+      "created_at": "2026-03-06T13:22:44.933103Z"
+    },
+    {
+      "id": "59685424-4093-4c03-8cc0-2ecee1bfdd0d",
+      "author": "ryan.porter",
+      "text": "Comment B: in progress.",
+      "created_at": "2026-03-06T13:22:55.027609Z"
+    },
+    {
+      "id": "0536342a-936b-4752-9673-b9b648da92c1",
+      "author": "ryan.porter",
+      "text": "Comment C: blocked.",
+      "created_at": "2026-03-06T13:23:07.523406Z"
+    },
+    {
+      "id": "08c71eec-8075-41fd-9bd3-9ec070c85fc9",
+      "author": "ryan.porter",
+      "text": "Comment D: closed.",
+      "created_at": "2026-03-06T13:23:19.613185Z"
+    }
+  ],
+  "created_at": "2026-03-06T13:22:40.606568Z",
+  "updated_at": "2026-03-06T13:23:19.613185Z",
+  "closed_at": "2026-03-06T13:23:12.450021Z",
+  "custom": {}
+}

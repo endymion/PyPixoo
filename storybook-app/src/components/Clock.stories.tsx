@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Clock } from "./Clock";
+import { radixDark } from "../radixColors";
 
 const markerModes = [
   "dot12",
@@ -37,26 +38,26 @@ type Story = StoryObj<typeof Clock>;
 export const Default: Story = {
   args: {
     t: 0,
-    handColor: "white",
-    faceColor: "black",
+    handColor: radixDark("sand", 12),
+    faceColor: radixDark("sand", 1),
   },
 };
 
 export const QuarterPast: Story = {
-  args: { t: 0.25, handColor: "white", faceColor: "black" },
+  args: { t: 0.25, handColor: radixDark("sand", 12), faceColor: radixDark("sand", 1) },
 };
 
 export const HalfPast: Story = {
-  args: { t: 0.5, handColor: "white", faceColor: "black" },
+  args: { t: 0.5, handColor: radixDark("sand", 12), faceColor: radixDark("sand", 1) },
 };
 
 /** Real time: two hands (hour + minute). */
 export const Time1245: Story = {
-  args: { hour: 12, minute: 45, handColor: "white", faceColor: "black" },
+  args: { hour: 12, minute: 45, handColor: radixDark("sand", 12), faceColor: radixDark("sand", 1) },
 };
 
 export const Time330: Story = {
-  args: { hour: 3, minute: 30, handColor: "white", faceColor: "black" },
+  args: { hour: 3, minute: 30, handColor: radixDark("sand", 12), faceColor: radixDark("sand", 1) },
 };
 
 /** Three hands: hour, minute, second (showSecondHand true by default; secondHandColor configurable). */
@@ -66,10 +67,10 @@ export const TimeWithSeconds: Story = {
     minute: 9,
     second: 30,
     showSecondHand: true,
-    handColor: "white",
-    secondHandColor: "rgba(255,100,100,0.9)",
+    handColor: radixDark("sand", 12),
+    secondHandColor: radixDark("red", 9),
     markerMode: "ticks_all_thick_quarters",
-    faceColor: "black",
+    faceColor: radixDark("sand", 1),
   },
 };
 
@@ -80,9 +81,9 @@ export const TimeWithSecondsAtZero: Story = {
     minute: 9,
     second: 0,
     showSecondHand: true,
-    handColor: "white",
-    secondHandColor: "rgba(255,100,100,0.9)",
-    faceColor: "black",
+    handColor: radixDark("sand", 12),
+    secondHandColor: radixDark("red", 9),
+    faceColor: radixDark("sand", 1),
   },
 };
 
@@ -92,13 +93,13 @@ export const TimeNoSecondHand: Story = {
     hour: 2,
     minute: 15,
     showSecondHand: false,
-    hourHandColor: "rgba(242,232,255,0.6)",
-    minuteHandColor: "rgba(242,232,255,0.5)",
-    markerColor: "rgba(255,0,255,0.5)",
-    topMarkerColor: "rgba(255,0,255,0.8)",
+    hourHandColor: radixDark("plum", 10),
+    minuteHandColor: radixDark("plum", 9),
+    markerColor: radixDark("plum", 7),
+    topMarkerColor: radixDark("plum", 9),
     faceFade: 1.0,
     markerMode: "dots_all_thick_quarters",
-    faceColor: "black",
+    faceColor: radixDark("sand", 1),
   },
 };
 
@@ -110,13 +111,13 @@ export const PixooclockDefault: Story = {
     second: 0,
     showSecondHand: false,
     markerMode: "dot12",
-    faceColor: "#000000",
-    markerColor: "#5A4C47",
-    topMarkerColor: "#6F5F58",
-    hourHandColor: "#AE8C7E",
-    minuteHandColor: "#D4B3A5",
-    secondHandColor: "#493E3A",
-    centerDotColor: "#5A4C47",
+    faceColor: radixDark("bronze", 1),
+    markerColor: radixDark("bronze", 7),
+    topMarkerColor: radixDark("bronze", 8),
+    hourHandColor: radixDark("bronze", 10),
+    minuteHandColor: radixDark("bronze", 11),
+    secondHandColor: radixDark("bronze", 6),
+    centerDotColor: radixDark("bronze", 7),
     hourLength: 20,
     minuteLength: 27,
     secondLength: 30,

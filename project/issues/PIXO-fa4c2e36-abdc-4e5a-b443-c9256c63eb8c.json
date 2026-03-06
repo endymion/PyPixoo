@@ -3,16 +3,77 @@
   "title": "Kanbus card palette not using Radix tokens",
   "description": "Observed:\nReact Storybook Kanbus card palette uses hardcoded hex values (non-Radix).\n\nExpected:\nPalette should be sourced from Radix dark color tokens for consistency with Python/radix usage.\n\nImpact:\nHarder to maintain color consistency and match device palette expectations.",
   "type": "bug",
-  "status": "open",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
   "parent": "PIXO-9b569afd-6d46-4f8a-ab03-00a4e2a21add",
   "labels": [],
   "dependencies": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "a0905f13-9172-4eb8-9490-5d61ad004132",
+      "author": "ryan.porter",
+      "text": "Starting fix: align Kanbus clock demo colors to Radix dark tokens. Will audit React Storybook components + Python fallback to ensure all colors come from Radix palette; also confirm clock face palette source.",
+      "created_at": "2026-03-06T12:08:12.192937Z"
+    },
+    {
+      "id": "a2eef821-f505-4026-be14-00fe4b2fc948",
+      "author": "ryan.porter",
+      "text": "Implemented Radix dark token mapping in Storybook and switched KanbusCard + Clock stories to use Radix tokens (no hardcoded hex). Python kanbus_clock now uses discrete Radix steps (band7/8/9/11 + band2/4/5) instead of lighten/darken. Next: verify visuals on device.",
+      "created_at": "2026-03-06T12:15:24.835078Z"
+    },
+    {
+      "id": "664ca004-b5ed-4177-9232-e57164912515",
+      "author": "ryan.porter",
+      "text": "Info screens now use Radix dark tokens on both Python (kanbus_clock) and React Storybook components. If comment should be the only bright element, we need to dim header/issue/parent text relative to comment; current palette uses band8/7 for header/top and sand11 for comment.",
+      "created_at": "2026-03-06T12:30:56.267609Z"
+    },
+    {
+      "id": "24118b62-b214-4142-8064-7b6e1b81f3d4",
+      "author": "ryan.porter",
+      "text": "Updated palette to use explicit Radix steps: base=7, attention=9, dim=6 (dark scale). Header/parent/issue now base; comment + transition body + transition issue-type/status use attention. React KanbusCard mirrors same mapping via radixColors.ts.",
+      "created_at": "2026-03-06T12:33:41.193628Z"
+    },
+    {
+      "id": "9f103cc1-6e6a-45dc-b2e2-d6fb3c5c3e95",
+      "author": "ryan.porter",
+      "text": "Aligned backgrounds: KanbusCard now uses a single body background for all non-header rows (header bg separate). Parent/issue/bottom rows no longer use headerBg or parent band background; only text color varies by type.",
+      "created_at": "2026-03-06T12:35:57.266985Z"
+    },
+    {
+      "id": "3eabd11c-295a-444b-a261-9cbdd636b9c0",
+      "author": "ryan.porter",
+      "text": "Bumped attention step to 10 (base=7, dim=6). Comment text now sand10; attention elements (transition/created body + status/issue-type in header) use step 10 in both Python and React.",
+      "created_at": "2026-03-06T12:46:16.681125Z"
+    },
+    {
+      "id": "7a994208-c6e5-408e-937b-ca027fe52bee",
+      "author": "ryan.porter",
+      "text": "Bumped attention step to 11 so comment text + transition/created attention elements use Radix dark step 11; base remains 7, dim 6.",
+      "created_at": "2026-03-06T12:48:55.296644Z"
+    },
+    {
+      "id": "55abed00-0cf1-431b-acde-0beec228b833",
+      "author": "ryan.porter",
+      "text": "Header background dimmed one Radix step: headerBg now band3 (was band4) in both Python and React Kanbus cards.",
+      "created_at": "2026-03-06T13:18:21.201717Z"
+    },
+    {
+      "id": "4498714c-16f5-4534-9887-30738d0cc878",
+      "author": "ryan.porter",
+      "text": "Comment text color switched to Radix dark sky (step 11) in both Python and React Kanbus cards.",
+      "created_at": "2026-03-06T13:20:08.081289Z"
+    },
+    {
+      "id": "f826fd58-12a0-4938-9dad-cb7a0b0dfbb3",
+      "author": "ryan.porter",
+      "text": "Reverted header background to Radix band4 (one notch lighter again) for both Python + React Kanbus cards.",
+      "created_at": "2026-03-06T13:21:20.894631Z"
+    }
+  ],
   "created_at": "2026-03-06T07:08:22.473485Z",
-  "updated_at": "2026-03-06T07:08:22.473485Z",
-  "closed_at": null,
+  "updated_at": "2026-03-06T13:24:57.829740Z",
+  "closed_at": "2026-03-06T13:24:57.829740Z",
   "custom": {}
 }

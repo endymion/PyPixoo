@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-81642a3d-6e8e-49a5-9d1b-20fd2c37c543",
+  "title": "Clock color QA test",
+  "description": "Temporary issue for Kanbus clock notification testing.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "f86e3f7f-4197-40d3-be5f-79222ae87e48",
+      "author": "ryan.porter",
+      "text": "Comment pass 1: verifying clock info card palette.",
+      "created_at": "2026-03-06T12:27:47.525577Z"
+    },
+    {
+      "id": "26bc76d2-b4b7-4f46-b75f-1b9fa62bdd4e",
+      "author": "ryan.porter",
+      "text": "Comment pass 2: comment should be the only bright text on screen.",
+      "created_at": "2026-03-06T12:29:45.653520Z"
+    },
+    {
+      "id": "ba2a0180-17ea-407e-b533-5d568cb4641c",
+      "author": "ryan.porter",
+      "text": "activity test after restart",
+      "created_at": "2026-03-06T12:37:32.048271Z"
+    }
+  ],
+  "created_at": "2026-03-06T12:27:28.835960Z",
+  "updated_at": "2026-03-06T12:37:32.048271Z",
+  "closed_at": "2026-03-06T12:27:51.171241Z",
+  "custom": {}
+}
