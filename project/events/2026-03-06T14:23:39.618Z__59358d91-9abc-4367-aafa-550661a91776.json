@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "59358d91-9abc-4367-aafa-550661a91776",
+  "issue_id": "PIXO-a95f49e9-4536-4daf-8e60-8160ac10a783",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-06T14:23:39.618Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Observed: parent description row is colored using the current issue type instead of the parent issue type.\n\nExpected: parent row background and text colors follow the parent issue type palette (epic=indigo, initiative=magenta, etc.), regardless of child issue type.\n\nAcceptance:\n- Parent row uses parent type colors on comment/created/transition cards.\n- Child issue rows keep child type colors.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "PIXO-1cf8b0d6-bc4e-494f-b846-31e461cbaf20",
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: parent row should use parent issue type colors"
+  }
+}

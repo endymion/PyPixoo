@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "ddfe9f29-f7bc-48e4-b142-9d51e499562f",
+  "issue_id": "PIXO-ecc675c0-f476-4b27-ba38-6bad0adcbbde",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-06T15:21:50.329Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Observed:\n- When many events arrive quickly, only a subset appear on the clock.\n\nExpected:\n- All events are shown, even if delayed.\n\nPlanned fix:\n- Remove drop-on-full behavior; backpressure on the auto-notice queue.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "PIXO-1cf8b0d6-bc4e-494f-b846-31e461cbaf20",
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock drops notifications under burst"
+  }
+}

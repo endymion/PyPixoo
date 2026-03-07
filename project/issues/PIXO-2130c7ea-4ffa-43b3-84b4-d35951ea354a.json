@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-2130c7ea-4ffa-43b3-84b4-d35951ea354a",
+  "title": "Kanbus clock: header id prefix one step lighter",
+  "description": "Goal:\n- Make header ID prefix one Radix step lighter than base header text (not as light as attention).\n\nAcceptance:\n- ID prefix color = band step 8 when base is step 7.\n- Issue type/status remain at base (or attention where specified).\n- Applies to all card types.",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "6a65d46a-cb48-4d89-a3ae-786c5a2d370c",
+      "author": "ryan.porter",
+      "text": "Starting: adjust header ID prefix color to Radix step 8 in Python + React; update tests.",
+      "created_at": "2026-03-06T15:23:35.424886Z"
+    },
+    {
+      "id": "f9fbecbc-4c7c-4703-afac-f3c0624d82ed",
+      "author": "ryan.porter",
+      "text": "Update: header ID prefix now uses Radix step 8 (base+1) in Python + React. Added header_id_color param to comment-like scenes; React KanbusCard idColor uses band step 8. Added test for id prefix color. Tests: uv run pytest tests/test_kanbus_clock.py -q (39 passed). Ready for visual check.",
+      "created_at": "2026-03-06T15:24:24.881865Z"
+    }
+  ],
+  "created_at": "2026-03-06T15:23:30.568328Z",
+  "updated_at": "2026-03-06T15:24:24.881865Z",
+  "closed_at": null,
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "278bf09c-5381-425a-ada5-713685804064",
+  "issue_id": "PIXO-a881efee-7e39-42f5-8334-d435c7c74a7c",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-06T15:10:59.242Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Demo task for Pixoo clock notifications.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+    "priority": 2,
+    "status": "open",
+    "title": "Clock demo: task workflow"
+  }
+}

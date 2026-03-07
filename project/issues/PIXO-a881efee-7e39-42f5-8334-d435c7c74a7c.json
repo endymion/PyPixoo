@@ -1,0 +1,49 @@
+{
+  "id": "PIXO-a881efee-7e39-42f5-8334-d435c7c74a7c",
+  "title": "Clock demo: task workflow",
+  "description": "Demo task for Pixoo clock notifications.",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "e3581871-b7f8-4d70-87fc-aeae129c022b",
+      "author": "ryan.porter",
+      "text": "Clock demo: task open",
+      "created_at": "2026-03-06T15:11:24.877754Z"
+    },
+    {
+      "id": "d83f4ae4-ceea-4b29-99fa-6a9250323b50",
+      "author": "ryan.porter",
+      "text": "Clock demo: task in progress",
+      "created_at": "2026-03-06T15:11:24.954019Z"
+    },
+    {
+      "id": "3d6ca060-dbd6-4716-ba99-ca08e7995380",
+      "author": "ryan.porter",
+      "text": "Clock demo: task closed",
+      "created_at": "2026-03-06T15:11:24.977590Z"
+    },
+    {
+      "id": "0058ef73-7735-4184-a1f1-93a21e00aad2",
+      "author": "ryan.porter",
+      "text": "Clock demo: task w/parent open",
+      "created_at": "2026-03-06T15:11:41.293496Z"
+    },
+    {
+      "id": "57750706-5822-4efb-9254-2fc4c924d0a6",
+      "author": "ryan.porter",
+      "text": "Clock demo: task w/parent in progress",
+      "created_at": "2026-03-06T15:11:41.327217Z"
+    }
+  ],
+  "created_at": "2026-03-06T15:10:59.242873Z",
+  "updated_at": "2026-03-06T15:11:41.327217Z",
+  "closed_at": null,
+  "custom": {}
+}

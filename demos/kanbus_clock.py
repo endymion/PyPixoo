@@ -19,9 +19,12 @@ import shlex
 import signal
 import subprocess
 import sys
+import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Optional
 from urllib.parse import urlencode
@@ -54,7 +57,9 @@ from pypixoo.transitions import TransitionSpec
 load_dotenv()
 DEFAULT_IP = os.environ.get("PIXOO_DEVICE_IP") or os.environ.get("PIXOO_IP") or "192.168.0.37"
 DEFAULT_HISTORY_FILE = Path(os.path.expanduser("~/.pypixoo/kanbus_clock_history"))
-DEFAULT_STORYBOOK = os.environ.get("PIXOO_STORYBOOK_URL") or "http://localhost:6006/iframe.html"
+DEFAULT_RUNTIME_ASSETS = (
+    Path(__file__).resolve().parents[1] / "storybook-app" / "dist-pixoo-runtime"
+)
 _FILENAME_TS_RE = re.compile(
     r"^(?P<ts>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z)__"
 )
@@ -63,6 +68,7 @@ _ISSUE_KEY_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9]*-\d+)\b")
 _PROJECT_KEY_FULL_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-\d+$")
 MIN_TS = datetime(1970, 1, 1, tzinfo=timezone.utc)
 _DEBUG_KBS = False
+_WORKSPACE_KBS_DISABLED = False
 
 try:
     import readline
@@ -85,28 +91,67 @@ class _CachedFrame:
     buffer: Buffer
 
 
-def _storybook_url(base_iframe: str, story_id: str, args: dict[str, Any]) -> str:
-    pairs: list[str] = []
+class _SilentStaticHandler(SimpleHTTPRequestHandler):
+    """Quiet static file handler for local runtime assets."""
+
+    def log_message(self, format: str, *args: Any) -> None:  # pragma: no cover - logging side effect
+        return
+
+
+class _RuntimeStaticServer:
+    """Serve prebuilt React runtime assets on localhost for Playwright capture."""
+
+    def __init__(self, assets_dir: Path) -> None:
+        self._assets_dir = assets_dir
+        self._httpd: ThreadingHTTPServer | None = None
+        self._thread: threading.Thread | None = None
+        self.base_url: str = ""
+
+    def start(self) -> None:
+        runtime_entry = self._assets_dir / "index.html"
+        if not runtime_entry.is_file():
+            runtime_entry = self._assets_dir / "runtime.html"
+        if not runtime_entry.is_file():
+            raise RuntimeError(
+                "React runtime assets missing at "
+                f"{self._assets_dir}. Build them with "
+                "`npm --prefix storybook-app run build-pixoo-runtime`."
+            )
+
+        handler = partial(_SilentStaticHandler, directory=str(self._assets_dir))
+        self._httpd = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        self.base_url = f"http://127.0.0.1:{self._httpd.server_port}/{runtime_entry.name}"
+        self._thread = threading.Thread(target=self._httpd.serve_forever, daemon=True)
+        self._thread.start()
+
+    def stop(self) -> None:
+        if self._httpd is not None:
+            self._httpd.shutdown()
+            self._httpd.server_close()
+            self._httpd = None
+        if self._thread is not None:
+            self._thread.join(timeout=1.0)
+            self._thread = None
+
+
+def _runtime_clock_url(base_url: str, args: dict[str, Any]) -> str:
+    query: dict[str, str] = {}
     for key, value in args.items():
         rendered = "true" if isinstance(value, bool) and value else "false" if isinstance(value, bool) else str(value)
-        pairs.append(f"{key}:{rendered}")
-    query = {"id": story_id}
-    if pairs:
-        query["args"] = ";".join(pairs)
-    return f"{base_iframe}?{urlencode(query)}"
+        query[key] = rendered
+    return f"{base_url}?{urlencode(query)}"
 
 
-def _render_story_frame(
+def _render_runtime_frame(
     url: str,
     *,
     t: float = 0.0,
-    browser_mode: str = "per_frame",
 ) -> Buffer:
     source = WebFrameSource(
         url=url,
         timestamps=[t],
         duration_per_frame_ms=100,
-        browser_mode=browser_mode,
+        browser_mode="per_frame",
         timestamp_param="t",
         viewport_size=64,
         device_scale_factor=3,
@@ -122,14 +167,10 @@ class ReactClockScene:
     def __init__(
         self,
         *,
-        storybook_iframe: str,
-        story_id: str,
-        browser_mode: str,
+        runtime_base_url: str,
         show_second_hand: bool,
     ) -> None:
-        self._storybook_iframe = storybook_iframe
-        self._story_id = story_id
-        self._browser_mode = browser_mode
+        self._runtime_base_url = runtime_base_url
         self._show_second_hand = show_second_hand
         self._cache: _CachedFrame | None = None
         self._refresh_task: asyncio.Task | None = None
@@ -138,9 +179,8 @@ class ReactClockScene:
     def _render_clock_sync(self, epoch_s: float) -> Buffer:
         local = time.localtime(epoch_s)
         key = f"{local.tm_hour}:{local.tm_min}:{local.tm_sec}:{int(epoch_s)}"
-        url = _storybook_url(
-            self._storybook_iframe,
-            self._story_id,
+        url = _runtime_clock_url(
+            self._runtime_base_url,
             {
                 "hour": local.tm_hour % 12,
                 "minute": local.tm_min,
@@ -148,10 +188,9 @@ class ReactClockScene:
                 "showSecondHand": self._show_second_hand,
             },
         )
-        buf = _render_story_frame(
+        buf = _render_runtime_frame(
             url,
             t=(local.tm_sec % 60) / 60.0,
-            browser_mode=self._browser_mode,
         )
         self._cache = _CachedFrame(key=key, buffer=buf)
         return buf
@@ -246,6 +285,7 @@ class ParentSnapshot:
     parent_id: str
     description: str
     title: str = ""
+    issue_type_upper: str = "ISSUE"
 
 
 @dataclass(frozen=True)
@@ -338,7 +378,7 @@ def _issue_type_card_colors(
     base_fg = _safe_parse_color(f"dark.{band}{_BASE_STEP}", fallback=(145, 145, 145))
     attention_fg = _safe_parse_color(f"dark.{band}{_ATTENTION_STEP}", fallback=(180, 180, 180))
     dim_fg = _safe_parse_color(f"dark.{band}{_DIM_STEP}", fallback=(120, 120, 120))
-    bg = _safe_parse_color(f"dark.{band}2", fallback=(8, 8, 8))
+    bg = _safe_parse_color(f"dark.{band}1", fallback=(8, 8, 8))
     header_bg = _safe_parse_color(f"dark.{band}4", fallback=(18, 18, 18))
     border = _safe_parse_color(f"dark.{band}5", fallback=(30, 30, 30))
     return base_fg, attention_fg, dim_fg, bg, header_bg, border
@@ -505,10 +545,18 @@ def _run_kbs_show_json(
     if not issue_id:
         return None
     
-    def _attempt(cwd_value: Optional[Path], label: str) -> Optional[dict[str, Any]]:
+    def _attempt(
+        cwd_value: Optional[Path],
+        label: str,
+        *,
+        timeout_s: float,
+        extra_args: Optional[list[str]] = None,
+    ) -> Optional[dict[str, Any]]:
         cwd = str(cwd_value) if cwd_value else None
         _debug_kbs(f"kbs: show {issue_id} --json ({label}, cwd={cwd or 'default'})")
         command = ["kbs", "show", issue_id, "--json"]
+        if extra_args:
+            command.extend(extra_args)
         try:
             proc = subprocess.run(
                 command,
@@ -516,7 +564,7 @@ def _run_kbs_show_json(
                 capture_output=True,
                 text=True,
                 check=False,
-                timeout=10.0,
+                timeout=timeout_s,
             )
         except subprocess.TimeoutExpired as exc:
             _debug_kbs(f"kbs: timeout after {exc.timeout}s for issue {issue_id} ({label})")
@@ -543,19 +591,28 @@ def _run_kbs_show_json(
             return None
         return parsed if isinstance(parsed, dict) else None
 
-    # Preferred behavior: query from a single workspace root.
-    workspace_result = _attempt(kbs_root, "workspace-root")
-    if workspace_result is not None:
-        return workspace_result
-
-    # Fallback: scope to the event's project root when workspace lookup is slow/failing.
+    # Preferred behavior: scope to the event's project root when available.
     if project_root is not None:
-        project_result = _attempt(project_root, "project-root-fallback")
-        if project_result is not None:
-            return project_result
+        project_arg_result = _attempt(
+            project_root,
+            "project-root-arg",
+            timeout_s=3.0,
+            extra_args=["--project-root", str(project_root)],
+        )
+        if project_arg_result is not None:
+            return project_arg_result
+
+    # Workspace root lookup (skip if it times out).
+    global _WORKSPACE_KBS_DISABLED
+    if (not _WORKSPACE_KBS_DISABLED) and kbs_root is not None:
+        workspace_result = _attempt(kbs_root, "workspace-root", timeout_s=2.0)
+        if workspace_result is not None:
+            return workspace_result
+        _WORKSPACE_KBS_DISABLED = True
+        _debug_kbs("kbs: workspace-root lookup disabled after timeout")
 
     # Final fallback with process default cwd.
-    default_result = _attempt(None, "default-cwd-fallback")
+    default_result = _attempt(None, "default-cwd-fallback", timeout_s=10.0)
     if default_result is not None:
         return default_result
 
@@ -793,10 +850,12 @@ def _fetch_parent_snapshot(
     if issue is None:
         return None
     title = _normalize_space(str(issue.get("title") or issue.get("name") or ""))
+    issue_type = _normalize_space(str(issue.get("type") or issue.get("issue_type") or "ISSUE")).upper()
     return ParentSnapshot(
         parent_id=str(issue.get("id") or parent_id),
         description=_normalize_space(str(issue.get("description") or title or "")),
         title=title,
+        issue_type_upper=issue_type or "ISSUE",
     )
 
 
@@ -1068,6 +1127,7 @@ def _build_comment_like_scene(
     bottom_bg: tuple[int, int, int],
     header_bg: tuple[int, int, int],
     header_text_color: tuple[int, int, int],
+    header_id_color: tuple[int, int, int] | None = None,
     header_issue_type_color: tuple[int, int, int] | None = None,
     header_status_color: tuple[int, int, int] | None = None,
     name: str,
@@ -1081,7 +1141,7 @@ def _build_comment_like_scene(
         if header_spans:
             header_spans.append(TextSpan(text="", advance_px=3))
         if index == 0:
-            color = header_text_color
+            color = header_id_color or header_text_color
         elif index == 1:
             color = header_issue_type_color or header_text_color
         else:
@@ -1131,7 +1191,7 @@ def _build_comment_like_scene(
                 content=line,
             )
         )
-    return InfoScene(layout=InfoLayout(rows=rows, background_color=issue_bg), name=name)
+    return InfoScene(layout=InfoLayout(rows=rows, background_color=bottom_bg), name=name)
 
 
 def _message_scene(
@@ -1467,6 +1527,9 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
 
     if etype == "issue_created":
         base_fg, attention_fg, _dim_fg, event_bg, header_bg, _ = _issue_type_card_colors(snapshot.issue_type_upper)
+        band = _issue_type_band(snapshot.issue_type_upper)
+        id_color = _safe_parse_color(f"dark.{band}{min(_BASE_STEP + 1, 12)}", fallback=base_fg)
+        issue_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}2", fallback=event_bg)
         parent_snapshot = (
             _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
             if snapshot.parent_id
@@ -1484,22 +1547,30 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             f"render created: parent_title={parent_title!r} issue_title={issue_title!r} "
             f"bottom_first={bottom_lines[0]!r}"
         )
+        parent_text_color = base_fg
+        parent_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}3", fallback=event_bg)
+        if parent_snapshot is not None:
+            parent_band = _issue_type_band(parent_snapshot.issue_type_upper)
+            parent_base_fg, _, _, _, _, _ = _issue_type_card_colors(parent_snapshot.issue_type_upper)
+            parent_text_color = parent_base_fg
+            parent_bg = _safe_parse_color(f"dark.{parent_band}3", fallback=event_bg)
         scene = _build_comment_like_scene(
             issue_type_upper=snapshot.issue_type_upper,
             header_parts=header_parts,
             parent_lines=parent_lines,
             issue_lines=issue_lines,
             bottom_lines=bottom_lines,
-            parent_text_color=base_fg,
+            parent_text_color=parent_text_color,
             issue_text_color=base_fg,
             bottom_text_color=attention_fg,
-            parent_bg=event_bg,
-            issue_bg=event_bg,
+            parent_bg=parent_bg,
+            issue_bg=issue_bg,
             bottom_bg=event_bg,
             header_bg=header_bg,
             header_text_color=base_fg,
-            header_issue_type_color=attention_fg,
-            header_status_color=attention_fg,
+            header_id_color=id_color,
+            header_issue_type_color=base_fg,
+            header_status_color=base_fg,
             name="created-scene",
         )
         return AutoNotice(
@@ -1510,6 +1581,9 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
 
     if etype == "state_transition":
         base_fg, attention_fg, _dim_fg, event_bg, header_bg, _ = _issue_type_card_colors(snapshot.issue_type_upper)
+        band = _issue_type_band(snapshot.issue_type_upper)
+        id_color = _safe_parse_color(f"dark.{band}{min(_BASE_STEP + 1, 12)}", fallback=base_fg)
+        issue_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}2", fallback=event_bg)
         parent_snapshot = (
             _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
             if snapshot.parent_id
@@ -1527,21 +1601,29 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             f"render transition: parent_title={parent_title!r} issue_title={issue_title!r} "
             f"bottom_first={bottom_lines[0]!r}"
         )
+        parent_text_color = base_fg
+        parent_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}3", fallback=event_bg)
+        if parent_snapshot is not None:
+            parent_band = _issue_type_band(parent_snapshot.issue_type_upper)
+            parent_base_fg, _, _, _, _, _ = _issue_type_card_colors(parent_snapshot.issue_type_upper)
+            parent_text_color = parent_base_fg
+            parent_bg = _safe_parse_color(f"dark.{parent_band}3", fallback=event_bg)
         scene = _build_comment_like_scene(
             issue_type_upper=snapshot.issue_type_upper,
             header_parts=header_parts,
             parent_lines=parent_lines,
             issue_lines=issue_lines,
             bottom_lines=bottom_lines,
-            parent_text_color=base_fg,
+            parent_text_color=parent_text_color,
             issue_text_color=base_fg,
             bottom_text_color=attention_fg,
-            parent_bg=event_bg,
-            issue_bg=event_bg,
+            parent_bg=parent_bg,
+            issue_bg=issue_bg,
             bottom_bg=event_bg,
             header_bg=header_bg,
             header_text_color=base_fg,
-            header_issue_type_color=attention_fg,
+            header_id_color=id_color,
+            header_issue_type_color=base_fg,
             header_status_color=attention_fg,
             name="transition-scene",
         )
@@ -1553,6 +1635,9 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
 
     if etype == "comment_added":
         base_fg, attention_fg, _dim_fg, event_bg, header_bg, _ = _issue_type_card_colors(snapshot.issue_type_upper)
+        band = _issue_type_band(snapshot.issue_type_upper)
+        id_color = _safe_parse_color(f"dark.{band}{min(_BASE_STEP + 1, 12)}", fallback=base_fg)
+        issue_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}2", fallback=event_bg)
         comment_text = _extract_comment_text(payload)
         if (not comment_text) or (len(comment_text) < 8) or (" " not in comment_text):
             comment_text = snapshot.latest_comment_text
@@ -1575,20 +1660,28 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             f"comment_first={comment_lines[0]!r}"
         )
         comment_fg = _safe_parse_color(f"dark.sky{_ATTENTION_STEP}", fallback=(180, 210, 230))
+        parent_text_color = base_fg
+        parent_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}3", fallback=event_bg)
+        if parent_snapshot is not None:
+            parent_band = _issue_type_band(parent_snapshot.issue_type_upper)
+            parent_base_fg, _, _, _, _, _ = _issue_type_card_colors(parent_snapshot.issue_type_upper)
+            parent_text_color = parent_base_fg
+            parent_bg = _safe_parse_color(f"dark.{parent_band}3", fallback=event_bg)
         scene = _build_comment_like_scene(
             issue_type_upper=snapshot.issue_type_upper,
             header_parts=header_parts,
             parent_lines=parent_lines,
             issue_lines=issue_lines,
             bottom_lines=comment_lines,
-            parent_text_color=base_fg,
+            parent_text_color=parent_text_color,
             issue_text_color=base_fg,
             bottom_text_color=comment_fg,
-            parent_bg=event_bg,
-            issue_bg=event_bg,
+            parent_bg=parent_bg,
+            issue_bg=issue_bg,
             bottom_bg=event_bg,
             header_bg=header_bg,
             header_text_color=base_fg,
+            header_id_color=id_color,
             name="comment-scene",
         )
         return AutoNotice(
@@ -1688,6 +1781,7 @@ def _watch_poll_step(
             latest_text = latest or "none"
             logs.append(f"watcher: + {folder} ({count} files, latest={latest_text})")
 
+    total_events = 0
     for folder in sorted(tracked.keys()):
         events = scan_folder_for_new_events(
             folder,
@@ -1695,7 +1789,10 @@ def _watch_poll_step(
             failures,
             max_failures=max_failures,
         )
+        if _DEBUG_KBS and events:
+            logs.append(f"watcher: {len(events)} new event(s) in {folder}")
         for event in events:
+            total_events += 1
             try:
                 notice = summarize_event(event, kbs_root)
             except KbsShowAmbiguous:
@@ -1709,6 +1806,9 @@ def _watch_poll_step(
             notices.append(notice)
             logs.append(f"watcher: event {event.event_type} {event.issue_id}")
 
+    if _DEBUG_KBS and total_events == 0:
+        logs.append("watcher: scan complete (no new events)")
+
     return logs, notices
 
 
@@ -1717,17 +1817,15 @@ def _watch_poll_step(
 # --------------------------
 
 
-def _enqueue_auto_notice(queue: asyncio.Queue[AutoNotice], notice: AutoNotice) -> None:
-    if queue.full():
-        try:
-            queue.get_nowait()
-            print("watcher: dropped oldest auto notice (queue full)")
-        except asyncio.QueueEmpty:
-            pass
-    try:
-        queue.put_nowait(notice)
-    except asyncio.QueueFull:
-        print("watcher: auto notice queue still full, dropping new event")
+async def _enqueue_auto_notice(
+    queue: asyncio.Queue[AutoNotice],
+    notice: AutoNotice,
+    *,
+    high_watermark: int = 48,
+) -> None:
+    await queue.put(notice)
+    if queue.qsize() >= high_watermark:
+        print(f"watcher: auto notice backlog at {queue.qsize()} items")
 
 
 async def _wait_for_queue_capacity(
@@ -1831,25 +1929,37 @@ async def _watch_events_loop(
 ) -> None:
     failures: dict[Path, int] = {}
     next_rescan = time.monotonic() + max(0.5, rescan_seconds)
+    last_heartbeat = 0.0
 
     while not stop_event.is_set():
         now = time.monotonic()
         do_rescan = now >= next_rescan
-        logs, discovered = await asyncio.to_thread(
-            _watch_poll_step,
-            root=root,
-            tracked=tracked,
-            failures=failures,
-            do_rescan=do_rescan,
-            max_failures=max_failures,
-            kbs_root=kbs_root,
-        )
+        try:
+            logs, discovered = await asyncio.to_thread(
+                _watch_poll_step,
+                root=root,
+                tracked=tracked,
+                failures=failures,
+                do_rescan=do_rescan,
+                max_failures=max_failures,
+                kbs_root=kbs_root,
+            )
+        except Exception as exc:
+            print(f"watcher: poll error: {exc}")
+            await asyncio.sleep(max(0.1, poll_seconds))
+            continue
         for line in logs:
             print(line)
         for notice in discovered:
-            _enqueue_auto_notice(notices, notice)
+            await _enqueue_auto_notice(notices, notice)
         if do_rescan:
             next_rescan = now + max(0.5, rescan_seconds)
+        if _DEBUG_KBS and (now - last_heartbeat) >= 5.0:
+            print(
+                "watcher: heartbeat "
+                f"tracked={len(tracked)} backlog={notices.qsize()} failures={len(failures)}"
+            )
+            last_heartbeat = now
 
         await asyncio.sleep(max(0.1, poll_seconds))
 
@@ -2080,13 +2190,6 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--auto-info-seconds", type=float, default=30.0)
     parser.add_argument("--history-file", default=str(DEFAULT_HISTORY_FILE))
     parser.add_argument("--react-clock", action=argparse.BooleanOptionalAction, default=True)
-    parser.add_argument("--storybook-iframe", default=DEFAULT_STORYBOOK)
-    parser.add_argument("--clock-story-id", default="pixoo-clock--pixooclock-default")
-    parser.add_argument(
-        "--clock-browser-mode",
-        choices=["persistent", "per_frame"],
-        default="per_frame",
-    )
     parser.add_argument(
         "--react-second-hand",
         action=argparse.BooleanOptionalAction,
@@ -2108,9 +2211,6 @@ async def run(
     auto_info_seconds: float,
     history_file: Path,
     react_clock: bool,
-    storybook_iframe: str,
-    clock_story_id: str,
-    clock_browser_mode: str,
     react_second_hand: bool,
     debug: bool,
     no_repl: bool,
@@ -2121,6 +2221,7 @@ async def run(
     discovered = discover_event_dirs(root)
     tracked = _startup_report(root, discovered)
 
+    print(f"pixoo: connecting to {ip}")
     pixoo = Pixoo(ip)
     if not pixoo.connect():
         raise SystemExit(f"Failed to connect to Pixoo at {ip}")
@@ -2128,18 +2229,18 @@ async def run(
         sink = PixooFrameSink(pixoo, reconnect=True)
         raster = AsyncRasterClient(sink)
         player = ScenePlayer(raster, fps=max(1, fps))
+        player._debug = bool(debug)  # type: ignore[attr-defined]
 
+        runtime_server: _RuntimeStaticServer | None = None
         if react_clock:
+            runtime_server = _RuntimeStaticServer(DEFAULT_RUNTIME_ASSETS)
+            runtime_server.start()
             clock_scene = ReactClockScene(
-                storybook_iframe=storybook_iframe,
-                story_id=clock_story_id,
-                browser_mode=clock_browser_mode,
+                runtime_base_url=runtime_server.base_url,
                 show_second_hand=react_second_hand,
             )
             await clock_scene.start()
-            print(
-                f"clock-source: react story={clock_story_id} iframe={storybook_iframe}"
-            )
+            print(f"clock-source: react runtime {runtime_server.base_url}")
         else:
             style = clock._style_from_args(clock.build_parser(ip_default=ip).parse_args([]))
             clock_scene = ClockScene(render_frame=lambda ts: clock.render_clock_frame(ts, style), name="clock")
@@ -2194,6 +2295,8 @@ async def run(
             await asyncio.gather(watcher, consumer, return_exceptions=True)
             if react_clock and hasattr(clock_scene, "stop"):
                 await clock_scene.stop()
+            if runtime_server is not None:
+                runtime_server.stop()
             await player.stop()
             await runner
     finally:
@@ -2214,9 +2317,6 @@ def main() -> None:
                 auto_info_seconds=max(0.1, args.auto_info_seconds),
                 history_file=Path(args.history_file).expanduser(),
                 react_clock=bool(args.react_clock),
-                storybook_iframe=args.storybook_iframe,
-                clock_story_id=args.clock_story_id,
-                clock_browser_mode=args.clock_browser_mode,
                 react_second_hand=bool(args.react_second_hand),
                 debug=bool(args.debug),
                 no_repl=bool(args.no_repl),

@@ -11,3 +11,4 @@ docs/_build/
 docs/api/showdoc/
 .env
 .run/
+storybook-app/dist-pixoo-runtime/

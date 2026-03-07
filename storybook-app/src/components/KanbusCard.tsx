@@ -42,11 +42,12 @@ function paletteForBand(band: RadixBand): CardPalette {
     base: radixDark(band, 7),
     attention: radixDark(band, 11),
     dim: radixDark(band, 6),
-    bg: radixDark(band, 2),
+    bg: radixDark(band, 1),
     headerBg: radixDark(band, 4),
     border: radixDark(band, 5),
   };
 }
+
 
 const HEADER_HEIGHT = 6;
 const BODY_TOP = HEADER_HEIGHT;
@@ -177,10 +178,10 @@ export function KanbusCard(props: KanbusCardProps) {
   const palette = paletteForBand(band);
   const { top, bottom, divider } = kindRows(props);
   const headerParts = [props.idPrefix.toUpperCase(), props.issueType.toUpperCase(), props.status.toUpperCase()];
-  const isAttentionHeader = props.kind === "transition" || props.kind === "created";
   const headerBase = palette.base;
-  const issueTypeHeader = isAttentionHeader ? palette.attention : palette.base;
-  const statusColor = isAttentionHeader ? palette.attention : palette.base;
+  const issueTypeHeader = palette.base;
+  const statusColor = props.kind === "transition" ? palette.attention : palette.base;
+  const idColor = radixDark(band, 8);
   const hasParent = (props.parentLines?.length ?? 0) > 0;
   const parentBand =
     props.parentType === "initiative"
@@ -193,8 +194,8 @@ export function KanbusCard(props: KanbusCardProps) {
       ? radixDark(parentBand, 7)
       : palette.base;
   const bodyBg = palette.bg;
-  const parentRowBg = bodyBg;
-  const issueRowBg = bodyBg;
+  const parentRowBg = radixDark(parentBand, 3);
+  const issueRowBg = radixDark(band, 2);
   const issueTextColor = palette.base;
 
   const rows: React.ReactNode[] = [];
@@ -315,7 +316,7 @@ export function KanbusCard(props: KanbusCardProps) {
           issueType={headerParts[1]}
           status={headerParts[2]}
           color={headerBase}
-          idColor={headerBase}
+          idColor={idColor}
           issueTypeColor={issueTypeHeader}
           statusColor={statusColor}
         />

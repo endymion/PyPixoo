@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-288f602c-e676-4701-af4e-a8b1a7d36916",
+  "title": "Clock demo: bug no-parent",
+  "description": "Demo bug with no parent for Pixoo clock notifications.",
+  "type": "bug",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "717eb341-6c3d-4a06-bb18-33176b6028be",
+      "author": "ryan.porter",
+      "text": "Clock demo: bug no-parent open",
+      "created_at": "2026-03-06T15:12:11.696506Z"
+    },
+    {
+      "id": "d88abd2e-833b-4785-b94e-b407497ac9c8",
+      "author": "ryan.porter",
+      "text": "Clock demo: bug no-parent in progress",
+      "created_at": "2026-03-06T15:12:15.100339Z"
+    }
+  ],
+  "created_at": "2026-03-06T15:11:14.604800Z",
+  "updated_at": "2026-03-06T15:12:15.100339Z",
+  "closed_at": null,
+  "custom": {}
+}

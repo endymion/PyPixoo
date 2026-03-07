@@ -1,0 +1,79 @@
+{
+  "id": "PIXO-b891295c-d90a-4d6d-9e96-630e734f9b76",
+  "title": "Kanbus clock does not display notifications despite detected events",
+  "description": "Observed:\n- kanbus_clock logs show event detection and notice dequeue\n- device remains on clock, no info cards appear\n\nExpected:\n- each detected event enqueues a notice and triggers a transition to info cards\n\nImpact:\n- missed notifications\n\nPlan:\n- instrument ScenePlayer transitions\n- verify queue consumption\n- fix rendering/transition path",
+  "type": "bug",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-1cf8b0d6-bc4e-494f-b846-31e461cbaf20",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "d6845d59-8847-41ee-a975-b8dd19f6c874",
+      "author": "ryan.porter",
+      "text": "Started investigation. Plan:\n- add debug instrumentation in ScenePlayer transition start/end\n- verify notice queue consumption and transition enqueue\n- identify why info scenes not rendering despite detected events\n- fix and retest with live device",
+      "created_at": "2026-03-06T19:10:21.493259Z"
+    },
+    {
+      "id": "be4a8d48-ef3e-4386-8794-63d4117284eb",
+      "author": "ryan.porter",
+      "text": "Added ScenePlayer debug logging hooks (set_scene/enqueue/transition start/end) gated by --debug via player._debug to trace why notices are not rendering. Next: rerun kanbus_clock with --debug and verify transitions fire when events detected.",
+      "created_at": "2026-03-06T19:11:26.081510Z"
+    },
+    {
+      "id": "ec6f44ce-47a8-46e3-8c34-0fd3dfa4a26d",
+      "author": "ryan.porter",
+      "text": "Added watcher heartbeat + poll exception logging + scan summary logs when --debug is enabled. Next: restart kanbus_clock and verify watcher sees new events; confirm transitions fire with ScenePlayer debug.",
+      "created_at": "2026-03-06T19:14:52.531935Z"
+    },
+    {
+      "id": "f3f86a72-2dd7-4c5d-8e26-ef9dd379d6c4",
+      "author": "ryan.porter",
+      "text": "notify test",
+      "created_at": "2026-03-06T19:15:08.964901Z"
+    },
+    {
+      "id": "60cf75ef-321c-43ad-82be-3ef0152a1842",
+      "author": "ryan.porter",
+      "text": "notify test 2",
+      "created_at": "2026-03-06T19:15:48.714281Z"
+    },
+    {
+      "id": "dd0af90f-cf35-4c38-bbb4-68c73a9a99b0",
+      "author": "ryan.porter",
+      "text": "notify test 3",
+      "created_at": "2026-03-06T19:16:22.694440Z"
+    },
+    {
+      "id": "285504d1-a8ac-4548-95ab-90e3a18f91cd",
+      "author": "ryan.porter",
+      "text": "Debug run results:\n- watcher sees new events in /Users/ryan.porter/Projects/PyPixoo/project/events\n- consumer enqueues transitions; ScenePlayer logs show transition start/end to comment-scene with 30s hold\n- still need visual confirmation on device; next step is to verify device IP and observe the comment card during the 30s hold",
+      "created_at": "2026-03-06T19:17:19.044353Z"
+    },
+    {
+      "id": "0264fc50-6c9c-4e43-874a-a5880ea35256",
+      "author": "ryan.porter",
+      "text": "Added startup log to print Pixoo IP so we can confirm the device being driven when notifications appear.",
+      "created_at": "2026-03-06T19:17:36.859017Z"
+    },
+    {
+      "id": "ec6742a7-e068-41cc-a52b-206e0ca3db84",
+      "author": "ryan.porter",
+      "text": "notify test 4",
+      "created_at": "2026-03-06T19:18:25.234157Z"
+    },
+    {
+      "id": "72a94b3f-48e1-4e9a-90e7-20aec780ca12",
+      "author": "ryan.porter",
+      "text": "notify test live",
+      "created_at": "2026-03-06T20:01:16.117085Z"
+    }
+  ],
+  "created_at": "2026-03-06T19:09:57.201493Z",
+  "updated_at": "2026-03-06T20:01:16.117085Z",
+  "closed_at": null,
+  "custom": {}
+}

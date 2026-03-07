@@ -1,0 +1,49 @@
+{
+  "id": "PIXO-ecc675c0-f476-4b27-ba38-6bad0adcbbde",
+  "title": "Kanbus clock drops notifications under burst",
+  "description": "Observed:\n- When many events arrive quickly, only a subset appear on the clock.\n\nExpected:\n- All events are shown, even if delayed.\n\nPlanned fix:\n- Remove drop-on-full behavior; backpressure on the auto-notice queue.",
+  "type": "bug",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-1cf8b0d6-bc4e-494f-b846-31e461cbaf20",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "f2f53e6e-d549-4c90-99c1-2319b7fd03e9",
+      "author": "ryan.porter",
+      "text": "Starting fix: replace auto-notice drop-on-full with backpressure; add high-water log and async queue test.",
+      "created_at": "2026-03-06T15:21:57.241357Z"
+    },
+    {
+      "id": "7452c4df-08ca-4bcd-ae90-c20cbbf8d50f",
+      "author": "ryan.porter",
+      "text": "Implemented backpressure: auto-notice enqueue now awaits queue.put; removed drop-on-full; added backlog log when qsize>=48. Added async test ensuring put blocks when queue full. Tests: uv run pytest tests/test_kanbus_clock.py -q (38 passed). Ready for visual verification.",
+      "created_at": "2026-03-06T15:22:23.400506Z"
+    },
+    {
+      "id": "ec7b633e-fd21-474b-8a76-90f35c17aec2",
+      "author": "ryan.porter",
+      "text": "Added workspace-root timeout guard: kbs show from workspace uses 2s timeout, disables workspace lookup after first timeout; falls back to project-root to avoid 10s stalls that made notifications appear dropped. Tests: py_compile + queue test.",
+      "created_at": "2026-03-06T15:31:58.963625Z"
+    },
+    {
+      "id": "996cefe8-b28e-4019-9fb0-3f4253e2635b",
+      "author": "ryan.porter",
+      "text": "Updated kbs show lookup: use --project-root when event repo root is known to avoid workspace-root 10s timeouts; workspace lookup now secondary. Added test for --project-root arg. Tests: uv run pytest tests/test_kanbus_clock.py -q (40 passed).",
+      "created_at": "2026-03-06T15:34:24.230486Z"
+    },
+    {
+      "id": "0b46f1cb-a739-4d2d-85f0-bbf17762f664",
+      "author": "ryan.porter",
+      "text": "Fix: project-root lookup now runs with cwd=project_root (not workspace root) while passing --project-root, eliminating 3s timeouts that stalled event handling. Tests: py_compile + kbs show arg test.",
+      "created_at": "2026-03-06T15:38:19.009012Z"
+    }
+  ],
+  "created_at": "2026-03-06T15:21:50.329358Z",
+  "updated_at": "2026-03-06T15:38:19.009012Z",
+  "closed_at": null,
+  "custom": {}
+}

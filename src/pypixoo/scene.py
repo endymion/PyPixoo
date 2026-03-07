@@ -119,6 +119,7 @@ class ScenePlayer:
         self._stop_event = asyncio.Event()
         self._frame_index = 0
         self._last_mono_s = 0.0
+        self._debug = False
 
     async def set_scene(self, scene: Scene) -> None:
         """Set active scene immediately."""
@@ -128,12 +129,22 @@ class ScenePlayer:
         self._active_transition = None
         self._hold_until_mono_s = 0.0
         _safe_scene_hook(scene, "on_enter")
+        if self._debug:
+            name = getattr(scene, "name", scene.__class__.__name__)
+            print(f"scene: set_scene -> {name}")
 
     async def enqueue(self, item: QueueItem) -> None:
         """Queue scene transition in FIFO order."""
         if len(self._queue) >= self._max_queue:
             raise ValueError("scene transition queue is full")
         self._queue.append(item)
+        if self._debug:
+            scene_name = getattr(item.scene, "name", item.scene.__class__.__name__)
+            print(
+                "scene: enqueue "
+                f"{scene_name} transition={item.transition.kind} hold_ms={item.hold_ms} "
+                f"queue_depth={len(self._queue)}"
+            )
 
     async def clear_queue(self) -> None:
         """Drop pending transition requests."""
@@ -184,6 +195,14 @@ class ScenePlayer:
             item=item,
             started_mono_s=now_mono_s,
         )
+        if self._debug:
+            from_name = getattr(self._current_scene, "name", self._current_scene.__class__.__name__)
+            to_name = getattr(item.scene, "name", item.scene.__class__.__name__)
+            print(
+                "scene: transition start "
+                f"{from_name} -> {to_name} "
+                f"kind={item.transition.kind} duration_ms={item.transition.duration_ms}"
+            )
 
     def _render_transition_frame(
         self,
@@ -267,6 +286,12 @@ class ScenePlayer:
             self._active_transition = None
             hold_ms = max(0, active.item.hold_ms)
             self._hold_until_mono_s = now_mono_s + (hold_ms / 1000.0)
+            if self._debug:
+                to_name = getattr(active.item.scene, "name", active.item.scene.__class__.__name__)
+                print(
+                    "scene: transition end "
+                    f"to={to_name} hold_ms={hold_ms}"
+                )
 
         return output
 

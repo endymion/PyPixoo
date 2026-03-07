@@ -7,6 +7,10 @@ import json
 from pathlib import Path
 import sys
 from types import SimpleNamespace
+import asyncio
+import urllib.request
+
+import pytest
 
 
 def _load_demo_module():
@@ -389,15 +393,17 @@ def test_issue_type_palette_applies_to_cards_including_comments():
 
     def _assert_band(scene, band: str, *, comment: bool = False):
         header = scene.layout.rows[0]
-        expected_bg = module.parse_color(f"dark.{band}2")
-        expected_header_bg = module._lighten_color(expected_bg, steps=4)
-        expected_header = module.parse_color(f"dark.{band}8")
-        expected_main = module.parse_color(f"dark.{band}9")
-        expected_comment = module.parse_color("dark.sand11")
+        expected_body_bg = module.parse_color(f"dark.{band}1")
+        expected_issue_bg = module.parse_color(f"dark.{band}2")
+        expected_header_bg = module.parse_color(f"dark.{band}4")
+        expected_header = module.parse_color(f"dark.{band}{module._BASE_STEP}")
+        expected_main = module.parse_color(f"dark.{band}{module._ATTENTION_STEP}")
+        expected_comment = module.parse_color(f"dark.sky{module._ATTENTION_STEP}")
         assert header.background_color == expected_header_bg
         assert header.style.color == expected_header
-        # Body rows should use the same band background.
-        assert all(getattr(row, "background_color", expected_bg) == expected_bg for row in scene.layout.rows[1:])
+        # Body rows use issue bg (step 2) for issue lines and body bg (step 1) for bottom lines.
+        assert any(getattr(row, "background_color", expected_body_bg) == expected_body_bg for row in scene.layout.rows[1:])
+        assert any(getattr(row, "background_color", expected_issue_bg) == expected_issue_bg for row in scene.layout.rows[1:])
         # Main body content should use the brightest intensity for the band.
         text_rows = [row for row in scene.layout.rows[1:] if hasattr(row, "style") and getattr(row, "content", "") != ""]
         if comment:
@@ -466,6 +472,54 @@ def test_issue_type_palette_applies_to_cards_including_comments():
     _assert_band(bug_comment_notice.scene, "red", comment=True)
 
 
+def test_parent_row_uses_parent_issue_type_palette():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        issue_id = args[0][2]
+        fixtures = {
+            "kanbus-child-1": {
+                "id": "kanbus-child-1",
+                "type": "story",
+                "status": "open",
+                "title": "Child title",
+                "description": "Child description",
+                "parent": "kanbus-parent-1",
+                "comments": [],
+            },
+            "kanbus-parent-1": {
+                "id": "kanbus-parent-1",
+                "type": "epic",
+                "status": "open",
+                "title": "Parent title",
+                "description": "Parent description",
+                "comments": [],
+            },
+        }
+        payload = fixtures.get(issue_id, {"id": issue_id, "type": "issue", "status": "open", "description": ""})
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+
+    notice = module.summarize_event(
+        module.KanbusEvent(
+            path=Path("parent.json"),
+            schema_version=1,
+            event_id="e-parent",
+            issue_id="kanbus-child-1",
+            event_type="comment_added",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+            actor_id="tester",
+            payload={"comment": "Parent palette test"},
+        )
+    )
+    assert notice.scene is not None
+    rows = notice.scene.layout.rows
+    parent_row = rows[1]
+    parent_bg = parent_row.background_color
+    assert parent_bg == module.parse_color("dark.indigo3")
+
+
 def test_comment_and_transition_use_titles_in_top_rows():
     module = _load_demo_module()
 
@@ -522,6 +576,47 @@ def test_comment_and_transition_use_titles_in_top_rows():
     transition_bottom = "\n".join(str(r.content) for r in transition_rows[3:])
     assert "Title One" in transition_top
     assert "Description One" in transition_bottom
+
+
+def test_transition_header_status_uses_attention_color():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        issue_id = args[0][2]
+        payload = {
+            "id": issue_id,
+            "type": "story",
+            "status": "in_progress",
+            "title": "Story title",
+            "description": "Story description",
+        }
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+
+    notice = module.summarize_event(
+        module.KanbusEvent(
+            path=Path("t.json"),
+            schema_version=1,
+            event_id="et",
+            issue_id="kanbus-story-1",
+            event_type="state_transition",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+            actor_id="tester",
+            payload={},
+        )
+    )
+    assert notice.scene is not None
+    header_row = notice.scene.layout.rows[0]
+    spans = getattr(header_row, "content", [])
+    status_spans = [
+        span
+        for span in spans
+        if getattr(span, "text", "") in {"INPROGRESS", "IN", "PROGRESS"}
+    ]
+    assert status_spans
+    expected = module.parse_color(f"dark.yellow{module._ATTENTION_STEP}")
+    assert all(getattr(span, "color", None) == expected for span in status_spans)
 
 
 def test_issue_prefix_uses_event_issue_key_when_show_returns_internal_id():
@@ -629,6 +724,79 @@ def test_summarize_event_prefers_event_issue_key_prefix_over_lookup_ids():
     )
     assert notice.scene is not None
     assert _scene_header_text(notice.scene).startswith("ABCTASK")
+
+
+def test_header_id_prefix_is_one_step_lighter_than_base():
+    module = _load_demo_module()
+
+    def _fake_issue(*args, **kwargs):
+        issue_id = args[0][2]
+        payload = {
+            "id": issue_id,
+            "type": "task",
+            "status": "open",
+            "title": "Title",
+            "description": "Desc",
+        }
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_issue  # type: ignore[assignment]
+
+    notice = module.summarize_event(
+        module.KanbusEvent(
+            path=Path("ev.json"),
+            schema_version=1,
+            event_id="e-1",
+            issue_id="ABCD-1234",
+            event_type="issue_created",
+            occurred_at=module._parse_iso8601("2026-03-04T00:00:00Z"),
+            actor_id="tester",
+            payload={},
+        )
+    )
+    assert notice.scene is not None
+    header_row = notice.scene.layout.rows[0]
+    spans = getattr(header_row, "content", [])
+    prefix_span = next(
+        (span for span in spans if getattr(span, "text", "") == "ABCD"),
+        None,
+    )
+    assert prefix_span is not None
+    expected = module.parse_color(f"dark.blue{min(module._BASE_STEP + 1, 12)}")
+    assert prefix_span.color == expected
+
+
+def test_kbs_show_uses_project_root_arg_when_available():
+    module = _load_demo_module()
+    calls: list[list[str]] = []
+
+    def _fake_run(*args, **kwargs):
+        command = args[0]
+        calls.append(command)
+        payload = {"id": "PIXO-1234", "type": "task", "status": "open", "description": "d"}
+        return SimpleNamespace(returncode=0, stdout=json.dumps(payload))
+
+    module.subprocess.run = _fake_run  # type: ignore[assignment]
+    module._run_kbs_show_json("PIXO-1234", kbs_root=Path("/tmp"), project_root=Path("/tmp/proj"))
+    assert any("--project-root" in call for call in calls)
+
+
+def test_auto_notice_queue_blocks_instead_of_dropping():
+    module = _load_demo_module()
+
+    async def _run() -> None:
+        queue: asyncio.Queue[module.AutoNotice] = asyncio.Queue(maxsize=1)
+        notice = module.AutoNotice(header="H", message="M")
+        await module._enqueue_auto_notice(queue, notice)
+
+        put_task = asyncio.create_task(module._enqueue_auto_notice(queue, notice))
+        await asyncio.sleep(0)
+        assert not put_task.done()
+        _ = await queue.get()
+        await asyncio.wait_for(put_task, timeout=1.0)
+        assert queue.qsize() == 1
+
+    asyncio.run(_run())
 
 
 def test_event_prefix_override_rejects_numeric_only_prefix():
@@ -1178,3 +1346,58 @@ def test_build_parser_defaults_auto_info_seconds_30():
     parser = module.build_parser()
     args = parser.parse_args([])
     assert args.auto_info_seconds == 30.0
+    assert args.react_clock is True
+    assert not hasattr(args, "storybook_iframe")
+    assert not hasattr(args, "clock_story_id")
+    assert not hasattr(args, "clock_browser_mode")
+
+
+def test_runtime_clock_url_uses_direct_query_params():
+    module = _load_demo_module()
+    url = module._runtime_clock_url(
+        "http://127.0.0.1:1234/index.html",
+        {"hour": 9, "minute": 30, "showSecondHand": False},
+    )
+    assert "id=" not in url
+    assert "args=" not in url
+    assert "hour=9" in url
+    assert "minute=30" in url
+    assert "showSecondHand=false" in url
+
+
+def test_runtime_static_server_requires_built_assets(tmp_path: Path):
+    module = _load_demo_module()
+    server = module._RuntimeStaticServer(tmp_path / "missing")
+    with pytest.raises(RuntimeError):
+        server.start()
+
+
+def test_runtime_static_server_serves_index(tmp_path: Path):
+    module = _load_demo_module()
+    assets = tmp_path / "runtime"
+    assets.mkdir(parents=True)
+    (assets / "index.html").write_text("<html><body>ok</body></html>", encoding="utf-8")
+    server = module._RuntimeStaticServer(assets)
+    server.start()
+    try:
+        with urllib.request.urlopen(server.base_url, timeout=2) as response:
+            body = response.read().decode("utf-8")
+            assert "ok" in body
+    finally:
+        server.stop()
+
+
+def test_runtime_static_server_accepts_runtime_html(tmp_path: Path):
+    module = _load_demo_module()
+    assets = tmp_path / "runtime"
+    assets.mkdir(parents=True)
+    (assets / "runtime.html").write_text("<html><body>runtime</body></html>", encoding="utf-8")
+    server = module._RuntimeStaticServer(assets)
+    server.start()
+    try:
+        assert server.base_url.endswith("/runtime.html")
+        with urllib.request.urlopen(server.base_url, timeout=2) as response:
+            body = response.read().decode("utf-8")
+            assert "runtime" in body
+    finally:
+        server.stop()

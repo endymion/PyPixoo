@@ -1,0 +1,73 @@
+{
+  "id": "PIXO-a95f49e9-4536-4daf-8e60-8160ac10a783",
+  "title": "Kanbus clock: parent row should use parent issue type colors",
+  "description": "Observed: parent description row is colored using the current issue type instead of the parent issue type.\n\nExpected: parent row background and text colors follow the parent issue type palette (epic=indigo, initiative=magenta, etc.), regardless of child issue type.\n\nAcceptance:\n- Parent row uses parent type colors on comment/created/transition cards.\n- Child issue rows keep child type colors.",
+  "type": "bug",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-1cf8b0d6-bc4e-494f-b846-31e461cbaf20",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "877785b9-e5b3-4e12-913c-1d53491d14c3",
+      "author": "ryan.porter",
+      "text": "Starting fix: parent row palette should follow parent issue type. Updating kanbus_clock.py parent snapshot to include type and use parent band for parent row bg/text; updating React KanbusCard parent row bg to use parent band; adding test for parent row background color.",
+      "created_at": "2026-03-06T14:25:03.562840Z"
+    },
+    {
+      "id": "7dad62a8-4b90-4462-9d09-43d4dcbd3685",
+      "author": "ryan.porter",
+      "text": "Update: parent row now uses parent issue type palette in Python kanbus_clock and React KanbusCard (parent bg/text derived from parent type). Added ParentSnapshot.issue_type_upper, adjusted parent_bg/parent_text_color in created/transition/comment. Tests: uv run python -m py_compile demos/kanbus_clock.py; uv run pytest tests/test_kanbus_clock.py -q (36 passed). Ready for visual confirmation.",
+      "created_at": "2026-03-06T14:26:14.089311Z"
+    },
+    {
+      "id": "e8860789-d7f6-475e-96ac-f4423ea6d22a",
+      "author": "ryan.porter",
+      "text": "Adjusting parent row background to be between header and body (luminance-based) while staying in parent band; will update python + React and tests.",
+      "created_at": "2026-03-06T14:43:04.610405Z"
+    },
+    {
+      "id": "d9443387-4fd4-4616-983f-24da2ddb033d",
+      "author": "ryan.porter",
+      "text": "Update: parent row bg now chosen to sit between header and body luminance while staying in parent band. Added _pick_parent_row_bg and luma helper; applied to created/transition/comment. React KanbusCard now mirrors this selection. Tests: py_compile + pytest tests/test_kanbus_clock.py (36 passed). Ready to verify on device.",
+      "created_at": "2026-03-06T14:44:22.922885Z"
+    },
+    {
+      "id": "3420113e-667f-43a4-a98f-c900f5c4ed14",
+      "author": "ryan.porter",
+      "text": "Change request: lock parent row bg to step 3, issue row bg to step 2, main body bg to step 1 (no luminance logic). Will update python + React + tests.",
+      "created_at": "2026-03-06T14:47:03.471655Z"
+    },
+    {
+      "id": "9caf80fa-70b4-4ac2-8880-0991ca0fd3ab",
+      "author": "ryan.porter",
+      "text": "Applied requested background steps only: body bg step1, issue row bg step2, parent row bg step3 (parent band). Header bg stays step4. Text colors unchanged (base=7, attention=11, dim=6). Restarting clock for visual check.",
+      "created_at": "2026-03-06T14:48:25.408718Z"
+    },
+    {
+      "id": "a05105bd-d93c-43d2-a1f5-7d3dd3d785d0",
+      "author": "ryan.porter",
+      "text": "Transition header colors: align ID/type/status to same intensity as parent row text (no brighter). Will set header_issue_type_color/status_color to base in transition/created to match parent row brightness.",
+      "created_at": "2026-03-06T14:54:24.583723Z"
+    },
+    {
+      "id": "d647db4e-3c79-49bf-8fb2-7eccccaddeb4",
+      "author": "ryan.porter",
+      "text": "Aligned header token colors across created/transition/comment: React KanbusCard now uses base color for id/type/status (no attention highlight). Python already set header_issue_type/status to base. Standard components + standard colors across screens.",
+      "created_at": "2026-03-06T14:55:10.404536Z"
+    },
+    {
+      "id": "41d3d772-7df7-46ed-8856-07ab8222f79c",
+      "author": "ryan.porter",
+      "text": "Fix: transition header status now uses attention color (base for id/type, attention for status). React KanbusCard statusColor set to attention for transition only. Added test for attention-colored status; pytest tests/test_kanbus_clock.py (37 passed). Restarting clock for visual check.",
+      "created_at": "2026-03-06T15:01:10.269972Z"
+    }
+  ],
+  "created_at": "2026-03-06T14:23:39.617947Z",
+  "updated_at": "2026-03-06T15:01:10.269972Z",
+  "closed_at": null,
+  "custom": {}
+}

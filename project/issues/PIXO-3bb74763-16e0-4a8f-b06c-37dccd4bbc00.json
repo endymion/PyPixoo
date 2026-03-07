@@ -1,0 +1,253 @@
+{
+  "id": "PIXO-3bb74763-16e0-4a8f-b06c-37dccd4bbc00",
+  "title": "Clock demo: story workflow",
+  "description": "Demo story for Pixoo clock notifications.",
+  "type": "story",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "11c70dc2-39d9-4bfd-b299-80a742fe7b29",
+      "author": "ryan.porter",
+      "text": "Clock demo: story open",
+      "created_at": "2026-03-06T15:11:30.729567Z"
+    },
+    {
+      "id": "355d8f6a-8a86-41e0-86c8-f8e29c5ebeb4",
+      "author": "ryan.porter",
+      "text": "Clock demo: story in progress",
+      "created_at": "2026-03-06T15:11:30.748427Z"
+    },
+    {
+      "id": "a97fef78-39ad-46e5-a101-101c7f2b6df0",
+      "author": "ryan.porter",
+      "text": "Clock demo: story closed",
+      "created_at": "2026-03-06T15:11:30.767409Z"
+    },
+    {
+      "id": "27c2b755-3427-42f2-9839-1f885ac2343a",
+      "author": "ryan.porter",
+      "text": "Clock demo: story w/parent open",
+      "created_at": "2026-03-06T15:11:55.408496Z"
+    },
+    {
+      "id": "c2e49db4-ff5c-45f6-8f6c-41ce79c59d76",
+      "author": "ryan.porter",
+      "text": "Clock demo: story w/parent in progress",
+      "created_at": "2026-03-06T15:11:55.442816Z"
+    },
+    {
+      "id": "308168c6-e7f4-4f5d-bac7-e45c38315fb2",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 1",
+      "created_at": "2026-03-06T15:22:44.137947Z"
+    },
+    {
+      "id": "75449db7-acd6-422e-b551-cd52a7d3dbab",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 2",
+      "created_at": "2026-03-06T15:22:44.146208Z"
+    },
+    {
+      "id": "8cc55068-2670-4010-a04e-8b20d06bfe17",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 3",
+      "created_at": "2026-03-06T15:22:44.215036Z"
+    },
+    {
+      "id": "5a034b88-42bd-400c-be1b-fc61bcfb22fb",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 4",
+      "created_at": "2026-03-06T15:22:44.325647Z"
+    },
+    {
+      "id": "287ca097-b8a7-4a12-98bd-b01bcc19e973",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 5",
+      "created_at": "2026-03-06T15:22:44.333624Z"
+    },
+    {
+      "id": "862a24bb-f3ec-475c-a0da-1a9c9920c93f",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 6",
+      "created_at": "2026-03-06T15:22:44.341311Z"
+    },
+    {
+      "id": "4d4a7b6a-c0bd-46e8-9b0f-30481a4fc5ac",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 7",
+      "created_at": "2026-03-06T15:22:44.350503Z"
+    },
+    {
+      "id": "52cefc57-dcf3-4310-8cdb-7fa54e3d29a7",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 8",
+      "created_at": "2026-03-06T15:22:44.363087Z"
+    },
+    {
+      "id": "6cb8cd55-70fb-425b-a0c3-d5f356518be1",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 9",
+      "created_at": "2026-03-06T15:22:44.390069Z"
+    },
+    {
+      "id": "1cecf692-10b9-471c-a6ed-901960de1941",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 10",
+      "created_at": "2026-03-06T15:22:44.417911Z"
+    },
+    {
+      "id": "377adfa5-6134-4adf-8064-b6eb978cedf9",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 11",
+      "created_at": "2026-03-06T15:22:44.430601Z"
+    },
+    {
+      "id": "316804b2-cfc8-4efa-bc58-c94cf1060753",
+      "author": "ryan.porter",
+      "text": "Clock demo burst 12",
+      "created_at": "2026-03-06T15:22:44.440004Z"
+    },
+    {
+      "id": "e003c4f6-5240-4d3b-bcd0-74f623ccc3ee",
+      "author": "ryan.porter",
+      "text": "Clock demo: header ID prefix brightness",
+      "created_at": "2026-03-06T15:24:41.436309Z"
+    },
+    {
+      "id": "7a29b6bd-58a2-4a7b-91cf-c0dc3de12d75",
+      "author": "ryan.porter",
+      "text": "Clock demo: after restart",
+      "created_at": "2026-03-06T15:25:06.495289Z"
+    },
+    {
+      "id": "c9158151-e48f-430d-8001-096f3f324a22",
+      "author": "ryan.porter",
+      "text": "Clock demo: in-progress",
+      "created_at": "2026-03-06T15:25:06.547940Z"
+    },
+    {
+      "id": "db9a7dc3-b2a4-48d3-8538-83b628162a1f",
+      "author": "ryan.porter",
+      "text": "Clock demo: debug notice",
+      "created_at": "2026-03-06T15:28:23.588201Z"
+    },
+    {
+      "id": "3e97c9d4-4a55-4dcf-9815-9c89eb7eb891",
+      "author": "ryan.porter",
+      "text": "Clock demo: debug event detection",
+      "created_at": "2026-03-06T15:30:04.380221Z"
+    },
+    {
+      "id": "da52ad53-d3b2-4f24-9613-c80293794bbd",
+      "author": "ryan.porter",
+      "text": "Clock demo: queue check 1",
+      "created_at": "2026-03-06T15:32:24.144505Z"
+    },
+    {
+      "id": "0972599b-bf3d-4256-b969-46a174da8aae",
+      "author": "ryan.porter",
+      "text": "Clock demo: queue check 2",
+      "created_at": "2026-03-06T15:32:24.221671Z"
+    },
+    {
+      "id": "a2fa5072-0058-4328-935f-2354b7b48857",
+      "author": "ryan.porter",
+      "text": "Clock demo: queue check 3",
+      "created_at": "2026-03-06T15:32:24.311005Z"
+    },
+    {
+      "id": "5bbfe7b6-c731-4b3f-9730-c9b0662e8d6e",
+      "author": "ryan.porter",
+      "text": "Clock demo: queue check 4",
+      "created_at": "2026-03-06T15:32:24.318422Z"
+    },
+    {
+      "id": "8f9e178e-55a4-4dfc-9916-d8434ba2ce56",
+      "author": "ryan.porter",
+      "text": "Clock demo: queue check 5",
+      "created_at": "2026-03-06T15:32:24.326167Z"
+    },
+    {
+      "id": "a66070cf-76a8-4f03-b64a-51be93f5f6a2",
+      "author": "ryan.porter",
+      "text": "Clock demo: fast queue 1",
+      "created_at": "2026-03-06T15:34:46.066598Z"
+    },
+    {
+      "id": "861726f4-6897-4b16-8d7b-4c351b3d7490",
+      "author": "ryan.porter",
+      "text": "Clock demo: fast queue 2",
+      "created_at": "2026-03-06T15:34:46.075010Z"
+    },
+    {
+      "id": "23ff0397-5f01-40b1-8467-8e6bdca6df95",
+      "author": "ryan.porter",
+      "text": "Clock demo: fast queue 3",
+      "created_at": "2026-03-06T15:34:46.090749Z"
+    },
+    {
+      "id": "27cc7dda-8917-4fc0-b00c-24f30da5c4a1",
+      "author": "ryan.porter",
+      "text": "Clock demo: fast queue 4",
+      "created_at": "2026-03-06T15:34:46.100507Z"
+    },
+    {
+      "id": "3f19a617-2a50-47d6-b9fc-e06e42355eb8",
+      "author": "ryan.porter",
+      "text": "Clock demo: fast queue 5",
+      "created_at": "2026-03-06T15:34:46.108584Z"
+    },
+    {
+      "id": "7af374f4-7339-44af-9d2a-d7e846ac07c4",
+      "author": "ryan.porter",
+      "text": "Clock demo: fast queue 6",
+      "created_at": "2026-03-06T15:34:46.115714Z"
+    },
+    {
+      "id": "604773f7-a6f4-48ff-b97b-4fd74e298f89",
+      "author": "ryan.porter",
+      "text": "Clock demo: event check after queue fix",
+      "created_at": "2026-03-06T15:37:31.297922Z"
+    },
+    {
+      "id": "1eadd95b-fe34-4a33-bbd7-4e1cf44eae81",
+      "author": "ryan.porter",
+      "text": "Clock demo: queue after root fix 1",
+      "created_at": "2026-03-06T15:38:38.982300Z"
+    },
+    {
+      "id": "e6487063-effd-4cb8-b8b1-6df52dedca9e",
+      "author": "ryan.porter",
+      "text": "Clock demo: queue after root fix 2",
+      "created_at": "2026-03-06T15:38:38.989825Z"
+    },
+    {
+      "id": "1830c723-0623-4794-ab51-e603ee329e3a",
+      "author": "ryan.porter",
+      "text": "Clock demo: queue after root fix 3",
+      "created_at": "2026-03-06T15:38:38.997216Z"
+    },
+    {
+      "id": "4b39cd68-d9f2-4839-b5b3-f0ed4ad75d8f",
+      "author": "ryan.porter",
+      "text": "Clock demo: visibility check now",
+      "created_at": "2026-03-06T15:39:55.018829Z"
+    },
+    {
+      "id": "3c619351-1b51-4f1c-addc-26a21e5bce96",
+      "author": "ryan.porter",
+      "text": "Clock demo: visibility check after restart",
+      "created_at": "2026-03-06T16:54:49.882741Z"
+    }
+  ],
+  "created_at": "2026-03-06T15:11:04.635691Z",
+  "updated_at": "2026-03-06T16:54:49.882741Z",
+  "closed_at": null,
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "61925bf4-362e-413c-824d-ecfdb2316fb9",
+  "issue_id": "PIXO-977a92b2-4f33-43e3-8f2e-42e05e052f19",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-06T15:11:11.223Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Demo bug for Pixoo clock notifications.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+    "priority": 2,
+    "status": "open",
+    "title": "Clock demo: bug workflow"
+  }
+}

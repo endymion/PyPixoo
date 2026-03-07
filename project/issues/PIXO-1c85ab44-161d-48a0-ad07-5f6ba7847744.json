@@ -1,0 +1,43 @@
+{
+  "id": "PIXO-1c85ab44-161d-48a0-ad07-5f6ba7847744",
+  "title": "kanbus_clock React runtime should not depend on Storybook",
+  "description": "Observed:\n- kanbus_clock default React mode fetches frames from Storybook iframe\n- runtime fails if Storybook server is not running\n\nExpected:\n- React rendering works without Storybook in runtime\n- Storybook remains design-time only\n\nPlan:\n- add dedicated runtime entry/build for React components\n- auto-serve runtime assets from kanbus_clock\n- remove Storybook runtime flags from kanbus_clock",
+  "type": "bug",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-1cf8b0d6-bc4e-494f-b846-31e461cbaf20",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "cdcc3cbd-68ea-494b-bf99-21ca9f3398bc",
+      "author": "ryan.porter",
+      "text": "Starting implementation: adding a dedicated React runtime bundle and switching kanbus_clock to serve that bundle locally instead of Storybook.",
+      "created_at": "2026-03-07T02:17:20.019551Z"
+    },
+    {
+      "id": "ce5e2e7f-c447-44da-9734-937a20c98feb",
+      "author": "ryan.porter",
+      "text": "Implemented runtime decoupling:\n- Added dedicated React runtime bundle in storybook-app (`build-pixoo-runtime`) with a standalone runtime page (`runtime.html`) and entry (`src/runtime/main.tsx`).\n- Refactored kanbus_clock React path to serve local runtime assets via an internal static server; removed Storybook runtime flags from CLI.\n- Added fail-fast when runtime assets are missing with clear build command.\n- Added tests for parser/runtime URL/asset checks/server lifecycle.\n\nValidation:\n- `python3 -m py_compile demos/kanbus_clock.py`\n- `pytest tests/test_kanbus_clock.py -q` => 44 passed\n- Manual smoke run shows `clock-source: react runtime http://127.0.0.1:<port>/runtime.html` with Storybook not running.",
+      "created_at": "2026-03-07T02:24:02.832256Z"
+    },
+    {
+      "id": "ddff20f3-c85c-439f-9be8-b430936fb6b6",
+      "author": "ryan.porter",
+      "text": "Validation complete and green. Waiting on live device acceptance: run kanbus_clock with React mode and Storybook stopped, confirm clock + notifications still render.",
+      "created_at": "2026-03-07T02:24:30.062600Z"
+    },
+    {
+      "id": "d17f0e13-deb0-40cd-9d69-6c76a6e07c77",
+      "author": "ryan.porter",
+      "text": "Adjusted runtime default clock face to the tuned Kanbus style: markerMode=dot12, no second hand, dim Radix bronze palette and geometry parity with PixooclockDefault. Rebuilt runtime bundle and restarted kanbus_clock for live verification.",
+      "created_at": "2026-03-07T02:26:14.322492Z"
+    }
+  ],
+  "created_at": "2026-03-07T02:17:14.834706Z",
+  "updated_at": "2026-03-07T02:26:14.322492Z",
+  "closed_at": null,
+  "custom": {}
+}

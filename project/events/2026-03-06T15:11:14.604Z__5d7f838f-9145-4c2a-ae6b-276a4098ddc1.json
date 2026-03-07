@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "5d7f838f-9145-4c2a-ae6b-276a4098ddc1",
+  "issue_id": "PIXO-288f602c-e676-4701-af4e-a8b1a7d36916",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-06T15:11:14.604Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Demo bug with no parent for Pixoo clock notifications.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Clock demo: bug no-parent"
+  }
+}

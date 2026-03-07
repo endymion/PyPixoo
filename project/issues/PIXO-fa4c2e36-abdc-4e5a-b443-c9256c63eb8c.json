@@ -70,10 +70,16 @@
       "author": "ryan.porter",
       "text": "Reverted header background to Radix band4 (one notch lighter again) for both Python + React Kanbus cards.",
       "created_at": "2026-03-06T13:21:20.894631Z"
+    },
+    {
+      "id": "c9d0d8ca-893e-41f8-bbb3-71fc01f15d2d",
+      "author": "ryan.porter",
+      "text": "Parent row background now uses Radix band step 3 (header still step 4, body step 2). Applied in Python and React.",
+      "created_at": "2026-03-06T14:11:35.677622Z"
     }
   ],
   "created_at": "2026-03-06T07:08:22.473485Z",
-  "updated_at": "2026-03-06T13:24:57.829740Z",
+  "updated_at": "2026-03-06T14:11:35.677622Z",
   "closed_at": "2026-03-06T13:24:57.829740Z",
   "custom": {}
 }

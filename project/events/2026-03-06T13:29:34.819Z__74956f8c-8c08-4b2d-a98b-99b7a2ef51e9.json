@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "74956f8c-8c08-4b2d-a98b-99b7a2ef51e9",
+  "issue_id": "PIXO-9850034a-1b01-459a-b895-2c75396f96cb",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-06T13:29:34.819Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Temp issue for long Kanbus clock demo sequence.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Long demo workflow"
+  }
+}

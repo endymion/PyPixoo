@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-980d5023-415b-4458-ac87-d7ecbcfbd0d3",
+  "title": "Clock demo: task no-parent",
+  "description": "Demo task with no parent for Pixoo clock notifications.",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "28a4afc8-e12c-47a0-adb8-12bf049f6659",
+      "author": "ryan.porter",
+      "text": "Clock demo: task no-parent open",
+      "created_at": "2026-03-06T15:11:47.919619Z"
+    },
+    {
+      "id": "69b8be7f-daa7-4c7b-ba8f-18f54f9da43a",
+      "author": "ryan.porter",
+      "text": "Clock demo: task no-parent in progress",
+      "created_at": "2026-03-06T15:11:47.935774Z"
+    }
+  ],
+  "created_at": "2026-03-06T15:11:36.122160Z",
+  "updated_at": "2026-03-06T15:11:47.935774Z",
+  "closed_at": null,
+  "custom": {}
+}

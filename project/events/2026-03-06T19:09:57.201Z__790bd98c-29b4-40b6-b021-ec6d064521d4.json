@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "790bd98c-29b4-40b6-b021-ec6d064521d4",
+  "issue_id": "PIXO-b891295c-d90a-4d6d-9e96-630e734f9b76",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-06T19:09:57.201Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Observed:\n- kanbus_clock logs show event detection and notice dequeue\n- device remains on clock, no info cards appear\n\nExpected:\n- each detected event enqueues a notice and triggers a transition to info cards\n\nImpact:\n- missed notifications\n\nPlan:\n- instrument ScenePlayer transitions\n- verify queue consumption\n- fix rendering/transition path",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "PIXO-1cf8b0d6-bc4e-494f-b846-31e461cbaf20",
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock does not display notifications despite detected events"
+  }
+}

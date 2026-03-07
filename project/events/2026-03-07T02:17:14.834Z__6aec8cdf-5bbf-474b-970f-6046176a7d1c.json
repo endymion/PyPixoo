@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "6aec8cdf-5bbf-474b-970f-6046176a7d1c",
+  "issue_id": "PIXO-1c85ab44-161d-48a0-ad07-5f6ba7847744",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T02:17:14.834Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Observed:\n- kanbus_clock default React mode fetches frames from Storybook iframe\n- runtime fails if Storybook server is not running\n\nExpected:\n- React rendering works without Storybook in runtime\n- Storybook remains design-time only\n\nPlan:\n- add dedicated runtime entry/build for React components\n- auto-serve runtime assets from kanbus_clock\n- remove Storybook runtime flags from kanbus_clock",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": "PIXO-1cf8b0d6-bc4e-494f-b846-31e461cbaf20",
+    "priority": 2,
+    "status": "open",
+    "title": "kanbus_clock React runtime should not depend on Storybook"
+  }
+}

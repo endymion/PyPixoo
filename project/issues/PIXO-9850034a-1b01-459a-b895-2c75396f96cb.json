@@ -1,0 +1,73 @@
+{
+  "id": "PIXO-9850034a-1b01-459a-b895-2c75396f96cb",
+  "title": "Long demo workflow",
+  "description": "Temp issue for long Kanbus clock demo sequence.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "ad845312-1d92-437f-a756-c2990a136686",
+      "author": "ryan.porter",
+      "text": "Step 1: created",
+      "created_at": "2026-03-06T13:29:44.289798Z"
+    },
+    {
+      "id": "b86237b5-6a01-4369-84e8-c074a723a7fd",
+      "author": "ryan.porter",
+      "text": "Step 2: in progress",
+      "created_at": "2026-03-06T13:29:46.338597Z"
+    },
+    {
+      "id": "4b64a770-c385-4283-b152-9d453e6bd174",
+      "author": "ryan.porter",
+      "text": "Step 3: blocked",
+      "created_at": "2026-03-06T13:29:48.378842Z"
+    },
+    {
+      "id": "1876a7e8-81f7-4ad6-9873-019b6b326284",
+      "author": "ryan.porter",
+      "text": "Step 4: done",
+      "created_at": "2026-03-06T13:29:50.421803Z"
+    },
+    {
+      "id": "4efd8e69-981b-4365-829d-9f89f7b1ae2b",
+      "author": "ryan.porter",
+      "text": "Parent row bg step 3 check",
+      "created_at": "2026-03-06T14:12:02.667505Z"
+    },
+    {
+      "id": "a71540cf-b408-4e67-ae2d-9e94111f87d1",
+      "author": "ryan.porter",
+      "text": "Kitchen test comment 1",
+      "created_at": "2026-03-06T14:16:01.001584Z"
+    },
+    {
+      "id": "ce794304-a661-42fc-8334-b342c6ed8787",
+      "author": "ryan.porter",
+      "text": "Kitchen test comment 2",
+      "created_at": "2026-03-06T14:16:01.265040Z"
+    },
+    {
+      "id": "e5e6b738-2efc-4b48-a96b-62532b38325d",
+      "author": "ryan.porter",
+      "text": "Kitchen test comment 3",
+      "created_at": "2026-03-06T14:16:01.529447Z"
+    },
+    {
+      "id": "e36eb53f-2c91-4783-9a90-6af2e1e3a356",
+      "author": "ryan.porter",
+      "text": "Scoped root test comment",
+      "created_at": "2026-03-06T14:17:59.444017Z"
+    }
+  ],
+  "created_at": "2026-03-06T13:29:34.819257Z",
+  "updated_at": "2026-03-06T14:17:59.444017Z",
+  "closed_at": "2026-03-06T13:29:49.400570Z",
+  "custom": {}
+}

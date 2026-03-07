@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-977a92b2-4f33-43e3-8f2e-42e05e052f19",
+  "title": "Clock demo: bug workflow",
+  "description": "Demo bug for Pixoo clock notifications.",
+  "type": "bug",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "52899dda-0c75-46b6-957b-4515a7658b20",
+      "author": "ryan.porter",
+      "text": "Clock demo: bug w/parent open",
+      "created_at": "2026-03-06T15:12:01.443187Z"
+    },
+    {
+      "id": "7ab160ff-c4f3-4ae5-9886-12c195b0e96e",
+      "author": "ryan.porter",
+      "text": "Clock demo: bug w/parent in progress",
+      "created_at": "2026-03-06T15:12:06.297173Z"
+    }
+  ],
+  "created_at": "2026-03-06T15:11:11.223506Z",
+  "updated_at": "2026-03-06T15:12:06.297173Z",
+  "closed_at": null,
+  "custom": {}
+}

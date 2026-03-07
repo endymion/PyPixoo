@@ -382,10 +382,16 @@
       "author": "ryan.porter",
       "text": "Fixing pop-in transitions: React clock rendering is now cached-only on the render thread; heavy Storybook render moved entirely to background refresh + warmup to avoid blocking ScenePlayer frames during transitions. This should restore push-left animation.",
       "created_at": "2026-03-06T07:42:18.549867Z"
+    },
+    {
+      "id": "cddbd030-c587-44ff-a02f-4e486cec61ee",
+      "author": "ryan.porter",
+      "text": "kanbus clock test: comment to trigger notification",
+      "created_at": "2026-03-06T19:11:54.094665Z"
     }
   ],
   "created_at": "2026-03-06T01:59:39.247808Z",
-  "updated_at": "2026-03-06T12:16:08.905832Z",
+  "updated_at": "2026-03-06T19:11:54.094665Z",
   "closed_at": "2026-03-06T12:16:08.905832Z",
   "custom": {}
 }
