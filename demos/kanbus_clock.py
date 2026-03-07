@@ -72,6 +72,7 @@ _FILENAME_TS_RE = re.compile(
 _SHORT_SECONDS_RE = re.compile(r"^-s(\d+(?:\.\d+)?)$")
 _ISSUE_KEY_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9]*-\d+)\b")
 _PROJECT_KEY_FULL_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-\d+$")
+_PROJECT_PREFIX_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*$")
 MIN_TS = datetime(1970, 1, 1, tzinfo=timezone.utc)
 _DEBUG_KBS = False
 _WORKSPACE_KBS_DISABLED = False
@@ -605,13 +606,29 @@ def _issue_type_card_colors(
     tuple[int, int, int],
 ]:
     band = _issue_type_band(issue_type_upper)
-    base_fg = _radix_color(band, _BASE_STEP, fallback=(145, 145, 145))
-    attention_fg = _radix_color(band, _ATTENTION_STEP, fallback=(180, 180, 180))
-    dim_fg = _radix_color(band, _DIM_STEP, fallback=(120, 120, 120))
-    bg = _radix_color(band, 1, fallback=(8, 8, 8))
-    header_bg = _radix_color(band, 4, fallback=(18, 18, 18))
-    border = _radix_color(band, 5, fallback=(30, 30, 30))
+    if _ACTIVE_THEME == "light":
+        # Higher contrast for light theme: darker backgrounds and brighter text.
+        base_fg = _radix_color(band, 11, fallback=(70, 70, 70))
+        attention_fg = _radix_color(band, 12, fallback=(40, 40, 40))
+        dim_fg = _radix_color(band, 10, fallback=(110, 110, 110))
+        bg = _radix_color(band, 3, fallback=(220, 220, 220))
+        header_bg = _radix_color(band, 5, fallback=(200, 200, 200))
+        border = _radix_color(band, 6, fallback=(170, 170, 170))
+    else:
+        base_fg = _radix_color(band, _BASE_STEP, fallback=(145, 145, 145))
+        attention_fg = _radix_color(band, _ATTENTION_STEP, fallback=(180, 180, 180))
+        dim_fg = _radix_color(band, _DIM_STEP, fallback=(120, 120, 120))
+        bg = _radix_color(band, 1, fallback=(8, 8, 8))
+        header_bg = _radix_color(band, 4, fallback=(18, 18, 18))
+        border = _radix_color(band, 5, fallback=(30, 30, 30))
     return base_fg, attention_fg, dim_fg, bg, header_bg, border
+
+
+def _main_content_body_bg(issue_type_upper: str, *, fallback: tuple[int, int, int]) -> tuple[int, int, int]:
+    """Background for the large bottom body section on card scenes."""
+    if _ACTIVE_THEME == "dark":
+        return (0, 0, 0)
+    return _radix_color(_issue_type_band(issue_type_upper), 2, fallback=fallback)
 
 
 def _darken_color(color: tuple[int, int, int], *, steps: int) -> tuple[int, int, int]:
@@ -1056,7 +1073,11 @@ def _fetch_issue_snapshot(
     payload: Optional[dict[str, Any]] = None,
     project_root: Optional[Path] = None,
 ) -> Optional[IssueSnapshot]:
-    issue = _run_kbs_show_json(issue_id, kbs_root, project_root)
+    issue = _ISSUE_JSON_CACHE.get(issue_id)
+    if issue is not None:
+        issue = dict(issue)
+    else:
+        issue = _run_kbs_show_json(issue_id, kbs_root, project_root)
     if issue is None:
         return None
     issue_id_value = str(issue.get("id") or "").strip()
@@ -1085,7 +1106,11 @@ def _fetch_issue_snapshot(
 def _fetch_parent_snapshot(
     parent_id: str, kbs_root: Optional[Path] = None, project_root: Optional[Path] = None
 ) -> Optional[ParentSnapshot]:
-    issue = _run_kbs_show_json(parent_id, kbs_root, project_root)
+    issue = _ISSUE_JSON_CACHE.get(parent_id)
+    if issue is not None:
+        issue = dict(issue)
+    else:
+        issue = _run_kbs_show_json(parent_id, kbs_root, project_root)
     if issue is None:
         return None
     title = _normalize_space(str(issue.get("title") or issue.get("name") or ""))
@@ -1105,16 +1130,21 @@ def _issue_meta_header_parts(snapshot: IssueSnapshot) -> tuple[str, str, str]:
     return (prefix, issue_type, status)
 
 
+def _is_project_prefix(value: str) -> bool:
+    text = _normalize_space(value).upper()
+    return bool(text and _PROJECT_PREFIX_RE.fullmatch(text))
+
+
 def _event_prefix_override(event_issue_id: str) -> str:
     """Prefer the event issue id for header prefix when it is meaningful."""
     text = (event_issue_id or "").strip()
     if not text:
         return ""
-    if text.lower().startswith("kanbus-"):
+    if "-" not in text:
         return ""
     candidate = _issue_id_prefix_upper(text)
     # Never use a numeric-only prefix like "1234".
-    if candidate.isdigit():
+    if not _is_project_prefix(candidate):
         return ""
     return candidate
 
@@ -1145,7 +1175,7 @@ def _payload_prefix_override(payload: dict[str, Any]) -> str:
         value = payload.get(key)
         if isinstance(value, str) and value.strip():
             prefix = _issue_id_prefix_upper(value)
-            if prefix and not prefix.isdigit() and prefix != "KANBUS":
+            if prefix and not prefix.isdigit():
                 return prefix
     payload_custom = payload.get("custom")
     if isinstance(payload_custom, dict):
@@ -1153,12 +1183,12 @@ def _payload_prefix_override(payload: dict[str, Any]) -> str:
             value = payload_custom.get(key)
             if isinstance(value, str) and value.strip():
                 prefix = _issue_id_prefix_upper(value)
-                if prefix and not prefix.isdigit() and prefix != "KANBUS":
+                if prefix and not prefix.isdigit():
                     return prefix
     pattern_key = _extract_issue_key_pattern(*_collect_string_values(payload))
     if pattern_key:
         prefix = _issue_id_prefix_upper(pattern_key)
-        if prefix and not prefix.isdigit() and prefix != "KANBUS":
+        if prefix and not prefix.isdigit():
             return prefix
     # Compose from common split fields.
     project_key = payload.get("project_key") or payload.get("projectKey") or payload.get("project")
@@ -1166,7 +1196,7 @@ def _payload_prefix_override(payload: dict[str, Any]) -> str:
     if isinstance(project_key, str) and project_key.strip() and issue_num is not None:
         composed = f"{project_key.strip()}-{issue_num}"
         prefix = _issue_id_prefix_upper(composed)
-        if prefix and not prefix.isdigit() and prefix != "KANBUS":
+        if prefix and not prefix.isdigit():
             return prefix
     return ""
 
@@ -1749,7 +1779,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             latest_comment_text=snapshot.latest_comment_text,
         )
     event_prefix = payload_prefix or _event_prefix_override(event.issue_id)
-    if event_prefix and snapshot.id_prefix_upper.isdigit():
+    if event_prefix and not _is_project_prefix(snapshot.id_prefix_upper):
         snapshot = IssueSnapshot(
             issue_id=snapshot.issue_id,
             id_prefix_upper=event_prefix,
@@ -1769,6 +1799,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
         band = _issue_type_band(snapshot.issue_type_upper)
         id_color = _radix_color(band, min(_BASE_STEP + 1, 12), fallback=base_fg)
         issue_bg = _radix_color(_issue_type_band(snapshot.issue_type_upper), 2, fallback=event_bg)
+        body_bg = _main_content_body_bg(snapshot.issue_type_upper, fallback=event_bg)
         parent_snapshot = (
             _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
             if snapshot.parent_id
@@ -1780,8 +1811,8 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             parent_title = parent_snapshot.title
             parent_lines = _fixed_rows(_wrap_title(parent_title, max_lines=2), 2)
         issue_lines = _fixed_rows(_wrap_title(issue_title, max_lines=2), 2)
-        bottom_count = 5 if parent_lines else 7
-        bottom_lines = _fixed_rows(_wrap_title(issue_title, max_lines=bottom_count), bottom_count)
+        bottom_count = 5 if parent_snapshot is not None else 7
+        bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=bottom_count), bottom_count)
         _debug_kbs(
             f"render created: parent_title={parent_title!r} issue_title={issue_title!r} "
             f"bottom_first={bottom_lines[0]!r}"
@@ -1804,12 +1835,12 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             bottom_text_color=attention_fg,
             parent_bg=parent_bg,
             issue_bg=issue_bg,
-            bottom_bg=event_bg,
+            bottom_bg=body_bg,
             header_bg=header_bg,
             header_text_color=base_fg,
             header_id_color=id_color,
             header_issue_type_color=base_fg,
-            header_status_color=base_fg,
+            header_status_color=attention_fg,
             name="created-scene",
         )
         return AutoNotice(
@@ -1823,6 +1854,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
         band = _issue_type_band(snapshot.issue_type_upper)
         id_color = _radix_color(band, min(_BASE_STEP + 1, 12), fallback=base_fg)
         issue_bg = _radix_color(_issue_type_band(snapshot.issue_type_upper), 2, fallback=event_bg)
+        body_bg = _main_content_body_bg(snapshot.issue_type_upper, fallback=event_bg)
         parent_snapshot = (
             _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
             if snapshot.parent_id
@@ -1834,7 +1866,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             parent_title = parent_snapshot.title
             parent_lines = _fixed_rows(_wrap_title(parent_title, max_lines=2), 2)
         issue_lines = _fixed_rows(_wrap_title(issue_title, max_lines=2), 2)
-        bottom_count = 5 if parent_lines else 7
+        bottom_count = 5 if parent_snapshot is not None else 7
         bottom_lines = _fixed_rows(_wrap_desc(snapshot.description, max_lines=bottom_count), bottom_count)
         _debug_kbs(
             f"render transition: parent_title={parent_title!r} issue_title={issue_title!r} "
@@ -1858,7 +1890,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             bottom_text_color=attention_fg,
             parent_bg=parent_bg,
             issue_bg=issue_bg,
-            bottom_bg=event_bg,
+            bottom_bg=body_bg,
             header_bg=header_bg,
             header_text_color=base_fg,
             header_id_color=id_color,
@@ -1877,6 +1909,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
         band = _issue_type_band(snapshot.issue_type_upper)
         id_color = _radix_color(band, min(_BASE_STEP + 1, 12), fallback=base_fg)
         issue_bg = _radix_color(_issue_type_band(snapshot.issue_type_upper), 2, fallback=event_bg)
+        body_bg = _main_content_body_bg(snapshot.issue_type_upper, fallback=event_bg)
         comment_text = _extract_comment_text(payload)
         if (not comment_text) or (len(comment_text) < 8) or (" " not in comment_text):
             comment_text = snapshot.latest_comment_text
@@ -1892,7 +1925,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             parent_title = parent_snapshot.title
             parent_lines = _fixed_rows(_wrap_title(parent_title, max_lines=2), 2)
         issue_lines = _fixed_rows(_wrap_title(issue_title, max_lines=2), 2)
-        bottom_count = 5 if parent_lines else 7
+        bottom_count = 5 if parent_snapshot is not None else 7
         comment_lines = _fixed_rows(_wrap_desc(comment_text, max_lines=bottom_count), bottom_count)
         _debug_kbs(
             f"render comment: parent_title={parent_title!r} issue_title={issue_title!r} "
@@ -1917,7 +1950,7 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             bottom_text_color=comment_fg,
             parent_bg=parent_bg,
             issue_bg=issue_bg,
-            bottom_bg=event_bg,
+            bottom_bg=body_bg,
             header_bg=header_bg,
             header_text_color=base_fg,
             header_id_color=id_color,
@@ -2104,12 +2137,16 @@ def _event_from_gossip_envelope(
 
     if current_comment_count > prior_comment_count and latest_comment:
         event_type = "comment_added"
-        payload = {"comment": latest_comment}
+        payload = {
+            "comment": latest_comment,
+            "project_key": str(envelope.get("project") or ""),
+        }
     elif prior_issue is not None and current_status and prior_status and current_status != prior_status:
         event_type = "state_transition"
         payload = {
             "from_status": prior_status,
             "to_status": current_status,
+            "project_key": str(envelope.get("project") or ""),
         }
     elif prior_issue is None and created_at and updated_at and created_at == updated_at:
         event_type = "issue_created"
@@ -2118,6 +2155,7 @@ def _event_from_gossip_envelope(
             "status": str(issue.get("status") or "open"),
             "title": str(issue.get("title") or ""),
             "description": str(issue.get("description") or ""),
+            "project_key": str(envelope.get("project") or ""),
         }
     else:
         return None
@@ -2151,6 +2189,7 @@ async def _watch_gossip_worker(
     seen_ids: set[str],
     seen_order: deque[str],
     prior_issue_by_id: dict[str, dict[str, Any]],
+    startup_cutoff: Optional[datetime] = None,
     seen_max: int = 4096,
     max_failures_before_disable: int = 5,
 ) -> None:
@@ -2235,6 +2274,17 @@ async def _watch_gossip_worker(
 
                 if event is None:
                     continue
+                if (
+                    startup_cutoff is not None
+                    and event.occurred_at is not None
+                    and event.occurred_at < startup_cutoff
+                ):
+                    if _DEBUG_KBS:
+                        print(
+                            f"gossip[{root.name}]: skip historical event "
+                            f"{event.event_type} {event.issue_id} at {event.occurred_at.isoformat()}"
+                        )
+                    continue
                 try:
                     notice = await asyncio.to_thread(summarize_event, event, kbs_root)
                 except KbsShowAmbiguous:
@@ -2293,6 +2343,8 @@ async def _watch_gossip_loop(
     seen_ids: set[str] = set()
     seen_order: deque[str] = deque()
     prior_issue_by_id: dict[str, dict[str, Any]] = {}
+    startup_cutoff = datetime.now(timezone.utc)
+    print(f"gossip: startup cutoff {startup_cutoff.isoformat()} (ignoring older events)")
     workers = [
         asyncio.create_task(
             _watch_gossip_worker(
@@ -2303,6 +2355,7 @@ async def _watch_gossip_loop(
                 seen_ids=seen_ids,
                 seen_order=seen_order,
                 prior_issue_by_id=prior_issue_by_id,
+                startup_cutoff=startup_cutoff,
             )
         )
         for project_root in roots
@@ -2719,10 +2772,13 @@ def discover_kanbus_project_roots(root: Path) -> list[Path]:
     """Find descendant Kanbus project roots by `.kanbus.yml` files."""
     ignored_dirs = {
         ".git",
+        ".kanbus",
         ".venv",
         "node_modules",
         "dist",
         "build",
+        "cdk.out",
+        "tmp",
         "target",
         "__pycache__",
         "project",
@@ -2732,7 +2788,11 @@ def discover_kanbus_project_roots(root: Path) -> list[Path]:
     }
     roots: list[Path] = []
     for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = [name for name in dirnames if name not in ignored_dirs]
+        dirnames[:] = [
+            name
+            for name in dirnames
+            if name not in ignored_dirs and not name.startswith("asset.")
+        ]
         if ".kanbus.yml" in filenames:
             roots.append(Path(dirpath).resolve())
     return sorted(dict.fromkeys(roots))
@@ -2744,16 +2804,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--fps", type=int, default=5)
     parser.add_argument("--transition-ms", type=int, default=1200)
     parser.add_argument("--root", default=".")
-    parser.add_argument("--poll-seconds", type=float, default=1.0)
-    parser.add_argument("--rescan-seconds", type=float, default=10.0)
     parser.add_argument("--auto-info-seconds", type=float, default=30.0)
     parser.add_argument("--history-file", default=str(DEFAULT_HISTORY_FILE))
-    parser.add_argument(
-        "--event-source",
-        choices=("gossip", "poll"),
-        default="gossip",
-        help="event ingestion source (default: gossip realtime stream)",
-    )
     parser.add_argument("--react-clock", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument(
         "--theme",
@@ -2783,11 +2835,8 @@ async def run(
     fps: int,
     transition_ms: int,
     root: Path,
-    poll_seconds: float,
-    rescan_seconds: float,
     auto_info_seconds: float,
     history_file: Path,
-    event_source: str,
     theme: str,
     theme_check_seconds: float,
     react_clock: bool,
@@ -2799,23 +2848,18 @@ async def run(
     _DEBUG_KBS = debug
     selected_theme = _set_active_theme(theme)
     print(f"kanbus-watch theme: {theme} -> {selected_theme}")
-    tracked: dict[Path, set[str]] = {}
-    gossip_roots: list[Path] = []
-    if event_source == "poll":
-        print(f"kanbus-watch: scanning for project/events under {root}")
-        discovered = discover_event_dirs(root)
-        tracked = _startup_report(root, discovered)
-    else:
-        print(f"kanbus-watch root: {root}")
-        print("kanbus-watch source: gossip")
-        gossip_roots = discover_kanbus_project_roots(root)
-        if not gossip_roots:
-            raise SystemExit(
-                f"No Kanbus projects found under {root}. Expected descendant directories with .kanbus.yml"
-            )
-        print(f"kanbus-watch: found {len(gossip_roots)} Kanbus project root(s)")
-        for project_root in gossip_roots:
-            print(f" - gossip root: {project_root}")
+    print(f"kanbus-watch root: {root}")
+    print("kanbus-watch source: gossip")
+    gossip_roots = discover_kanbus_project_roots(root.resolve())
+    if not gossip_roots:
+        raise SystemExit(
+            f"No Kanbus projects found under {root.resolve()}.\n"
+            "Initialize one with: `cd <root> && kbs init`."
+        )
+    print("kanbus-watch gossip mode: workspace descendants")
+    print(f"kanbus-watch: found {len(gossip_roots)} Kanbus project root(s)")
+    for project_root in gossip_roots:
+        print(f" - gossip root: {project_root}")
 
     print(f"pixoo: connecting to {ip}")
     pixoo = Pixoo(ip)
@@ -2861,27 +2905,14 @@ async def run(
                 on_theme_change=on_theme_change,
             )
         )
-        if event_source == "gossip":
-            watcher = asyncio.create_task(
-                _watch_gossip_loop(
-                    roots=gossip_roots,
-                    notices=notices,
-                    stop_event=stop_event,
-                    kbs_root=root,
-                )
+        watcher = asyncio.create_task(
+            _watch_gossip_loop(
+                roots=gossip_roots,
+                notices=notices,
+                stop_event=stop_event,
+                kbs_root=root,
             )
-        else:
-            watcher = asyncio.create_task(
-                _watch_events_loop(
-                    root=root,
-                    tracked=tracked,
-                    notices=notices,
-                    stop_event=stop_event,
-                    poll_seconds=poll_seconds,
-                    rescan_seconds=rescan_seconds,
-                    kbs_root=root,
-                )
-            )
+        )
         consumer = asyncio.create_task(
             _auto_notice_consumer(
                 notices=notices,
@@ -2931,11 +2962,8 @@ def main() -> None:
                 fps=max(1, args.fps),
                 transition_ms=max(1, args.transition_ms),
                 root=Path(args.root).expanduser().resolve(),
-                poll_seconds=max(0.1, args.poll_seconds),
-                rescan_seconds=max(0.5, args.rescan_seconds),
                 auto_info_seconds=max(0.1, args.auto_info_seconds),
                 history_file=Path(args.history_file).expanduser(),
-                event_source=str(args.event_source),
                 theme=str(args.theme),
                 theme_check_seconds=max(1.0, args.theme_check_seconds),
                 react_clock=bool(args.react_clock),

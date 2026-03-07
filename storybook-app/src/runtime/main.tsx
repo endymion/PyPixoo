@@ -52,7 +52,7 @@ function defaultClockProps(theme: "dark" | "light"): ClockProps {
   return {
     showSecondHand: false,
     markerMode: "dot12",
-    faceColor: radix("bronze", 1),
+    faceColor: theme === "light" ? radix("sand", 8) : radix("bronze", 1),
     markerColor: radix("bronze", 7),
     topMarkerColor: radix("bronze", 8),
     hourHandColor: radix("bronze", 10),
