@@ -1448,6 +1448,16 @@ def test_watch_gossip_loop_fans_out_workers():
     assert sorted(seen) == sorted([Path("/tmp/proj-a"), Path("/tmp/proj-b"), Path("/tmp/proj-c")])
 
 
+def test_gossip_restart_delay_is_exponential_and_bounded():
+    module = _load_demo_module()
+    assert module._gossip_restart_delay_seconds(0) == 0.5
+    assert module._gossip_restart_delay_seconds(1) == 1.0
+    assert module._gossip_restart_delay_seconds(2) == 2.0
+    assert module._gossip_restart_delay_seconds(3) == 4.0
+    assert module._gossip_restart_delay_seconds(6) == 30.0
+    assert module._gossip_restart_delay_seconds(20) == 30.0
+
+
 def test_theme_resolution_and_radix_token_mapping(monkeypatch):
     module = _load_demo_module()
     monkeypatch.setattr(module, "_detect_system_theme", lambda: "light")

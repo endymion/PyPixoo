@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-14c47e9a-76f5-4886-82a9-c5ba1e9c6007",
+  "title": "Fix kanbus_clock header color NameError and comment header color parity",
+  "description": "Runtime bug in demos/kanbus_clock.py: undefined header_fg/main_fg in _build_card_scene_from_sections, and comment_added path omits header_issue_type_color/header_status_color causing inconsistent header coloring.",
+  "type": "bug",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "4d1d19fc-3cf2-41e4-889b-6a7531785c9b",
+      "author": "ryan.porter",
+      "text": "Started: verifying the two reported kanbus_clock bugs and preparing a targeted patch + tests.",
+      "created_at": "2026-03-07T02:32:28.825964Z"
+    },
+    {
+      "id": "cf91118f-c536-4e67-993e-22738d288129",
+      "author": "ryan.porter",
+      "text": "Patched demos/kanbus_clock.py: (1) fixed undefined header_fg/main_fg in _build_card_scene_from_sections by using defined header_color/main_fg variables, (2) comment_added now passes header_issue_type_color and header_status_color explicitly. Validation: pytest tests/test_kanbus_clock.py -q => 44 passed.",
+      "created_at": "2026-03-07T02:36:51.650174Z"
+    }
+  ],
+  "created_at": "2026-03-07T02:32:24.506424Z",
+  "updated_at": "2026-03-07T02:36:51.650174Z",
+  "closed_at": null,
+  "custom": {}
+}

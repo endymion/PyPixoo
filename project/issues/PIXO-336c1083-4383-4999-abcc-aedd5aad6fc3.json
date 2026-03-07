@@ -1,0 +1,91 @@
+{
+  "id": "PIXO-336c1083-4383-4999-abcc-aedd5aad6fc3",
+  "title": "Add gossip pub-sub realtime source to kanbus_clock",
+  "description": "Experiment with kbs gossip watch --print event stream and integrate it into demos/kanbus_clock.py so notifications are driven by realtime pub-sub updates instead of poll-only detection.",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "81da3e87-b893-400c-8a13-9d9a8f629ced",
+      "author": "ryan.porter",
+      "text": "Started: capturing gossip stream format and then integrating it into kanbus_clock runtime.",
+      "created_at": "2026-03-07T02:58:32.931118Z"
+    },
+    {
+      "id": "4cfec44c-6039-4488-bcab-f105a67464fc",
+      "author": "ryan.porter",
+      "text": "gossip runtime integration live test",
+      "created_at": "2026-03-07T03:04:22.405279Z"
+    },
+    {
+      "id": "5bdeee0e-b4ff-446e-9cbd-836911054270",
+      "author": "ryan.porter",
+      "text": "Integrated gossip realtime source into kanbus_clock. Added --event-source (default gossip), gossip broker/watch lifecycle, issue.mutated envelope classification (issue_created/state_transition/comment_added), and in-memory issue snapshot cache so summarize_event can resolve from stream data. Validated with live run: comment, create, and transition events were consumed from gossip and queued with push-left transitions.",
+      "created_at": "2026-03-07T03:05:36.990732Z"
+    },
+    {
+      "id": "8a2b5330-51a0-4c63-bf25-6809a7690afc",
+      "author": "ryan.porter",
+      "text": "Implementing multi-project gossip fan-out and --theme auto|dark|light across cards + React clock runtime, then running py_compile and test_kanbus_clock.",
+      "created_at": "2026-03-07T04:22:42.158362Z"
+    },
+    {
+      "id": "db43db2f-4dd2-46e8-a10f-a9c02ebc39df",
+      "author": "ryan.porter",
+      "text": "Implemented: multi-project gossip fan-out under --root (one watcher per discovered .kanbus.yml project), global envelope dedupe, theme system (--theme auto|dark|light) for card colors + React clock query, and fail-fast when no Kanbus roots are found for gossip mode. Validation: py_compile ok, pytest tests/test_kanbus_clock.py => 50 passed, npm run build-pixoo-runtime ok.",
+      "created_at": "2026-03-07T04:28:54.207326Z"
+    },
+    {
+      "id": "c0a1bdec-e13a-469d-9604-71f02752d94b",
+      "author": "ryan.porter",
+      "text": "light mode visual check",
+      "created_at": "2026-03-07T04:36:09.066403Z"
+    },
+    {
+      "id": "ed226d5d-9a6c-4674-8501-21d924861635",
+      "author": "ryan.porter",
+      "text": "light mode visual check 2",
+      "created_at": "2026-03-07T04:37:00.765003Z"
+    },
+    {
+      "id": "f3003758-cb7f-4af7-87b8-4b35d285d38c",
+      "author": "ryan.porter",
+      "text": "Adding periodic system-theme recheck for --theme auto so kanbus_clock switches live with OS light/dark changes.",
+      "created_at": "2026-03-07T04:39:04.578853Z"
+    },
+    {
+      "id": "c8e26dcf-ad2e-4b12-bb56-6f5dfe84f0f2",
+      "author": "ryan.porter",
+      "text": "Implemented periodic system-theme recheck in kanbus_clock (auto mode). Added --theme-check-seconds (default 60s), live theme switching for React clock scene + card colors, and tests. Validation: py_compile passes and tests/test_kanbus_clock.py (52) passing.",
+      "created_at": "2026-03-07T04:41:05.683958Z"
+    },
+    {
+      "id": "c0ec9263-7f55-4388-ab67-0fd4a8673386",
+      "author": "ryan.porter",
+      "text": "Observed on device: switching macOS to light mode did not update quickly. Tightening auto-theme monitor cadence and first-check timing, then restarting kanbus_clock for verification.",
+      "created_at": "2026-03-07T04:43:15.154Z"
+    },
+    {
+      "id": "b83dae8b-2b83-4eac-8fe8-a4b1b5e0da7f",
+      "author": "ryan.porter",
+      "text": "Implemented + validated: auto-theme now rechecks every 5s (first check within ~2s), React clock scene live-updates theme, tests passing (53). Restarted kanbus_clock on device with --theme auto.",
+      "created_at": "2026-03-07T04:44:26.655095Z"
+    },
+    {
+      "id": "beea51a6-96d1-428c-aa8a-81752d302633",
+      "author": "ryan.porter",
+      "text": "Committed and pushed: 6763234 (experiment/react-kanbus-clock). Includes auto-theme monitor defaults (5s), fast initial check, live React clock theme switching, and tests passing.",
+      "created_at": "2026-03-07T04:48:45.869077Z"
+    }
+  ],
+  "created_at": "2026-03-07T02:58:29.237290Z",
+  "updated_at": "2026-03-07T04:48:45.869077Z",
+  "closed_at": "2026-03-07T04:48:09.484950Z",
+  "custom": {}
+}

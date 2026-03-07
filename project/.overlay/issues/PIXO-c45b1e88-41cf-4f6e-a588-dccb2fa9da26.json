@@ -1,0 +1,53 @@
+{
+  "overlay_ts": "2026-03-07T02:59:06.302Z",
+  "overlay_event_id": "fd821bde-c657-4115-a236-84f790cb8d9f",
+  "issue": {
+    "id": "PIXO-c45b1e88-41cf-4f6e-a588-dccb2fa9da26",
+    "title": "kanbus_clock can get stuck on info screen",
+    "description": "Observed on device: info card displayed and never returned to clock. Investigate notification enqueue/transition flow and fix any hang paths.",
+    "type": "bug",
+    "status": "in_progress",
+    "priority": 2,
+    "assignee": null,
+    "creator": null,
+    "parent": null,
+    "labels": [],
+    "dependencies": [],
+    "comments": [
+      {
+        "id": "83f6c8ee-5f32-4bf2-8c16-140967fb329d",
+        "author": "ryan.porter",
+        "text": "Started investigation: checking notification queue consumer and transition-return path for stuck info scene.",
+        "created_at": "2026-03-07T02:39:37.682807Z"
+      },
+      {
+        "id": "37966c75-9b08-4546-a5f0-f718cbf7afa1",
+        "author": "ryan.porter",
+        "text": "Fix implemented: made notification enqueue resilient to transient ScenePlayer queue-full errors. _enqueue_message_transition now retries enqueue for both notice and clock-return items instead of failing; _auto_notice_consumer now catches enqueue exceptions and continues (plus task_done in finally). Added regression test test_enqueue_message_transition_retries_when_scene_queue_is_temporarily_full. Validation: pytest tests/test_kanbus_clock.py -q => 45 passed.",
+        "created_at": "2026-03-07T02:41:57.454409Z"
+      },
+      {
+        "id": "6cf77cfa-df7b-4432-b1d1-49cae93de623",
+        "author": "ryan.porter",
+        "text": "runtime-freeze verification: comment event should transition in and return to clock",
+        "created_at": "2026-03-07T02:43:43.220522Z"
+      },
+      {
+        "id": "272a806d-e8a5-43bd-b8b3-91076273429a",
+        "author": "ryan.porter",
+        "text": "Verified with live run: process was not running initially (display held stale frame). Restarted patched kanbus_clock and observed full cycle in logs: react-clock -> comment-scene (hold 30s) -> react-clock return transition. Keeping issue in_progress pending user visual confirmation.",
+        "created_at": "2026-03-07T02:44:44.264981Z"
+      },
+      {
+        "id": "8216bbf9-ff77-4269-b873-52120630d290",
+        "author": "ryan.porter",
+        "text": "gossip format probe comment",
+        "created_at": "2026-03-07T02:59:06.299417Z"
+      }
+    ],
+    "created_at": "2026-03-07T02:39:29.780941Z",
+    "updated_at": "2026-03-07T02:59:06.299417Z",
+    "closed_at": null,
+    "custom": {}
+  }
+}

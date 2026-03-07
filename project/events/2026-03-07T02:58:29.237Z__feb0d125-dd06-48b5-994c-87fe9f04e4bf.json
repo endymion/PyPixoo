@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "feb0d125-dd06-48b5-994c-87fe9f04e4bf",
+  "issue_id": "PIXO-336c1083-4383-4999-abcc-aedd5aad6fc3",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T02:58:29.237Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Experiment with kbs gossip watch --print event stream and integrate it into demos/kanbus_clock.py so notifications are driven by realtime pub-sub updates instead of poll-only detection.",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Add gossip pub-sub realtime source to kanbus_clock"
+  }
+}

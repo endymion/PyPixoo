@@ -1988,6 +1988,13 @@ def _event_from_gossip_envelope(
     )
 
 
+def _gossip_restart_delay_seconds(consecutive_failures: int) -> float:
+    """Return bounded retry delay for gossip worker restarts."""
+    failures = max(0, consecutive_failures)
+    exponent = min(failures, 6)  # cap at 32x
+    return min(30.0, 0.5 * (2 ** exponent))
+
+
 async def _watch_gossip_worker(
     *,
     root: Path,
@@ -2000,6 +2007,7 @@ async def _watch_gossip_worker(
     seen_max: int = 4096,
 ) -> None:
     broker_proc: asyncio.subprocess.Process | None = None
+    consecutive_failures = 0
 
     async def _start_broker_if_needed() -> None:
         nonlocal broker_proc
@@ -2101,8 +2109,16 @@ async def _watch_gossip_worker(
             if saw_connection_refused:
                 await _start_broker_if_needed()
             if returncode != 0:
-                print(f"gossip[{root.name}]: watch exited rc={returncode}; restarting")
-            await asyncio.sleep(0.5)
+                consecutive_failures += 1
+                delay = _gossip_restart_delay_seconds(consecutive_failures)
+                print(
+                    f"gossip[{root.name}]: watch exited rc={returncode}; "
+                    f"retrying in {delay:.1f}s (failure {consecutive_failures})"
+                )
+            else:
+                consecutive_failures = 0
+                delay = 0.5
+            await asyncio.sleep(delay)
     finally:
         if broker_proc is not None and broker_proc.returncode is None:
             broker_proc.terminate()

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "0bcc52cc-71df-4733-9c38-237709117a75",
+  "issue_id": "PIXO-15db6b58-6435-4b40-9245-46ba6e9af66d",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T03:05:16.873Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "demo",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "gossip classify create/transition"
+  }
+}

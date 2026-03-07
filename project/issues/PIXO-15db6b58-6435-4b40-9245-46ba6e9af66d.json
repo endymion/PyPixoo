@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-15db6b58-6435-4b40-9245-46ba6e9af66d",
+  "title": "gossip classify create/transition",
+  "description": "demo",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-07T03:05:16.873619Z",
+  "updated_at": "2026-03-07T03:05:20.398284Z",
+  "closed_at": null,
+  "custom": {}
+}

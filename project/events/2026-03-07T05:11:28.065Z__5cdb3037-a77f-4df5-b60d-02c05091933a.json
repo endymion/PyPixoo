@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "5cdb3037-a77f-4df5-b60d-02c05091933a",
+  "issue_id": "PIXO-065eb546-d935-428b-b812-15d4c7570fd0",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T05:11:28.065Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Observed: clock appears to update at a lower frame rate after enabling multi-root gossip mode. Logs show repeated non-stop restart loops for failing gossip watch workers (rc=1), which can consume CPU and starve rendering.\n\nExpected: failing gossip roots should back off retries instead of hot-looping, so clock rendering cadence remains stable.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "kanbus_clock frame rate drops when gossip workers hot-restart"
+  }
+}
