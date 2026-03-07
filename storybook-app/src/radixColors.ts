@@ -110,11 +110,121 @@ const RADIX_DARK: Record<RadixBand, RadixScale> = {
   },
 };
 
+const RADIX_LIGHT: Record<RadixBand, RadixScale> = {
+  blue: {
+    1: "#fbfdff",
+    2: "#f4faff",
+    3: "#e6f4fe",
+    4: "#d5efff",
+    5: "#c2e5ff",
+    6: "#acd8fc",
+    7: "#8ec8f6",
+    8: "#5eb1ef",
+    9: "#0090ff",
+    10: "#0588f0",
+    11: "#0d74ce",
+    12: "#113264",
+  },
+  red: {
+    1: "#fffcfc",
+    2: "#fff7f7",
+    3: "#feebec",
+    4: "#ffdbdc",
+    5: "#ffcdce",
+    6: "#fdbdbe",
+    7: "#f4a9aa",
+    8: "#eb8e90",
+    9: "#e5484d",
+    10: "#dc3e42",
+    11: "#ce2c31",
+    12: "#641723",
+  },
+  yellow: {
+    1: "#fdfdf9",
+    2: "#fefce9",
+    3: "#fffab8",
+    4: "#fff394",
+    5: "#ffe770",
+    6: "#f3d768",
+    7: "#e4c767",
+    8: "#d5ae39",
+    9: "#ffe629",
+    10: "#ffdc00",
+    11: "#9e6c00",
+    12: "#473b1f",
+  },
+  indigo: {
+    1: "#fdfdfe",
+    2: "#f7f9ff",
+    3: "#edf2fe",
+    4: "#e1e9ff",
+    5: "#d2deff",
+    6: "#c1d0ff",
+    7: "#abbdf9",
+    8: "#8da4ef",
+    9: "#3e63dd",
+    10: "#3358d4",
+    11: "#3a5bc7",
+    12: "#1f2d5c",
+  },
+  sand: {
+    1: "#fdfdfc",
+    2: "#f9f9f8",
+    3: "#f1f0ef",
+    4: "#e9e8e6",
+    5: "#e2e1de",
+    6: "#dad9d6",
+    7: "#cfceca",
+    8: "#bcbbb5",
+    9: "#8d8d86",
+    10: "#82827c",
+    11: "#63635e",
+    12: "#21201c",
+  },
+  plum: {
+    1: "#fefcff",
+    2: "#fdf7fd",
+    3: "#fbebfb",
+    4: "#f7def8",
+    5: "#f2d1f3",
+    6: "#e9c2ec",
+    7: "#deade3",
+    8: "#cf91d8",
+    9: "#ab4aba",
+    10: "#a144af",
+    11: "#953ea3",
+    12: "#53195d",
+  },
+  bronze: {
+    1: "#fdfcfc",
+    2: "#fdf7f5",
+    3: "#f6edea",
+    4: "#efe4df",
+    5: "#e7d9d3",
+    6: "#dfcdc5",
+    7: "#d3bcb3",
+    8: "#c2a499",
+    9: "#a18072",
+    10: "#957468",
+    11: "#7d5e54",
+    12: "#43302b",
+  },
+};
+
 export function radixDark(band: RadixBand, step: number): string {
   const scale = RADIX_DARK[band];
   const value = scale?.[step];
   if (!value) {
     throw new Error(`Unknown Radix dark token: ${band}${step}`);
+  }
+  return value;
+}
+
+export function radixLight(band: RadixBand, step: number): string {
+  const scale = RADIX_LIGHT[band];
+  const value = scale?.[step];
+  if (!value) {
+    throw new Error(`Unknown Radix light token: ${band}${step}`);
   }
   return value;
 }

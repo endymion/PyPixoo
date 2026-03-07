@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 
 import { Clock, type ClockProps } from "../components/Clock";
 import { PIXOO_SIZE } from "../pixoo";
+import { radixDark, radixLight } from "../radixColors";
 
 declare global {
   interface Window {
@@ -45,33 +46,36 @@ const STRING_KEYS: Array<keyof ClockProps> = [
   "markerMode",
 ];
 
-const DEFAULT_CLOCK_PROPS: ClockProps = {
-  showSecondHand: false,
-  markerMode: "dot12",
-  faceColor: "#141110", // dark.bronze1
-  markerColor: "#5a4c47", // dark.bronze7
-  topMarkerColor: "#6f5f58", // dark.bronze8
-  hourHandColor: "#ae8c7e", // dark.bronze10
-  minuteHandColor: "#d4b3a5", // dark.bronze11
-  secondHandColor: "#493e3a", // dark.bronze6
-  centerDotColor: "#5a4c47", // dark.bronze7
-  hourLength: 20,
-  minuteLength: 27,
-  secondLength: 30,
-  markerInnerRadius: 26,
-  markerOuterRadius: 30,
-  markerRadius: 1,
-  topMarkerRadius: 2,
-  quarterMarkerRadius: 2,
-  markerTickThickness: 1,
-  topMarkerTickThickness: 2,
-  quarterMarkerTickThickness: 2,
-  hourHandThickness: 2,
-  minuteHandThickness: 2,
-  secondHandThickness: 1,
-  centerDotRadius: 1,
-  faceFade: 1.0,
-};
+function defaultClockProps(theme: "dark" | "light"): ClockProps {
+  const radix = theme === "light" ? radixLight : radixDark;
+  return {
+    showSecondHand: false,
+    markerMode: "dot12",
+    faceColor: radix("bronze", 1),
+    markerColor: radix("bronze", 7),
+    topMarkerColor: radix("bronze", 8),
+    hourHandColor: radix("bronze", 10),
+    minuteHandColor: radix("bronze", 11),
+    secondHandColor: radix("bronze", 6),
+    centerDotColor: radix("bronze", 7),
+    hourLength: 20,
+    minuteLength: 27,
+    secondLength: 30,
+    markerInnerRadius: 26,
+    markerOuterRadius: 30,
+    markerRadius: 1,
+    topMarkerRadius: 2,
+    quarterMarkerRadius: 2,
+    markerTickThickness: 1,
+    topMarkerTickThickness: 2,
+    quarterMarkerTickThickness: 2,
+    hourHandThickness: 2,
+    minuteHandThickness: 2,
+    secondHandThickness: 1,
+    centerDotRadius: 1,
+    faceFade: 1.0,
+  };
+}
 
 function parseBool(raw: string | null): boolean | undefined {
   if (raw == null) {
@@ -89,7 +93,9 @@ function parseBool(raw: string | null): boolean | undefined {
 
 function parseClockPropsFromQuery(): ClockProps {
   const params = new URLSearchParams(window.location.search);
-  const props: ClockProps = { ...DEFAULT_CLOCK_PROPS };
+  const rawTheme = (params.get("theme") || "dark").trim().toLowerCase();
+  const theme: "dark" | "light" = rawTheme === "light" ? "light" : "dark";
+  const props: ClockProps = { ...defaultClockProps(theme) };
 
   for (const key of NUMBER_KEYS) {
     const value = params.get(key);

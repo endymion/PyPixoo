@@ -8,6 +8,7 @@ from pathlib import Path
 import sys
 from types import SimpleNamespace
 import asyncio
+import time
 import urllib.request
 
 import pytest
@@ -1104,6 +1105,48 @@ def test_enqueue_message_transition_respects_body_font():
         assert all(a < b for a, b in zip(first, second))
 
 
+def test_enqueue_message_transition_retries_when_scene_queue_is_temporarily_full():
+    module = _load_demo_module()
+
+    class _DummyClockScene:
+        name = "clock"
+
+    class _FlakyPlayer:
+        def __init__(self):
+            self.items = []
+            self.failed_once = False
+
+        @property
+        def queue_depth(self):
+            return len(self.items)
+
+        async def enqueue(self, item):
+            if len(self.items) == 1 and not self.failed_once:
+                self.failed_once = True
+                raise ValueError("scene transition queue is full")
+            self.items.append(item)
+
+    async def _run():
+        player = _FlakyPlayer()
+        await module._enqueue_message_transition(
+            player=player,
+            clock_scene=_DummyClockScene(),
+            level="info",
+            message="HELLO",
+            seconds=5.0,
+            transition_ms=1200,
+            fg=(100, 100, 100),
+            bg=(10, 10, 10),
+        )
+        return player
+
+    player = __import__("asyncio").run(_run())
+    assert player.failed_once is True
+    assert len(player.items) == 2
+    assert player.items[0].transition.kind == "push_left"
+    assert player.items[1].transition.kind == "push_left"
+
+
 def test_message_scene_pins_first_line_before_vertical_center_pad():
     module = _load_demo_module()
 
@@ -1346,10 +1389,200 @@ def test_build_parser_defaults_auto_info_seconds_30():
     parser = module.build_parser()
     args = parser.parse_args([])
     assert args.auto_info_seconds == 30.0
+    assert args.theme_check_seconds == 5.0
+    assert args.event_source == "gossip"
+    assert args.theme == "auto"
     assert args.react_clock is True
     assert not hasattr(args, "storybook_iframe")
     assert not hasattr(args, "clock_story_id")
     assert not hasattr(args, "clock_browser_mode")
+
+
+def test_discover_kanbus_project_roots_recursive(tmp_path: Path):
+    module = _load_demo_module()
+    (tmp_path / ".kanbus.yml").write_text("key: root\n", encoding="utf-8")
+    (tmp_path / "Kanbus" / ".kanbus.yml").parent.mkdir(parents=True)
+    (tmp_path / "Kanbus" / ".kanbus.yml").write_text("key: kanbus\n", encoding="utf-8")
+    (tmp_path / "Other" / "Nested" / ".kanbus.yml").parent.mkdir(parents=True)
+    (tmp_path / "Other" / "Nested" / ".kanbus.yml").write_text("key: nested\n", encoding="utf-8")
+    (tmp_path / "project" / "events").mkdir(parents=True)
+
+    roots = module.discover_kanbus_project_roots(tmp_path)
+    assert roots == sorted(
+        [
+            tmp_path.resolve(),
+            (tmp_path / "Kanbus").resolve(),
+            (tmp_path / "Other" / "Nested").resolve(),
+        ]
+    )
+
+
+def test_watch_gossip_loop_fans_out_workers():
+    module = _load_demo_module()
+
+    async def _run():
+        stop_event = asyncio.Event()
+        notices: asyncio.Queue[module.AutoNotice] = asyncio.Queue()
+        roots = [Path("/tmp/proj-a"), Path("/tmp/proj-b"), Path("/tmp/proj-c")]
+        seen: list[Path] = []
+
+        async def _fake_worker(**kwargs):
+            seen.append(kwargs["root"])
+            await kwargs["stop_event"].wait()
+
+        module._watch_gossip_worker = _fake_worker  # type: ignore[assignment]
+        task = asyncio.create_task(
+            module._watch_gossip_loop(
+                roots=roots,
+                notices=notices,
+                stop_event=stop_event,
+                kbs_root=Path("/tmp/workspace"),
+            )
+        )
+        await asyncio.sleep(0)
+        stop_event.set()
+        await asyncio.wait_for(task, timeout=1.0)
+        return seen
+
+    seen = asyncio.run(_run())
+    assert sorted(seen) == sorted([Path("/tmp/proj-a"), Path("/tmp/proj-b"), Path("/tmp/proj-c")])
+
+
+def test_theme_resolution_and_radix_token_mapping(monkeypatch):
+    module = _load_demo_module()
+    monkeypatch.setattr(module, "_detect_system_theme", lambda: "light")
+    assert module._set_active_theme("auto") == "light"
+    assert module._radix_token("blue", 7) == "blue7"
+    assert module._set_active_theme("dark") == "dark"
+    assert module._radix_token("blue", 7) == "dark.blue7"
+
+
+def test_theme_monitor_loop_updates_theme_and_calls_callback(monkeypatch):
+    module = _load_demo_module()
+    detected = iter(["dark", "light", "light"])
+    monkeypatch.setattr(module, "_detect_system_theme", lambda: next(detected))
+    assert module._set_active_theme("auto") == "dark"
+
+    seen: list[str] = []
+
+    async def _run():
+        stop_event = asyncio.Event()
+        task = asyncio.create_task(
+            module._theme_monitor_loop(
+                mode="auto",
+                check_seconds=1.0,
+                stop_event=stop_event,
+                on_theme_change=seen.append,
+            )
+        )
+        await asyncio.sleep(1.05)
+        stop_event.set()
+        await asyncio.wait_for(task, timeout=1.0)
+
+    asyncio.run(_run())
+    assert seen == ["light"]
+    assert module._ACTIVE_THEME == "light"
+
+
+def test_theme_monitor_loop_first_check_is_fast(monkeypatch):
+    module = _load_demo_module()
+    assert module._set_active_theme("dark") == "dark"
+    seen: list[str] = []
+
+    async def _run():
+        stop_event = asyncio.Event()
+        task = asyncio.create_task(
+            module._theme_monitor_loop(
+                mode="auto",
+                check_seconds=20.0,
+                stop_event=stop_event,
+                on_theme_change=seen.append,
+            )
+        )
+        await asyncio.sleep(0.2)
+        stop_event.set()
+        await asyncio.wait_for(task, timeout=1.0)
+
+    start = time.monotonic()
+    asyncio.run(_run())
+    elapsed = time.monotonic() - start
+    assert elapsed < 2.5
+    assert seen == []
+
+
+def test_theme_monitor_loop_noop_for_explicit_mode():
+    module = _load_demo_module()
+
+    async def _run():
+        stop_event = asyncio.Event()
+        started = time.monotonic()
+        await module._theme_monitor_loop(
+            mode="dark",
+            check_seconds=1.0,
+            stop_event=stop_event,
+            on_theme_change=None,
+        )
+        return time.monotonic() - started
+
+    elapsed = asyncio.run(_run())
+    assert elapsed < 0.1
+
+
+def test_event_from_gossip_envelope_classifies_created_transition_and_comment():
+    module = _load_demo_module()
+    created_issue = {
+        "id": "PIXO-abc123",
+        "type": "task",
+        "status": "open",
+        "title": "Issue title",
+        "description": "Issue description",
+        "comments": [],
+        "created_at": "2026-03-07T03:00:00.000Z",
+        "updated_at": "2026-03-07T03:00:00.000Z",
+    }
+    created_envelope = {
+        "id": "env-created",
+        "event_id": "evt-created",
+        "ts": "2026-03-07T03:00:00.000Z",
+        "producer_id": "gossip-test",
+        "type": "issue.mutated",
+        "issue_id": "PIXO-abc123",
+        "issue": created_issue,
+    }
+    created_event = module._event_from_gossip_envelope(created_envelope, prior_issue=None)
+    assert created_event is not None
+    assert created_event.event_type == "issue_created"
+
+    transitioned_issue = dict(created_issue)
+    transitioned_issue["status"] = "in_progress"
+    transitioned_issue["updated_at"] = "2026-03-07T03:00:10.000Z"
+    transitioned_envelope = dict(created_envelope)
+    transitioned_envelope["id"] = "env-transition"
+    transitioned_envelope["event_id"] = "evt-transition"
+    transitioned_envelope["issue"] = transitioned_issue
+    transitioned_event = module._event_from_gossip_envelope(
+        transitioned_envelope,
+        prior_issue=created_issue,
+    )
+    assert transitioned_event is not None
+    assert transitioned_event.event_type == "state_transition"
+    assert transitioned_event.payload["from_status"] == "OPEN"
+    assert transitioned_event.payload["to_status"] == "IN PROGRESS"
+
+    commented_issue = dict(transitioned_issue)
+    commented_issue["comments"] = [{"text": "fresh comment from gossip"}]
+    commented_issue["updated_at"] = "2026-03-07T03:00:20.000Z"
+    commented_envelope = dict(created_envelope)
+    commented_envelope["id"] = "env-comment"
+    commented_envelope["event_id"] = "evt-comment"
+    commented_envelope["issue"] = commented_issue
+    commented_event = module._event_from_gossip_envelope(
+        commented_envelope,
+        prior_issue=transitioned_issue,
+    )
+    assert commented_event is not None
+    assert commented_event.event_type == "comment_added"
+    assert commented_event.payload["comment"] == "fresh comment from gossip"
 
 
 def test_runtime_clock_url_uses_direct_query_params():
@@ -1363,6 +1596,27 @@ def test_runtime_clock_url_uses_direct_query_params():
     assert "hour=9" in url
     assert "minute=30" in url
     assert "showSecondHand=false" in url
+
+
+def test_react_clock_scene_includes_theme_query(monkeypatch):
+    module = _load_demo_module()
+    captured: dict[str, str] = {}
+
+    def _fake_render(url: str, *, t: float = 0.0):
+        captured["url"] = url
+        return module.Buffer(width=64, height=64, data=tuple([0] * (64 * 64 * 3)))
+
+    monkeypatch.setattr(module, "_render_runtime_frame", _fake_render)
+    scene = module.ReactClockScene(
+        runtime_base_url="http://127.0.0.1:1234/runtime.html",
+        show_second_hand=False,
+        theme="light",
+    )
+    scene._render_clock_sync(0.0)
+    assert "theme=light" in captured["url"]
+    scene.set_theme("dark")
+    scene._render_clock_sync(0.0)
+    assert "theme=dark" in captured["url"]
 
 
 def test_runtime_static_server_requires_built_assets(tmp_path: Path):

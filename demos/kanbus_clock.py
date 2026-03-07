@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import atexit
+from collections import deque
 import json
 import os
 import re
@@ -26,7 +27,7 @@ from datetime import datetime, timezone
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 from urllib.parse import urlencode
 
 from dotenv import load_dotenv
@@ -60,6 +61,7 @@ DEFAULT_HISTORY_FILE = Path(os.path.expanduser("~/.pypixoo/kanbus_clock_history"
 DEFAULT_RUNTIME_ASSETS = (
     Path(__file__).resolve().parents[1] / "storybook-app" / "dist-pixoo-runtime"
 )
+DEFAULT_THEME_CHECK_SECONDS = 5.0
 _FILENAME_TS_RE = re.compile(
     r"^(?P<ts>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z)__"
 )
@@ -69,6 +71,8 @@ _PROJECT_KEY_FULL_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-\d+$")
 MIN_TS = datetime(1970, 1, 1, tzinfo=timezone.utc)
 _DEBUG_KBS = False
 _WORKSPACE_KBS_DISABLED = False
+_ISSUE_JSON_CACHE: dict[str, dict[str, Any]] = {}
+_ACTIVE_THEME = "dark"
 
 try:
     import readline
@@ -83,6 +87,66 @@ class KbsShowAmbiguous(RuntimeError):
 def _debug_kbs(message: str) -> None:
     if _DEBUG_KBS:
         print(message)
+
+
+def _detect_system_theme() -> str:
+    if sys.platform == "darwin":
+        try:
+            proc = subprocess.run(
+                ["defaults", "read", "-g", "AppleInterfaceStyle"],
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=1.0,
+            )
+            if proc.returncode == 0 and "dark" in (proc.stdout or "").strip().lower():
+                return "dark"
+            return "light"
+        except Exception:
+            return "dark"
+    return "dark"
+
+
+def _resolve_theme(mode: str) -> str:
+    value = (mode or "auto").strip().lower()
+    if value == "auto":
+        return _detect_system_theme()
+    if value in {"dark", "light"}:
+        return value
+    return "dark"
+
+
+def _set_active_theme(mode: str) -> str:
+    global _ACTIVE_THEME
+    _ACTIVE_THEME = _resolve_theme(mode)
+    return _ACTIVE_THEME
+
+
+async def _theme_monitor_loop(
+    *,
+    mode: str,
+    check_seconds: float,
+    stop_event: asyncio.Event,
+    on_theme_change: Optional[Callable[[str], None]] = None,
+) -> None:
+    if (mode or "").strip().lower() != "auto":
+        return
+    interval = max(1.0, check_seconds)
+    last = _ACTIVE_THEME
+    next_wait = min(2.0, interval)
+    while not stop_event.is_set():
+        try:
+            await asyncio.wait_for(stop_event.wait(), timeout=next_wait)
+            break
+        except asyncio.TimeoutError:
+            pass
+        next_theme = _set_active_theme("auto")
+        if next_theme != last:
+            print(f"kanbus-watch theme change: {last} -> {next_theme}")
+            if on_theme_change is not None:
+                on_theme_change(next_theme)
+            last = next_theme
+        next_wait = interval
 
 
 @dataclass
@@ -169,9 +233,11 @@ class ReactClockScene:
         *,
         runtime_base_url: str,
         show_second_hand: bool,
+        theme: str,
     ) -> None:
         self._runtime_base_url = runtime_base_url
         self._show_second_hand = show_second_hand
+        self._theme = theme
         self._cache: _CachedFrame | None = None
         self._refresh_task: asyncio.Task | None = None
         self._stop_refresh = asyncio.Event()
@@ -186,6 +252,7 @@ class ReactClockScene:
                 "minute": local.tm_min,
                 "second": local.tm_sec,
                 "showSecondHand": self._show_second_hand,
+                "theme": self._theme,
             },
         )
         buf = _render_runtime_frame(
@@ -247,12 +314,18 @@ class ReactClockScene:
     def on_exit(self) -> None:
         return
 
+    def set_theme(self, theme: str) -> None:
+        next_theme = "light" if (theme or "").strip().lower() == "light" else "dark"
+        if next_theme == self._theme:
+            return
+        self._theme = next_theme
+        self._cache = None
+
 
 @dataclass(frozen=True)
 class AlertLevelDefaults:
     title: str
-    fg: str
-    bg: str
+    band: str
 
 
 @dataclass(frozen=True)
@@ -314,9 +387,9 @@ class AutoNotice:
 
 
 _LEVEL_DEFAULTS = {
-    "alert": AlertLevelDefaults(title="ALERT", fg="dark.red8", bg="dark.red2"),
-    "warn": AlertLevelDefaults(title="WARNING", fg="dark.yellow8", bg="dark.yellow2"),
-    "info": AlertLevelDefaults(title="INFO", fg="dark.sand8", bg="dark.sand2"),
+    "alert": AlertLevelDefaults(title="ALERT", band="red"),
+    "warn": AlertLevelDefaults(title="WARNING", band="yellow"),
+    "info": AlertLevelDefaults(title="INFO", band="sand"),
 }
 
 _ISSUE_TYPE_BANDS = {
@@ -339,10 +412,20 @@ def _safe_parse_color(token: str, *, fallback: tuple[int, int, int]) -> tuple[in
         return fallback
 
 
+def _radix_token(band: str, step: int) -> str:
+    if _ACTIVE_THEME == "light":
+        return f"{band}{step}"
+    return f"dark.{band}{step}"
+
+
+def _radix_color(band: str, step: int, *, fallback: tuple[int, int, int]) -> tuple[int, int, int]:
+    return _safe_parse_color(_radix_token(band, step), fallback=fallback)
+
+
 def _level_colors(level: str) -> tuple[tuple[int, int, int], tuple[int, int, int]]:
     defaults = _LEVEL_DEFAULTS[level]
-    fg = _safe_parse_color(defaults.fg, fallback=(220, 220, 220))
-    bg = _safe_parse_color(defaults.bg, fallback=(20, 20, 20))
+    fg = _radix_color(defaults.band, 8, fallback=(220, 220, 220))
+    bg = _radix_color(defaults.band, 2, fallback=(20, 20, 20))
     return fg, bg
 
 
@@ -375,12 +458,12 @@ def _issue_type_card_colors(
     tuple[int, int, int],
 ]:
     band = _issue_type_band(issue_type_upper)
-    base_fg = _safe_parse_color(f"dark.{band}{_BASE_STEP}", fallback=(145, 145, 145))
-    attention_fg = _safe_parse_color(f"dark.{band}{_ATTENTION_STEP}", fallback=(180, 180, 180))
-    dim_fg = _safe_parse_color(f"dark.{band}{_DIM_STEP}", fallback=(120, 120, 120))
-    bg = _safe_parse_color(f"dark.{band}1", fallback=(8, 8, 8))
-    header_bg = _safe_parse_color(f"dark.{band}4", fallback=(18, 18, 18))
-    border = _safe_parse_color(f"dark.{band}5", fallback=(30, 30, 30))
+    base_fg = _radix_color(band, _BASE_STEP, fallback=(145, 145, 145))
+    attention_fg = _radix_color(band, _ATTENTION_STEP, fallback=(180, 180, 180))
+    dim_fg = _radix_color(band, _DIM_STEP, fallback=(120, 120, 120))
+    bg = _radix_color(band, 1, fallback=(8, 8, 8))
+    header_bg = _radix_color(band, 4, fallback=(18, 18, 18))
+    border = _radix_color(band, 5, fallback=(30, 30, 30))
     return base_fg, attention_fg, dim_fg, bg, header_bg, border
 
 
@@ -544,6 +627,9 @@ def _run_kbs_show_json(
 ) -> Optional[dict[str, Any]]:
     if not issue_id:
         return None
+    cached = _ISSUE_JSON_CACHE.get(issue_id)
+    if cached is not None:
+        return dict(cached)
     
     def _attempt(
         cwd_value: Optional[Path],
@@ -589,7 +675,13 @@ def _run_kbs_show_json(
             parsed = json.loads(stdout_text)
         except Exception:
             return None
-        return parsed if isinstance(parsed, dict) else None
+        if not isinstance(parsed, dict):
+            return None
+        parsed_issue_id = str(parsed.get("id") or "").strip()
+        if parsed_issue_id:
+            _ISSUE_JSON_CACHE[parsed_issue_id] = dict(parsed)
+        _ISSUE_JSON_CACHE[issue_id] = dict(parsed)
+        return parsed
 
     # Preferred behavior: scope to the event's project root when available.
     if project_root is not None:
@@ -1012,7 +1104,7 @@ def _build_card_scene_from_sections(
 ) -> InfoScene:
     base_fg, attention_fg, dim_fg, bg, header_bg, border_color = _issue_type_card_colors(issue_type_upper)
     header_color = base_fg
-    border_color = border_color
+    main_fg = base_fg
     row_font = "bytesized"
     row_height = max(1, int(body_row_height))
 
@@ -1073,7 +1165,7 @@ def _build_card_scene_from_sections(
                 height=row_height,
                 align="left",
                 background_color=resolved_top_bg,
-            style=TextStyle(font=row_font, color=dim_fg),
+                style=TextStyle(font=row_font, color=dim_fg),
                 content=line,
             )
         )
@@ -1084,7 +1176,7 @@ def _build_card_scene_from_sections(
                 align="left",
                 background_color=bg,
                 border=BorderConfig(enabled=True, thickness=1, color=border_color),
-                style=TextStyle(font=row_font, color=header_fg),
+                style=TextStyle(font=row_font, color=header_color),
                 content="",
             )
         )
@@ -1528,8 +1620,8 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
     if etype == "issue_created":
         base_fg, attention_fg, _dim_fg, event_bg, header_bg, _ = _issue_type_card_colors(snapshot.issue_type_upper)
         band = _issue_type_band(snapshot.issue_type_upper)
-        id_color = _safe_parse_color(f"dark.{band}{min(_BASE_STEP + 1, 12)}", fallback=base_fg)
-        issue_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}2", fallback=event_bg)
+        id_color = _radix_color(band, min(_BASE_STEP + 1, 12), fallback=base_fg)
+        issue_bg = _radix_color(_issue_type_band(snapshot.issue_type_upper), 2, fallback=event_bg)
         parent_snapshot = (
             _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
             if snapshot.parent_id
@@ -1548,12 +1640,12 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             f"bottom_first={bottom_lines[0]!r}"
         )
         parent_text_color = base_fg
-        parent_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}3", fallback=event_bg)
+        parent_bg = _radix_color(_issue_type_band(snapshot.issue_type_upper), 3, fallback=event_bg)
         if parent_snapshot is not None:
             parent_band = _issue_type_band(parent_snapshot.issue_type_upper)
             parent_base_fg, _, _, _, _, _ = _issue_type_card_colors(parent_snapshot.issue_type_upper)
             parent_text_color = parent_base_fg
-            parent_bg = _safe_parse_color(f"dark.{parent_band}3", fallback=event_bg)
+            parent_bg = _radix_color(parent_band, 3, fallback=event_bg)
         scene = _build_comment_like_scene(
             issue_type_upper=snapshot.issue_type_upper,
             header_parts=header_parts,
@@ -1582,8 +1674,8 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
     if etype == "state_transition":
         base_fg, attention_fg, _dim_fg, event_bg, header_bg, _ = _issue_type_card_colors(snapshot.issue_type_upper)
         band = _issue_type_band(snapshot.issue_type_upper)
-        id_color = _safe_parse_color(f"dark.{band}{min(_BASE_STEP + 1, 12)}", fallback=base_fg)
-        issue_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}2", fallback=event_bg)
+        id_color = _radix_color(band, min(_BASE_STEP + 1, 12), fallback=base_fg)
+        issue_bg = _radix_color(_issue_type_band(snapshot.issue_type_upper), 2, fallback=event_bg)
         parent_snapshot = (
             _fetch_parent_snapshot(snapshot.parent_id, kbs_root, project_root)
             if snapshot.parent_id
@@ -1602,12 +1694,12 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             f"bottom_first={bottom_lines[0]!r}"
         )
         parent_text_color = base_fg
-        parent_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}3", fallback=event_bg)
+        parent_bg = _radix_color(_issue_type_band(snapshot.issue_type_upper), 3, fallback=event_bg)
         if parent_snapshot is not None:
             parent_band = _issue_type_band(parent_snapshot.issue_type_upper)
             parent_base_fg, _, _, _, _, _ = _issue_type_card_colors(parent_snapshot.issue_type_upper)
             parent_text_color = parent_base_fg
-            parent_bg = _safe_parse_color(f"dark.{parent_band}3", fallback=event_bg)
+            parent_bg = _radix_color(parent_band, 3, fallback=event_bg)
         scene = _build_comment_like_scene(
             issue_type_upper=snapshot.issue_type_upper,
             header_parts=header_parts,
@@ -1636,8 +1728,8 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
     if etype == "comment_added":
         base_fg, attention_fg, _dim_fg, event_bg, header_bg, _ = _issue_type_card_colors(snapshot.issue_type_upper)
         band = _issue_type_band(snapshot.issue_type_upper)
-        id_color = _safe_parse_color(f"dark.{band}{min(_BASE_STEP + 1, 12)}", fallback=base_fg)
-        issue_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}2", fallback=event_bg)
+        id_color = _radix_color(band, min(_BASE_STEP + 1, 12), fallback=base_fg)
+        issue_bg = _radix_color(_issue_type_band(snapshot.issue_type_upper), 2, fallback=event_bg)
         comment_text = _extract_comment_text(payload)
         if (not comment_text) or (len(comment_text) < 8) or (" " not in comment_text):
             comment_text = snapshot.latest_comment_text
@@ -1659,14 +1751,14 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             f"render comment: parent_title={parent_title!r} issue_title={issue_title!r} "
             f"comment_first={comment_lines[0]!r}"
         )
-        comment_fg = _safe_parse_color(f"dark.sky{_ATTENTION_STEP}", fallback=(180, 210, 230))
+        comment_fg = _radix_color("sky", _ATTENTION_STEP, fallback=(180, 210, 230))
         parent_text_color = base_fg
-        parent_bg = _safe_parse_color(f"dark.{_issue_type_band(snapshot.issue_type_upper)}3", fallback=event_bg)
+        parent_bg = _radix_color(_issue_type_band(snapshot.issue_type_upper), 3, fallback=event_bg)
         if parent_snapshot is not None:
             parent_band = _issue_type_band(parent_snapshot.issue_type_upper)
             parent_base_fg, _, _, _, _, _ = _issue_type_card_colors(parent_snapshot.issue_type_upper)
             parent_text_color = parent_base_fg
-            parent_bg = _safe_parse_color(f"dark.{parent_band}3", fallback=event_bg)
+            parent_bg = _radix_color(parent_band, 3, fallback=event_bg)
         scene = _build_comment_like_scene(
             issue_type_upper=snapshot.issue_type_upper,
             header_parts=header_parts,
@@ -1682,6 +1774,8 @@ def summarize_event(event: KanbusEvent, kbs_root: Optional[Path] = None) -> Opti
             header_bg=header_bg,
             header_text_color=base_fg,
             header_id_color=id_color,
+            header_issue_type_color=base_fg,
+            header_status_color=base_fg,
             name="comment-scene",
         )
         return AutoNotice(
@@ -1812,6 +1906,245 @@ def _watch_poll_step(
     return logs, notices
 
 
+def _issue_comment_count(issue: dict[str, Any]) -> int:
+    comments = issue.get("comments")
+    return len(comments) if isinstance(comments, list) else 0
+
+
+def _issue_latest_comment_text(issue: dict[str, Any]) -> str:
+    comments = issue.get("comments")
+    if not isinstance(comments, list):
+        return ""
+    for item in reversed(comments):
+        if isinstance(item, dict):
+            text = _normalize_space(str(item.get("text") or ""))
+            if text:
+                return text
+    return ""
+
+
+def _event_from_gossip_envelope(
+    envelope: dict[str, Any],
+    *,
+    prior_issue: Optional[dict[str, Any]],
+    project_root: Optional[Path] = None,
+) -> Optional[KanbusEvent]:
+    if str(envelope.get("type") or "").strip() != "issue.mutated":
+        return None
+    issue = envelope.get("issue")
+    if not isinstance(issue, dict):
+        return None
+
+    issue_id = str(issue.get("id") or envelope.get("issue_id") or "").strip()
+    if not issue_id:
+        return None
+
+    occurred_at = _parse_iso8601(str(envelope.get("ts") or ""))
+    event_id = str(envelope.get("event_id") or envelope.get("id") or "").strip()
+    actor_id = str(envelope.get("producer_id") or "gossip").strip() or "gossip"
+
+    current_status = _format_status_text(issue.get("status") or "")
+    prior_status = _format_status_text((prior_issue or {}).get("status") or "")
+    current_comment_count = _issue_comment_count(issue)
+    prior_comment_count = _issue_comment_count(prior_issue or {})
+    latest_comment = _issue_latest_comment_text(issue)
+
+    created_at = str(issue.get("created_at") or "")
+    updated_at = str(issue.get("updated_at") or "")
+
+    event_type = ""
+    payload: dict[str, Any] = {}
+
+    if current_comment_count > prior_comment_count and latest_comment:
+        event_type = "comment_added"
+        payload = {"comment": latest_comment}
+    elif prior_issue is not None and current_status and prior_status and current_status != prior_status:
+        event_type = "state_transition"
+        payload = {
+            "from_status": prior_status,
+            "to_status": current_status,
+        }
+    elif prior_issue is None and created_at and updated_at and created_at == updated_at:
+        event_type = "issue_created"
+        payload = {
+            "issue_type": str(issue.get("type") or "issue"),
+            "status": str(issue.get("status") or "open"),
+            "title": str(issue.get("title") or ""),
+            "description": str(issue.get("description") or ""),
+        }
+    else:
+        return None
+
+    return KanbusEvent(
+        path=Path(f"gossip://{event_id or issue_id}"),
+        schema_version=1,
+        event_id=event_id or issue_id,
+        issue_id=issue_id,
+        event_type=event_type,
+        occurred_at=occurred_at,
+        actor_id=actor_id,
+        payload=payload,
+        repo_root=project_root,
+    )
+
+
+async def _watch_gossip_worker(
+    *,
+    root: Path,
+    notices: asyncio.Queue[AutoNotice],
+    stop_event: asyncio.Event,
+    kbs_root: Optional[Path] = None,
+    seen_ids: set[str],
+    seen_order: deque[str],
+    prior_issue_by_id: dict[str, dict[str, Any]],
+    seen_max: int = 4096,
+) -> None:
+    broker_proc: asyncio.subprocess.Process | None = None
+
+    async def _start_broker_if_needed() -> None:
+        nonlocal broker_proc
+        if broker_proc is not None and broker_proc.returncode is None:
+            return
+        broker_proc = await asyncio.create_subprocess_exec(
+            "kbs",
+            "gossip",
+            "broker",
+            cwd=str(root),
+            stdout=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.DEVNULL,
+        )
+        print(f"gossip: started local broker ({root})")
+        await asyncio.sleep(0.25)
+
+    try:
+        while not stop_event.is_set():
+            await _start_broker_if_needed()
+            proc = await asyncio.create_subprocess_exec(
+                "kbs",
+                "gossip",
+                "watch",
+                "--print",
+                cwd=str(root),
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.STDOUT,
+            )
+
+            saw_connection_refused = False
+            assert proc.stdout is not None
+            while not stop_event.is_set():
+                line = await proc.stdout.readline()
+                if not line:
+                    break
+                text = line.decode("utf-8", errors="replace").strip()
+                if not text:
+                    continue
+                if "Connection refused" in text:
+                    saw_connection_refused = True
+                    print(f"gossip: {text}")
+                    continue
+                try:
+                    envelope = json.loads(text)
+                except Exception:
+                    if _DEBUG_KBS:
+                        print(f"gossip: non-json: {text}")
+                    continue
+                if not isinstance(envelope, dict):
+                    continue
+                envelope_id = str(envelope.get("id") or "").strip()
+                if envelope_id and envelope_id in seen_ids:
+                    continue
+                if envelope_id:
+                    seen_ids.add(envelope_id)
+                    seen_order.append(envelope_id)
+                    while len(seen_order) > seen_max:
+                        old = seen_order.popleft()
+                        seen_ids.discard(old)
+
+                issue = envelope.get("issue")
+                if isinstance(issue, dict):
+                    issue_id = str(issue.get("id") or envelope.get("issue_id") or "").strip()
+                    if issue_id:
+                        _ISSUE_JSON_CACHE[issue_id] = dict(issue)
+                        prior_issue = prior_issue_by_id.get(issue_id)
+                        event = _event_from_gossip_envelope(
+                            envelope,
+                            prior_issue=prior_issue,
+                            project_root=root,
+                        )
+                        prior_issue_by_id[issue_id] = dict(issue)
+                    else:
+                        event = None
+                else:
+                    event = None
+
+                if event is None:
+                    continue
+                try:
+                    notice = summarize_event(event, kbs_root)
+                except KbsShowAmbiguous:
+                    print(f"gossip: ambiguous identifier for {event.issue_id}, skipping")
+                    continue
+                if notice is None:
+                    continue
+                await _enqueue_auto_notice(notices, notice)
+                if _DEBUG_KBS:
+                    print(f"gossip[{root.name}]: event {event.event_type} {event.issue_id}")
+
+            try:
+                returncode = await asyncio.wait_for(proc.wait(), timeout=1.0)
+            except asyncio.TimeoutError:
+                proc.terminate()
+                await proc.wait()
+                returncode = -1
+            if stop_event.is_set():
+                break
+            if saw_connection_refused:
+                await _start_broker_if_needed()
+            if returncode != 0:
+                print(f"gossip[{root.name}]: watch exited rc={returncode}; restarting")
+            await asyncio.sleep(0.5)
+    finally:
+        if broker_proc is not None and broker_proc.returncode is None:
+            broker_proc.terminate()
+            try:
+                await asyncio.wait_for(broker_proc.wait(), timeout=1.0)
+            except asyncio.TimeoutError:
+                broker_proc.kill()
+                await broker_proc.wait()
+
+
+async def _watch_gossip_loop(
+    *,
+    roots: list[Path],
+    notices: asyncio.Queue[AutoNotice],
+    stop_event: asyncio.Event,
+    kbs_root: Optional[Path] = None,
+) -> None:
+    seen_ids: set[str] = set()
+    seen_order: deque[str] = deque()
+    prior_issue_by_id: dict[str, dict[str, Any]] = {}
+    workers = [
+        asyncio.create_task(
+            _watch_gossip_worker(
+                root=project_root,
+                notices=notices,
+                stop_event=stop_event,
+                kbs_root=kbs_root or project_root,
+                seen_ids=seen_ids,
+                seen_order=seen_order,
+                prior_issue_by_id=prior_issue_by_id,
+            )
+        )
+        for project_root in roots
+    ]
+    try:
+        await stop_event.wait()
+    finally:
+        for worker in workers:
+            worker.cancel()
+        await asyncio.gather(*workers, return_exceptions=True)
+
+
 # --------------------------
 # Runtime loops
 # --------------------------
@@ -1836,6 +2169,32 @@ async def _wait_for_queue_capacity(
 ) -> None:
     while player.queue_depth >= threshold:
         await asyncio.sleep(sleep_seconds)
+
+
+async def _enqueue_player_item_with_retry(
+    player: ScenePlayer,
+    item: QueueItem,
+    *,
+    label: str,
+    retry_sleep_seconds: float = 0.05,
+    warn_every_attempts: int = 20,
+) -> None:
+    attempts = 0
+    while True:
+        await _wait_for_queue_capacity(player)
+        try:
+            await player.enqueue(item)
+            return
+        except ValueError as exc:
+            if "queue is full" not in str(exc).lower():
+                raise
+            attempts += 1
+            if attempts % warn_every_attempts == 0:
+                print(
+                    f"scene: enqueue retry for {label}; queue still full "
+                    f"(attempt={attempts}, depth={player.queue_depth})"
+                )
+            await asyncio.sleep(retry_sleep_seconds)
 
 
 async def _enqueue_message_transition(
@@ -1897,22 +2256,24 @@ async def _enqueue_message_transition(
     hold_ms = int(max(0.1, seconds) * 1000)
     duration_ms = max(1, transition_ms)
 
-    await _wait_for_queue_capacity(player)
-    await player.enqueue(
+    await _enqueue_player_item_with_retry(
+        player,
         QueueItem(
             scene=resolved_scene,
             transition=TransitionSpec(kind="push_left", duration_ms=duration_ms),
             hold_ms=hold_ms,
-        )
+        ),
+        label="notice-scene",
     )
 
-    await _wait_for_queue_capacity(player)
-    await player.enqueue(
+    await _enqueue_player_item_with_retry(
+        player,
         QueueItem(
             scene=clock_scene,
             transition=TransitionSpec(kind="push_left", duration_ms=duration_ms),
             hold_ms=0,
-        )
+        ),
+        label="clock-return",
     )
 
 
@@ -1978,43 +2339,48 @@ async def _auto_notice_consumer(
             notice = await asyncio.wait_for(notices.get(), timeout=0.25)
         except asyncio.TimeoutError:
             continue
-        if _DEBUG_KBS:
-            print(
-                f"consumer: dequeued notice level={notice.level} header={notice.header!r} "
-                f"queue_depth={player.queue_depth}"
+        try:
+            if _DEBUG_KBS:
+                print(
+                    f"consumer: dequeued notice level={notice.level} header={notice.header!r} "
+                    f"queue_depth={player.queue_depth}"
+                )
+            fg, bg = _level_colors(notice.level)
+            if _DEBUG_KBS:
+                print("consumer: enqueueing transition to notice")
+            await _enqueue_message_transition(
+                player=player,
+                clock_scene=clock_scene,
+                level=notice.level,
+                message=notice.message,
+                seconds=auto_info_seconds,
+                transition_ms=transition_ms,
+                fg=fg,
+                bg=bg,
+                scene=notice.scene,
+                header_title=notice.header,
+                header_font=notice.header_font,
+                header_tight_padding=notice.header_tight_padding,
+                header_darker_steps=notice.header_darker_steps,
+                body_font=notice.body_font,
+                body_align=notice.body_align,
+                body_center_vertical=notice.body_center_vertical,
+                pin_first_line_top=notice.pin_first_line_top,
+                body_line_vpad=notice.body_line_vpad,
+                center_first_line=notice.center_first_line,
+                center_line_indices=notice.center_line_indices,
+                first_line_darker_steps=notice.first_line_darker_steps,
+                line_darker_steps=notice.line_darker_steps,
+                line_indent_px=notice.line_indent_px,
+                line_spacer_before_px=notice.line_spacer_before_px,
+                body_max_lines=notice.body_max_lines,
+                body_min_row_height=notice.body_min_row_height,
+                body_max_row_height=notice.body_max_row_height,
             )
-        fg, bg = _level_colors(notice.level)
-        if _DEBUG_KBS:
-            print("consumer: enqueueing transition to notice")
-        await _enqueue_message_transition(
-            player=player,
-            clock_scene=clock_scene,
-            level=notice.level,
-            message=notice.message,
-            seconds=auto_info_seconds,
-            transition_ms=transition_ms,
-            fg=fg,
-            bg=bg,
-            scene=notice.scene,
-            header_title=notice.header,
-            header_font=notice.header_font,
-            header_tight_padding=notice.header_tight_padding,
-            header_darker_steps=notice.header_darker_steps,
-            body_font=notice.body_font,
-            body_align=notice.body_align,
-            body_center_vertical=notice.body_center_vertical,
-            pin_first_line_top=notice.pin_first_line_top,
-            body_line_vpad=notice.body_line_vpad,
-            center_first_line=notice.center_first_line,
-            center_line_indices=notice.center_line_indices,
-            first_line_darker_steps=notice.first_line_darker_steps,
-            line_darker_steps=notice.line_darker_steps,
-            line_indent_px=notice.line_indent_px,
-            line_spacer_before_px=notice.line_spacer_before_px,
-            body_max_lines=notice.body_max_lines,
-            body_min_row_height=notice.body_min_row_height,
-            body_max_row_height=notice.body_max_row_height,
-        )
+        except Exception as exc:
+            print(f"consumer: failed to enqueue notice transition: {exc}")
+        finally:
+            notices.task_done()
 
 
 # --------------------------
@@ -2179,8 +2545,31 @@ def _startup_report(root: Path, event_dirs: list[Path]) -> dict[Path, set[str]]:
     return tracked
 
 
+def discover_kanbus_project_roots(root: Path) -> list[Path]:
+    """Find descendant Kanbus project roots by `.kanbus.yml` files."""
+    ignored_dirs = {
+        ".git",
+        ".venv",
+        "node_modules",
+        "dist",
+        "build",
+        "target",
+        "__pycache__",
+        "project",
+        "project-local",
+        ".pytest_cache",
+        ".mypy_cache",
+    }
+    roots: list[Path] = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [name for name in dirnames if name not in ignored_dirs]
+        if ".kanbus.yml" in filenames:
+            roots.append(Path(dirpath).resolve())
+    return sorted(dict.fromkeys(roots))
+
+
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Kanbus clock REPL + recursive events watcher")
+    parser = argparse.ArgumentParser(description="Kanbus clock REPL + Kanbus events watcher")
     parser.add_argument("--ip", default=DEFAULT_IP)
     parser.add_argument("--fps", type=int, default=5)
     parser.add_argument("--transition-ms", type=int, default=1200)
@@ -2189,7 +2578,25 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--rescan-seconds", type=float, default=10.0)
     parser.add_argument("--auto-info-seconds", type=float, default=30.0)
     parser.add_argument("--history-file", default=str(DEFAULT_HISTORY_FILE))
+    parser.add_argument(
+        "--event-source",
+        choices=("gossip", "poll"),
+        default="gossip",
+        help="event ingestion source (default: gossip realtime stream)",
+    )
     parser.add_argument("--react-clock", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument(
+        "--theme",
+        choices=("auto", "dark", "light"),
+        default="auto",
+        help="Color theme for clock and cards (default: auto)",
+    )
+    parser.add_argument(
+        "--theme-check-seconds",
+        type=float,
+        default=DEFAULT_THEME_CHECK_SECONDS,
+        help="How often auto theme mode re-checks system appearance (default: 5s)",
+    )
     parser.add_argument(
         "--react-second-hand",
         action=argparse.BooleanOptionalAction,
@@ -2210,6 +2617,9 @@ async def run(
     rescan_seconds: float,
     auto_info_seconds: float,
     history_file: Path,
+    event_source: str,
+    theme: str,
+    theme_check_seconds: float,
     react_clock: bool,
     react_second_hand: bool,
     debug: bool,
@@ -2217,9 +2627,25 @@ async def run(
 ) -> None:
     global _DEBUG_KBS
     _DEBUG_KBS = debug
-    print(f"kanbus-watch: scanning for project/events under {root}")
-    discovered = discover_event_dirs(root)
-    tracked = _startup_report(root, discovered)
+    selected_theme = _set_active_theme(theme)
+    print(f"kanbus-watch theme: {theme} -> {selected_theme}")
+    tracked: dict[Path, set[str]] = {}
+    gossip_roots: list[Path] = []
+    if event_source == "poll":
+        print(f"kanbus-watch: scanning for project/events under {root}")
+        discovered = discover_event_dirs(root)
+        tracked = _startup_report(root, discovered)
+    else:
+        print(f"kanbus-watch root: {root}")
+        print("kanbus-watch source: gossip")
+        gossip_roots = discover_kanbus_project_roots(root)
+        if not gossip_roots:
+            raise SystemExit(
+                f"No Kanbus projects found under {root}. Expected descendant directories with .kanbus.yml"
+            )
+        print(f"kanbus-watch: found {len(gossip_roots)} Kanbus project root(s)")
+        for project_root in gossip_roots:
+            print(f" - gossip root: {project_root}")
 
     print(f"pixoo: connecting to {ip}")
     pixoo = Pixoo(ip)
@@ -2238,6 +2664,7 @@ async def run(
             clock_scene = ReactClockScene(
                 runtime_base_url=runtime_server.base_url,
                 show_second_hand=react_second_hand,
+                theme=selected_theme,
             )
             await clock_scene.start()
             print(f"clock-source: react runtime {runtime_server.base_url}")
@@ -2252,17 +2679,38 @@ async def run(
 
         await player.set_scene(clock_scene)
         runner = asyncio.create_task(player.run())
-        watcher = asyncio.create_task(
-            _watch_events_loop(
-                root=root,
-                tracked=tracked,
-                notices=notices,
+        on_theme_change = None
+        if hasattr(clock_scene, "set_theme"):
+            on_theme_change = clock_scene.set_theme
+        theme_monitor = asyncio.create_task(
+            _theme_monitor_loop(
+                mode=theme,
+                check_seconds=max(1.0, theme_check_seconds),
                 stop_event=stop_event,
-                poll_seconds=poll_seconds,
-                rescan_seconds=rescan_seconds,
-                kbs_root=root,
+                on_theme_change=on_theme_change,
             )
         )
+        if event_source == "gossip":
+            watcher = asyncio.create_task(
+                _watch_gossip_loop(
+                    roots=gossip_roots,
+                    notices=notices,
+                    stop_event=stop_event,
+                    kbs_root=root,
+                )
+            )
+        else:
+            watcher = asyncio.create_task(
+                _watch_events_loop(
+                    root=root,
+                    tracked=tracked,
+                    notices=notices,
+                    stop_event=stop_event,
+                    poll_seconds=poll_seconds,
+                    rescan_seconds=rescan_seconds,
+                    kbs_root=root,
+                )
+            )
         consumer = asyncio.create_task(
             _auto_notice_consumer(
                 notices=notices,
@@ -2290,9 +2738,9 @@ async def run(
                 await stop_event.wait()
         finally:
             stop_event.set()
-            for task in (watcher, consumer):
+            for task in (watcher, consumer, theme_monitor):
                 task.cancel()
-            await asyncio.gather(watcher, consumer, return_exceptions=True)
+            await asyncio.gather(watcher, consumer, theme_monitor, return_exceptions=True)
             if react_clock and hasattr(clock_scene, "stop"):
                 await clock_scene.stop()
             if runtime_server is not None:
@@ -2316,6 +2764,9 @@ def main() -> None:
                 rescan_seconds=max(0.5, args.rescan_seconds),
                 auto_info_seconds=max(0.1, args.auto_info_seconds),
                 history_file=Path(args.history_file).expanduser(),
+                event_source=str(args.event_source),
+                theme=str(args.theme),
+                theme_check_seconds=max(1.0, args.theme_check_seconds),
                 react_clock=bool(args.react_clock),
                 react_second_hand=bool(args.react_second_hand),
                 debug=bool(args.debug),
