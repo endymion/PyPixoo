@@ -3,7 +3,7 @@
   "title": "kanbus_clock frame rate drops when gossip workers hot-restart",
   "description": "Observed: clock appears to update at a lower frame rate after enabling multi-root gossip mode. Logs show repeated non-stop restart loops for failing gossip watch workers (rc=1), which can consume CPU and starve rendering.\n\nExpected: failing gossip roots should back off retries instead of hot-looping, so clock rendering cadence remains stable.",
   "type": "bug",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 2,
   "assignee": null,
   "creator": null,
@@ -22,10 +22,52 @@
       "author": "ryan.porter",
       "text": "Implemented fix: gossip worker restart backoff now exponential and bounded (0.5s -> 1 -> 2 -> 4 -> ... up to 30s) instead of hot-looping every 0.5s. Added test coverage for delay function, ran py_compile + pytest tests/test_kanbus_clock.py (54 passed), and restarted clock process for live verification.",
       "created_at": "2026-03-07T05:12:47.297679Z"
+    },
+    {
+      "id": "a7fcbf20-7296-43a8-a5cc-82b483d9f8ee",
+      "author": "ryan.porter",
+      "text": "Additional isolation landed: moved blocking work off the render event loop. Gossip path now runs summarize_event/kbs show via asyncio.to_thread, and auto-theme polling runs system detection via asyncio.to_thread as well. Validation: py_compile + tests/test_kanbus_clock.py (54 passed).",
+      "created_at": "2026-03-07T05:29:00.124638Z"
+    },
+    {
+      "id": "8d89feb0-3314-4056-ae46-da612842491f",
+      "author": "ryan.porter",
+      "text": "Further stabilization: added theme-change hysteresis (requires two consecutive detections before applying) to prevent light/dark flapping rerenders, and auto-disables chronically failing gossip roots after repeated failures. Revalidated: py_compile + pytest tests/test_kanbus_clock.py (54 passed).",
+      "created_at": "2026-03-07T05:29:58.519425Z"
+    },
+    {
+      "id": "e8f1f11d-c2c9-4043-81f6-0d15b1f73c37",
+      "author": "ryan.porter",
+      "text": "Smoothness check event after watcher isolation",
+      "created_at": "2026-03-07T05:31:45.186719Z"
+    },
+    {
+      "id": "50565eb0-530c-4854-93df-96ab665a024b",
+      "author": "ryan.porter",
+      "text": "Root cause found for ~1 FPS feel: ReactClockScene cache key was second-quantized. Fixed by keying on sub-second frame buckets tied to demo FPS and passing fractional seconds into runtime clock props. Also tuned refresh loop cadence to target FPS. Validation: py_compile + tests/test_kanbus_clock.py (55 passed).",
+      "created_at": "2026-03-07T05:33:21.781981Z"
+    },
+    {
+      "id": "d1118cba-6237-4d71-a2b7-40548a5a8799",
+      "author": "ryan.porter",
+      "text": "Implementing render-loop fix: remove per-frame page.goto in React clock runtime; use persistent page + in-page prop updates to restore >1 FPS.",
+      "created_at": "2026-03-07T05:52:22.946477Z"
+    },
+    {
+      "id": "8a33ce5e-74f4-4bfd-b908-886220593f42",
+      "author": "ryan.porter",
+      "text": "Patched runtime frame path: React runtime now exposes __pixooApplyClockArgs and Python renderer keeps one Playwright page loaded, updating props in-page instead of per-frame navigation. Local benchmark: 30 frames in 1.00s (~30 FPS render path). Validation: py_compile + tests/test_kanbus_clock.py (55 passed). Waiting for device confirmation of improved clock FPS.",
+      "created_at": "2026-03-07T05:55:02.063602Z"
+    },
+    {
+      "id": "93e3c72c-e1f0-47b8-b477-dfa660516d10",
+      "author": "ryan.porter",
+      "text": "Verified fix: React runtime now updates in-page without per-frame navigation, restoring smooth clock refresh. User confirmed FPS is better; closing.",
+      "created_at": "2026-03-07T05:57:39.381650Z"
     }
   ],
   "created_at": "2026-03-07T05:11:28.065618Z",
-  "updated_at": "2026-03-07T05:12:47.297679Z",
-  "closed_at": null,
+  "updated_at": "2026-03-07T05:57:42.501609Z",
+  "closed_at": "2026-03-07T05:57:42.501609Z",
   "custom": {}
 }

@@ -13,6 +13,8 @@ import argparse
 import asyncio
 import atexit
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor
+import io
 import json
 import os
 import re
@@ -29,17 +31,19 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Callable, Optional
 from urllib.parse import urlencode
+from urllib.parse import parse_qsl
+from urllib.parse import urlsplit
+from urllib.parse import urlunsplit
 
 from dotenv import load_dotenv
+from PIL import Image
 
 import pixooclock as clock
 from pypixoo import (
     ClockScene,
-    FrameRenderer,
     InfoLayout,
     InfoScene,
     Pixoo,
-    WebFrameSource,
     TableCell,
     TableRow,
     TextRow,
@@ -122,6 +126,13 @@ def _set_active_theme(mode: str) -> str:
     return _ACTIVE_THEME
 
 
+async def _set_active_theme_async(mode: str) -> str:
+    resolved = await asyncio.to_thread(_resolve_theme, mode)
+    global _ACTIVE_THEME
+    _ACTIVE_THEME = resolved
+    return _ACTIVE_THEME
+
+
 async def _theme_monitor_loop(
     *,
     mode: str,
@@ -134,18 +145,25 @@ async def _theme_monitor_loop(
     interval = max(1.0, check_seconds)
     last = _ACTIVE_THEME
     next_wait = min(2.0, interval)
+    pending: str | None = None
     while not stop_event.is_set():
         try:
             await asyncio.wait_for(stop_event.wait(), timeout=next_wait)
             break
         except asyncio.TimeoutError:
             pass
-        next_theme = _set_active_theme("auto")
+        next_theme = await _set_active_theme_async("auto")
         if next_theme != last:
-            print(f"kanbus-watch theme change: {last} -> {next_theme}")
-            if on_theme_change is not None:
-                on_theme_change(next_theme)
-            last = next_theme
+            if pending != next_theme:
+                pending = next_theme
+            else:
+                print(f"kanbus-watch theme change: {last} -> {next_theme}")
+                if on_theme_change is not None:
+                    on_theme_change(next_theme)
+                last = next_theme
+                pending = None
+        else:
+            pending = None
         next_wait = interval
 
 
@@ -206,23 +224,133 @@ def _runtime_clock_url(base_url: str, args: dict[str, Any]) -> str:
     return f"{base_url}?{urlencode(query)}"
 
 
+class _RuntimeFrameRenderer:
+    """Persistent local Playwright renderer for runtime clock frames."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._playwright = None
+        self._browser = None
+        self._context = None
+        self._page = None
+        self._loaded_base_url: str | None = None
+        self._closed = False
+
+    def _ensure_page(self) -> None:
+        if self._page is not None:
+            return
+        from playwright.sync_api import sync_playwright
+
+        self._playwright = sync_playwright().start()
+        self._browser = self._playwright.chromium.launch(headless=True)
+        self._context = self._browser.new_context(
+            viewport={"width": 64, "height": 64},
+            device_scale_factor=3,
+        )
+        self._page = self._context.new_page()
+        self._closed = False
+
+    def _shutdown_unlocked(self) -> None:
+        if self._page is not None:
+            try:
+                self._page.close()
+            except Exception:
+                pass
+            self._page = None
+        if self._context is not None:
+            try:
+                self._context.close()
+            except Exception:
+                pass
+            self._context = None
+        if self._browser is not None:
+            try:
+                self._browser.close()
+            except Exception:
+                pass
+            self._browser = None
+        if self._playwright is not None:
+            try:
+                self._playwright.stop()
+            except Exception:
+                pass
+            self._playwright = None
+        self._loaded_base_url = None
+        self._closed = True
+
+    def close(self) -> None:
+        with self._lock:
+            self._shutdown_unlocked()
+
+    def _ensure_runtime_loaded(self, base_url: str) -> None:
+        if self._loaded_base_url == base_url:
+            return
+        assert self._page is not None
+        self._page.goto(base_url, wait_until="domcontentloaded", timeout=3000)
+        self._page.wait_for_function("() => window.__pixooReady === true", timeout=3000)
+        self._loaded_base_url = base_url
+
+    def render(self, url: str) -> bytes:
+        with self._lock:
+            self._ensure_page()
+            assert self._page is not None
+            parts = urlsplit(url)
+            base_url = urlunsplit((parts.scheme, parts.netloc, parts.path, "", ""))
+            payload = {k: v for k, v in parse_qsl(parts.query, keep_blank_values=True)}
+            try:
+                self._ensure_runtime_loaded(base_url)
+                self._page.evaluate(
+                    """
+                    async (args) => {
+                      if (typeof window.__pixooApplyClockArgs !== "function") {
+                        throw new Error("runtime missing __pixooApplyClockArgs");
+                      }
+                      await window.__pixooApplyClockArgs(args);
+                    }
+                    """,
+                    payload,
+                )
+            except Exception:
+                # Recreate browser/page once if runtime update failed.
+                self._shutdown_unlocked()
+                self._ensure_page()
+                assert self._page is not None
+                self._ensure_runtime_loaded(base_url)
+                self._page.evaluate(
+                    """
+                    async (args) => {
+                      if (typeof window.__pixooApplyClockArgs !== "function") {
+                        throw new Error("runtime missing __pixooApplyClockArgs");
+                      }
+                      await window.__pixooApplyClockArgs(args);
+                    }
+                    """,
+                    payload,
+                )
+            return self._page.screenshot()
+
+
+_RUNTIME_FRAME_RENDERER = _RuntimeFrameRenderer()
+atexit.register(_RUNTIME_FRAME_RENDERER.close)
+
+
+def _runtime_screenshot_to_buffer(screenshot_bytes: bytes) -> Buffer:
+    img = Image.open(io.BytesIO(screenshot_bytes)).convert("RGB")
+    if img.size != (64, 64):
+        img = img.resize((64, 64), Image.Resampling.BOX)
+    pixels = img.get_flattened_data()
+    flat = tuple(channel for pixel in pixels for channel in pixel)
+    return Buffer(width=64, height=64, data=flat)
+
+
 def _render_runtime_frame(
     url: str,
     *,
     t: float = 0.0,
 ) -> Buffer:
-    source = WebFrameSource(
-        url=url,
-        timestamps=[t],
-        duration_per_frame_ms=100,
-        browser_mode="per_frame",
-        timestamp_param="t",
-        viewport_size=64,
-        device_scale_factor=3,
-        downsample_mode="box",
-    )
-    sequence = FrameRenderer([source]).precompute()
-    return sequence.frames[0].image
+    del t
+    screenshot = _RUNTIME_FRAME_RENDERER.render(url)
+    return _runtime_screenshot_to_buffer(screenshot)
 
 
 class ReactClockScene:
@@ -234,31 +362,43 @@ class ReactClockScene:
         runtime_base_url: str,
         show_second_hand: bool,
         theme: str,
+        refresh_fps: int = 5,
     ) -> None:
         self._runtime_base_url = runtime_base_url
         self._show_second_hand = show_second_hand
         self._theme = theme
+        self._refresh_fps = max(1, int(refresh_fps))
         self._cache: _CachedFrame | None = None
         self._refresh_task: asyncio.Task | None = None
         self._stop_refresh = asyncio.Event()
+        self._render_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="react-clock-render")
+
+    def _frame_bucket(self, epoch_s: float) -> int:
+        return int(epoch_s * self._refresh_fps)
 
     def _render_clock_sync(self, epoch_s: float) -> Buffer:
         local = time.localtime(epoch_s)
-        key = f"{local.tm_hour}:{local.tm_min}:{local.tm_sec}:{int(epoch_s)}"
+        second_float = min(59.999, max(0.0, local.tm_sec + (epoch_s - int(epoch_s))))
+        key = f"{local.tm_hour}:{local.tm_min}:{second_float:.3f}:{self._frame_bucket(epoch_s)}"
         url = _runtime_clock_url(
             self._runtime_base_url,
             {
                 "hour": local.tm_hour % 12,
                 "minute": local.tm_min,
-                "second": local.tm_sec,
+                "second": f"{second_float:.3f}",
                 "showSecondHand": self._show_second_hand,
                 "theme": self._theme,
             },
         )
-        buf = _render_runtime_frame(
-            url,
-            t=(local.tm_sec % 60) / 60.0,
-        )
+        try:
+            buf = _render_runtime_frame(
+                url,
+                t=(second_float % 60.0) / 60.0,
+            )
+        except Exception as exc:
+            raise RuntimeError(
+                f"{threading.current_thread().name}: {exc}"
+            ) from exc
         self._cache = _CachedFrame(key=key, buffer=buf)
         return buf
 
@@ -268,24 +408,28 @@ class ReactClockScene:
         return self._cache.buffer
 
     async def _refresh_loop(self) -> None:
+        sleep_s = max(0.02, 0.5 / self._refresh_fps)
+        loop = asyncio.get_running_loop()
         while not self._stop_refresh.is_set():
             now = time.time()
             local = time.localtime(now)
-            key = f"{local.tm_hour}:{local.tm_min}:{local.tm_sec}:{int(now)}"
+            second_float = min(59.999, max(0.0, local.tm_sec + (now - int(now))))
+            key = f"{local.tm_hour}:{local.tm_min}:{second_float:.3f}:{self._frame_bucket(now)}"
             if self._cache is None or self._cache.key != key:
                 try:
-                    await asyncio.to_thread(self._render_clock_sync, now)
+                    await loop.run_in_executor(self._render_executor, self._render_clock_sync, now)
                 except Exception as exc:
                     print(f"react-clock refresh skipped: {exc}")
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(sleep_s)
 
     async def start(self) -> None:
         if self._refresh_task is not None and not self._refresh_task.done():
             return
         self._stop_refresh.clear()
+        loop = asyncio.get_running_loop()
         if self._cache is None:
             try:
-                await asyncio.to_thread(self._render_clock_sync, time.time())
+                await loop.run_in_executor(self._render_executor, self._render_clock_sync, time.time())
             except Exception as exc:
                 print(f"react-clock warmup skipped: {exc}")
         self._refresh_task = asyncio.create_task(self._refresh_loop())
@@ -296,6 +440,9 @@ class ReactClockScene:
             self._refresh_task.cancel()
             await asyncio.gather(self._refresh_task, return_exceptions=True)
             self._refresh_task = None
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(self._render_executor, _RUNTIME_FRAME_RENDERER.close)
+        self._render_executor.shutdown(wait=False, cancel_futures=True)
 
     def layers(self, ctx: RenderContext) -> list[LayerNode]:
         scene = self
@@ -2005,6 +2152,7 @@ async def _watch_gossip_worker(
     seen_order: deque[str],
     prior_issue_by_id: dict[str, dict[str, Any]],
     seen_max: int = 4096,
+    max_failures_before_disable: int = 5,
 ) -> None:
     broker_proc: asyncio.subprocess.Process | None = None
     consecutive_failures = 0
@@ -2088,7 +2236,7 @@ async def _watch_gossip_worker(
                 if event is None:
                     continue
                 try:
-                    notice = summarize_event(event, kbs_root)
+                    notice = await asyncio.to_thread(summarize_event, event, kbs_root)
                 except KbsShowAmbiguous:
                     print(f"gossip: ambiguous identifier for {event.issue_id}, skipping")
                     continue
@@ -2110,6 +2258,12 @@ async def _watch_gossip_worker(
                 await _start_broker_if_needed()
             if returncode != 0:
                 consecutive_failures += 1
+                if consecutive_failures >= max_failures_before_disable:
+                    print(
+                        f"gossip[{root.name}]: disabled after "
+                        f"{consecutive_failures} consecutive failures (rc={returncode})"
+                    )
+                    break
                 delay = _gossip_restart_delay_seconds(consecutive_failures)
                 print(
                     f"gossip[{root.name}]: watch exited rc={returncode}; "
@@ -2681,6 +2835,7 @@ async def run(
                 runtime_base_url=runtime_server.base_url,
                 show_second_hand=react_second_hand,
                 theme=selected_theme,
+                refresh_fps=max(1, fps),
             )
             await clock_scene.start()
             print(f"clock-source: react runtime {runtime_server.base_url}")

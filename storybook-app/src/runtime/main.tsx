@@ -9,6 +9,7 @@ declare global {
   interface Window {
     __pixooReady?: boolean;
     __pixooReadyError?: string;
+    __pixooApplyClockArgs?: (raw: Record<string, unknown>) => Promise<void>;
   }
 }
 
@@ -91,36 +92,82 @@ function parseBool(raw: string | null): boolean | undefined {
   return undefined;
 }
 
-function parseClockPropsFromQuery(): ClockProps {
-  const params = new URLSearchParams(window.location.search);
-  const rawTheme = (params.get("theme") || "dark").trim().toLowerCase();
-  const theme: "dark" | "light" = rawTheme === "light" ? "light" : "dark";
+function parseBoolUnknown(raw: unknown): boolean | undefined {
+  if (typeof raw === "boolean") {
+    return raw;
+  }
+  if (typeof raw === "number") {
+    return raw !== 0;
+  }
+  if (typeof raw === "string") {
+    return parseBool(raw);
+  }
+  return undefined;
+}
+
+function parseNumberUnknown(raw: unknown): number | undefined {
+  if (typeof raw === "number" && Number.isFinite(raw)) {
+    return raw;
+  }
+  if (typeof raw === "string") {
+    const parsed = Number(raw);
+    if (!Number.isNaN(parsed)) {
+      return parsed;
+    }
+  }
+  return undefined;
+}
+
+function parseStringUnknown(raw: unknown): string | undefined {
+  if (typeof raw === "string" && raw.length > 0) {
+    return raw;
+  }
+  return undefined;
+}
+
+function normalizeTheme(raw: unknown, fallback: "dark" | "light"): "dark" | "light" {
+  if (typeof raw === "string" && raw.trim().toLowerCase() === "light") {
+    return "light";
+  }
+  return fallback;
+}
+
+function buildClockPropsFromRaw(
+  raw: Record<string, unknown>,
+  fallbackTheme: "dark" | "light",
+): { props: ClockProps; theme: "dark" | "light" } {
+  const theme = normalizeTheme(raw.theme, fallbackTheme);
   const props: ClockProps = { ...defaultClockProps(theme) };
 
   for (const key of NUMBER_KEYS) {
-    const value = params.get(key);
-    if (value == null) {
-      continue;
-    }
-    const parsed = Number(value);
-    if (!Number.isNaN(parsed)) {
+    const parsed = parseNumberUnknown(raw[key]);
+    if (parsed !== undefined) {
       props[key] = parsed as never;
     }
   }
 
   for (const key of STRING_KEYS) {
-    const value = params.get(key);
-    if (value != null && value.length > 0) {
-      props[key] = value as never;
+    const parsed = parseStringUnknown(raw[key]);
+    if (parsed !== undefined) {
+      props[key] = parsed as never;
     }
   }
 
-  const showSecondHand = parseBool(params.get("showSecondHand"));
+  const showSecondHand = parseBoolUnknown(raw.showSecondHand);
   if (typeof showSecondHand === "boolean") {
     props.showSecondHand = showSecondHand;
   }
 
-  return props;
+  return { props, theme };
+}
+
+function parseClockPropsFromQuery(): ClockProps {
+  const params = new URLSearchParams(window.location.search);
+  const raw: Record<string, unknown> = {};
+  for (const [key, value] of params.entries()) {
+    raw[key] = value;
+  }
+  return buildClockPropsFromRaw(raw, "dark").props;
 }
 
 function markReadySoon(): void {
@@ -139,19 +186,40 @@ function bootstrap(): void {
     if (!rootEl) {
       throw new Error("Missing #root element");
     }
-    const clockProps = parseClockPropsFromQuery();
-    createRoot(rootEl).render(
-      <div
-        style={{
-          width: PIXOO_SIZE,
-          height: PIXOO_SIZE,
-          overflow: "hidden",
-          background: "#000",
-        }}
-      >
-        <Clock {...clockProps} />
-      </div>
+    const root = createRoot(rootEl);
+    const initialProps = parseClockPropsFromQuery();
+    const initialTheme = normalizeTheme(
+      new URLSearchParams(window.location.search).get("theme"),
+      "dark",
     );
+    let activeTheme: "dark" | "light" = initialTheme;
+
+    const renderClock = (clockProps: ClockProps): void => {
+      root.render(
+        <div
+          style={{
+            width: PIXOO_SIZE,
+            height: PIXOO_SIZE,
+            overflow: "hidden",
+            background: "#000",
+          }}
+        >
+          <Clock {...clockProps} />
+        </div>
+      );
+    };
+
+    renderClock(initialProps);
+    window.__pixooApplyClockArgs = async (raw: Record<string, unknown>) => {
+      const next = buildClockPropsFromRaw(raw, activeTheme);
+      activeTheme = next.theme;
+      renderClock(next.props);
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => resolve());
+        });
+      });
+    };
     markReadySoon();
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

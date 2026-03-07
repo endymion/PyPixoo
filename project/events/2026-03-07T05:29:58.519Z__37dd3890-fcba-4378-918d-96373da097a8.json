@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "event_id": "37dd3890-fcba-4378-918d-96373da097a8",
+  "issue_id": "PIXO-065eb546-d935-428b-b812-15d4c7570fd0",
+  "event_type": "comment_added",
+  "occurred_at": "2026-03-07T05:29:58.519Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "comment_author": "ryan.porter",
+    "comment_id": "8d89feb0-3314-4056-ae46-da612842491f"
+  }
+}

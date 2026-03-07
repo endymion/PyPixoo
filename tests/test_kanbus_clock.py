@@ -1485,7 +1485,7 @@ def test_theme_monitor_loop_updates_theme_and_calls_callback(monkeypatch):
                 on_theme_change=seen.append,
             )
         )
-        await asyncio.sleep(1.05)
+        await asyncio.sleep(2.2)
         stop_event.set()
         await asyncio.wait_for(task, timeout=1.0)
 
@@ -1621,12 +1621,26 @@ def test_react_clock_scene_includes_theme_query(monkeypatch):
         runtime_base_url="http://127.0.0.1:1234/runtime.html",
         show_second_hand=False,
         theme="light",
+        refresh_fps=5,
     )
     scene._render_clock_sync(0.0)
     assert "theme=light" in captured["url"]
+    assert "second=0.000" in captured["url"]
     scene.set_theme("dark")
     scene._render_clock_sync(0.0)
     assert "theme=dark" in captured["url"]
+
+
+def test_react_clock_scene_frame_bucket_uses_refresh_fps():
+    module = _load_demo_module()
+    scene = module.ReactClockScene(
+        runtime_base_url="http://127.0.0.1:1234/runtime.html",
+        show_second_hand=False,
+        theme="dark",
+        refresh_fps=5,
+    )
+    assert scene._frame_bucket(0.19) == 0
+    assert scene._frame_bucket(0.21) == 1
 
 
 def test_runtime_static_server_requires_built_assets(tmp_path: Path):
