@@ -12,8 +12,9 @@ from __future__ import annotations
 import argparse
 import asyncio
 import atexit
-from collections import deque
-from concurrent.futures import ThreadPoolExecutor
+from collections import OrderedDict, deque
+import concurrent.futures
+from concurrent.futures import Future, ThreadPoolExecutor
 import io
 import json
 import os
@@ -283,6 +284,52 @@ class _RuntimeFrameRenderer:
         with self._lock:
             self._shutdown_unlocked()
 
+
+class _ParallelFrameRenderer:
+    def __init__(self, worker_count: int) -> None:
+        self._worker_count = max(1, worker_count)
+        self._executor = ThreadPoolExecutor(
+            max_workers=self._worker_count,
+            thread_name_prefix="react-clock-render-pool",
+        )
+        self._futures: "OrderedDict[str, Future[Buffer]]" = OrderedDict()
+        self._condition = threading.Condition()
+
+    def submit(self, key: str, url: str) -> Future[Buffer]:
+        with self._condition:
+            future = self._futures.get(key)
+            if future is None or future.done():
+                future = self._executor.submit(_render_runtime_frame, url)
+                self._futures[key] = future
+                while len(self._futures) > self._worker_count * 3:
+                    self._futures.popitem(last=False)
+            return future
+
+    def result(self, key: str, timeout_s: float) -> Buffer | None:
+        with self._condition:
+            future = self._futures.get(key)
+        if future is None:
+            return None
+        try:
+            return future.result(timeout=timeout_s)
+        except concurrent.futures.TimeoutError:
+            return None
+        except Exception:
+            with self._condition:
+                self._futures.pop(key, None)
+            raise
+
+    def render_sync(self, url: str) -> Buffer:
+        return _render_runtime_frame(url)
+
+    def close(self) -> None:
+        with self._condition:
+            for key, future in list(self._futures.items()):
+                self._futures.pop(key, None)
+                if not future.done():
+                    future.cancel()
+        self._executor.shutdown(wait=False)
+
     def _ensure_runtime_loaded(self, base_url: str) -> None:
         if self._loaded_base_url == base_url:
             return
@@ -333,6 +380,7 @@ class _RuntimeFrameRenderer:
 
 _RUNTIME_FRAME_RENDERER = _RuntimeFrameRenderer()
 atexit.register(_RUNTIME_FRAME_RENDERER.close)
+DEFAULT_FRAME_WORKERS = 2
 
 
 def _runtime_screenshot_to_buffer(screenshot_bytes: bytes) -> Buffer:
@@ -364,6 +412,7 @@ class ReactClockScene:
         show_second_hand: bool,
         theme: str,
         refresh_fps: int = 5,
+        frame_workers: int = DEFAULT_FRAME_WORKERS,
     ) -> None:
         self._runtime_base_url = runtime_base_url
         self._show_second_hand = show_second_hand
@@ -373,6 +422,7 @@ class ReactClockScene:
         self._refresh_task: asyncio.Task | None = None
         self._stop_refresh = asyncio.Event()
         self._render_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="react-clock-render")
+        self._parallel_renderer = _ParallelFrameRenderer(worker_count=frame_workers)
 
     def _frame_bucket(self, epoch_s: float) -> int:
         return int(epoch_s * self._refresh_fps)
@@ -391,15 +441,15 @@ class ReactClockScene:
                 "theme": self._theme,
             },
         )
-        try:
-            buf = _render_runtime_frame(
-                url,
-                t=(second_float % 60.0) / 60.0,
-            )
-        except Exception as exc:
-            raise RuntimeError(
-                f"{threading.current_thread().name}: {exc}"
-            ) from exc
+        future = self._parallel_renderer.submit(key, url)
+        buf = self._parallel_renderer.result(key, timeout_s=0.05)
+        if buf is None:
+            try:
+                buf = self._parallel_renderer.render_sync(url)
+            except Exception as exc:
+                raise RuntimeError(
+                    f"{threading.current_thread().name}: {exc}"
+                ) from exc
         self._cache = _CachedFrame(key=key, buffer=buf)
         return buf
 
@@ -444,6 +494,7 @@ class ReactClockScene:
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(self._render_executor, _RUNTIME_FRAME_RENDERER.close)
         self._render_executor.shutdown(wait=False, cancel_futures=True)
+        self._parallel_renderer.close()
 
     def layers(self, ctx: RenderContext) -> list[LayerNode]:
         scene = self
@@ -2806,6 +2857,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--root", default=".")
     parser.add_argument("--auto-info-seconds", type=float, default=30.0)
     parser.add_argument("--history-file", default=str(DEFAULT_HISTORY_FILE))
+    parser.add_argument(
+        "--react-frame-workers",
+        type=int,
+        default=DEFAULT_FRAME_WORKERS,
+        help="Number of parallel workers rendering React frames (default 2)",
+    )
     parser.add_argument("--react-clock", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument(
         "--theme",
@@ -2841,6 +2898,7 @@ async def run(
     theme_check_seconds: float,
     react_clock: bool,
     react_second_hand: bool,
+    react_frame_workers: int,
     debug: bool,
     no_repl: bool,
 ) -> None:
@@ -2880,6 +2938,7 @@ async def run(
                 show_second_hand=react_second_hand,
                 theme=selected_theme,
                 refresh_fps=max(1, fps),
+                frame_workers=max(1, react_frame_workers),
             )
             await clock_scene.start()
             print(f"clock-source: react runtime {runtime_server.base_url}")
@@ -2968,6 +3027,7 @@ def main() -> None:
                 theme_check_seconds=max(1.0, args.theme_check_seconds),
                 react_clock=bool(args.react_clock),
                 react_second_hand=bool(args.react_second_hand),
+                react_frame_workers=max(1, args.react_frame_workers),
                 debug=bool(args.debug),
                 no_repl=bool(args.no_repl),
             )

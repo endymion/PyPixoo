@@ -394,7 +394,7 @@ def test_issue_type_palette_applies_to_cards_including_comments():
 
     def _assert_band(scene, band: str, *, comment: bool = False):
         header = scene.layout.rows[0]
-        expected_body_bg = module.parse_color(f"dark.{band}1")
+        expected_body_bg = (0, 0, 0)
         expected_issue_bg = module.parse_color(f"dark.{band}2")
         expected_header_bg = module.parse_color(f"dark.{band}4")
         expected_header = module.parse_color(f"dark.{band}{module._BASE_STEP}")
@@ -426,6 +426,13 @@ def test_issue_type_palette_applies_to_cards_including_comments():
     )
     assert task_notice.scene is not None
     _assert_band(task_notice.scene, "blue")
+    task_header = task_notice.scene.layout.rows[0]
+    expected_task_status = module.parse_color(f"dark.blue{module._ATTENTION_STEP}")
+    task_status_spans = [
+        span for span in task_header.content if getattr(span, "text", "") == "OPEN"
+    ]
+    assert task_status_spans
+    assert task_status_spans[0].color == expected_task_status
 
     epic_notice = module.summarize_event(
         module.KanbusEvent(
@@ -804,7 +811,7 @@ def test_event_prefix_override_rejects_numeric_only_prefix():
     module = _load_demo_module()
     assert module._event_prefix_override("ABC-1234") == "ABC"
     assert module._event_prefix_override("1234") == ""
-    assert module._event_prefix_override("kanbus-abc123") == ""
+    assert module._event_prefix_override("kanbus-abc123") == "KANBUS"
 
 
 def test_payload_prefix_override_prefers_full_issue_key():
@@ -850,6 +857,41 @@ def test_issue_prefix_uses_key_from_show_payload():
     snapshot = module._fetch_issue_snapshot("acdeff11-2222-3333-4444-555555555555")
     assert snapshot is not None
     assert snapshot.id_prefix_upper == "PIXO"
+
+
+def test_summarize_event_prefers_payload_project_key_over_hash_like_snapshot_prefix():
+    module = _load_demo_module()
+
+    module._fetch_issue_snapshot = lambda *args, **kwargs: module.IssueSnapshot(  # type: ignore[assignment]
+        issue_id="6db04e",
+        id_prefix_upper="6DB04E",
+        issue_type_upper="TASK",
+        status_upper="INPROGRESS",
+        description="Issue description",
+        title="Issue title",
+        parent_id=None,
+        latest_comment_text="",
+    )
+
+    event = module.KanbusEvent(
+        path=Path("x.json"),
+        schema_version=1,
+        event_id="evt-1",
+        issue_id="6db04e",
+        event_type="state_transition",
+        occurred_at=module._parse_iso8601("2026-03-07T00:00:00Z"),
+        actor_id="tester",
+        payload={
+            "project_key": "PIXO",
+            "from_status": "OPEN",
+            "to_status": "IN_PROGRESS",
+        },
+    )
+
+    notice = module.summarize_event(event)
+    assert notice is not None
+    assert notice.scene is not None
+    assert _scene_header_text(notice.scene).startswith("PIXO")
 
 
 def test_summarize_event_uses_payload_prefix_when_event_id_is_numeric():
@@ -1390,7 +1432,7 @@ def test_build_parser_defaults_auto_info_seconds_30():
     args = parser.parse_args([])
     assert args.auto_info_seconds == 30.0
     assert args.theme_check_seconds == 5.0
-    assert args.event_source == "gossip"
+    assert not hasattr(args, "event_source")
     assert args.theme == "auto"
     assert args.react_clock is True
     assert not hasattr(args, "storybook_iframe")
@@ -1465,6 +1507,19 @@ def test_theme_resolution_and_radix_token_mapping(monkeypatch):
     assert module._radix_token("blue", 7) == "blue7"
     assert module._set_active_theme("dark") == "dark"
     assert module._radix_token("blue", 7) == "dark.blue7"
+
+
+def test_main_content_body_background_is_black_in_dark_mode():
+    module = _load_demo_module()
+    module._set_active_theme("dark")
+    assert module._main_content_body_bg("TASK", fallback=(12, 34, 56)) == (0, 0, 0)
+
+
+def test_main_content_body_background_uses_band_step1_in_light_mode():
+    module = _load_demo_module()
+    module._set_active_theme("light")
+    expected = module._radix_color("blue", 2, fallback=(12, 34, 56))
+    assert module._main_content_body_bg("TASK", fallback=(12, 34, 56)) == expected
 
 
 def test_theme_monitor_loop_updates_theme_and_calls_callback(monkeypatch):
