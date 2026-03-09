@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-88ea331b-d415-4d25-b56e-a85f100c0cae",
+  "title": "kanbus_clock: make main content row background pure black in dark mode",
+  "description": "Comment, transition, and created info cards should render the main content body row background as pure black in dark mode instead of tinted band color.",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "826583e5-2419-491c-be53-ee60db367fd0",
+      "author": "ryan.porter",
+      "text": "Implementing color update: set main content body row background to pure black for created/transition/comment card scenes.",
+      "created_at": "2026-03-07T06:08:01.954846Z"
+    },
+    {
+      "id": "3c8f9a72-aeac-4e58-9894-3d62a18cf3c3",
+      "author": "ryan.porter",
+      "text": "Implemented: main content body section background is now pure black in dark mode for issue_created/state_transition/comment_added cards. Added tests for dark/light behavior and updated palette expectations. Validation: py_compile + pytest tests/test_kanbus_clock.py (57 passed).",
+      "created_at": "2026-03-07T06:09:00.277209Z"
+    }
+  ],
+  "created_at": "2026-03-07T06:07:49.057339Z",
+  "updated_at": "2026-03-07T06:09:00.285334Z",
+  "closed_at": "2026-03-07T06:09:00.285334Z",
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "e8c799b9-c02d-4080-b178-55d29bd7f0c5",
+  "issue_id": "PIXO-f194a26f-3e15-480d-ae50-54a548f22e48",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:40:43.414Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "probe3",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Gossip broker probe"
+  }
+}

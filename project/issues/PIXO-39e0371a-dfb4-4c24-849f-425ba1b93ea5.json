@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-39e0371a-dfb4-4c24-849f-425ba1b93ea5",
+  "title": "Animation check",
+  "description": "verify clock active",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "a33e9e83-6258-40e4-98b8-5c936ea972b2",
+      "author": "ryan.porter",
+      "text": "anim check comment",
+      "created_at": "2026-03-07T06:32:26.830579Z"
+    }
+  ],
+  "created_at": "2026-03-07T06:32:26.820848Z",
+  "updated_at": "2026-03-07T06:32:26.848442Z",
+  "closed_at": "2026-03-07T06:32:26.848442Z",
+  "custom": {}
+}

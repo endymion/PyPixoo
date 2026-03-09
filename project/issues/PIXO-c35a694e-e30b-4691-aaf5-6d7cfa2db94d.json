@@ -1,0 +1,79 @@
+{
+  "id": "PIXO-c35a694e-e30b-4691-aaf5-6d7cfa2db94d",
+  "title": "Clock supervisor harness for periodic restart",
+  "description": "Run kanbus_clock under a supervisor that restarts every 7 minutes for realtime kbs testing.",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "a52991cf-fb49-4e11-8f9b-9164907d914c",
+      "author": "ryan.porter",
+      "text": "Implementing supervisor harness to restart kanbus_clock every 7 minutes and launching it for realtime testing.",
+      "created_at": "2026-03-08T12:42:52.507220Z"
+    },
+    {
+      "id": "89fc6d04-0239-46f7-9b66-28c6611bbc34",
+      "author": "ryan.porter",
+      "text": "Supervisor launched successfully. Running kanbus_clock under periodic restart every 420s. Active PIDs: supervisor=67890, clock=67923.",
+      "created_at": "2026-03-08T12:44:08.633137Z"
+    },
+    {
+      "id": "89b0eb16-7e0a-4ee1-a577-7529179cf5a5",
+      "author": "ryan.porter",
+      "text": "Switching from periodic restart supervisor to continuous single-process kanbus_clock runtime per request.",
+      "created_at": "2026-03-08T13:12:49.629088Z"
+    },
+    {
+      "id": "f99a3c28-6807-4045-a619-a5dc1653560b",
+      "author": "ryan.porter",
+      "text": "Supervisor stopped. Running continuous single kanbus_clock process (no periodic restart).",
+      "created_at": "2026-03-08T13:13:32.428991Z"
+    },
+    {
+      "id": "524dac26-f3ca-48ec-a38c-ead6a524cdb3",
+      "author": "ryan.porter",
+      "text": "Restarting continuous kanbus_clock after config change.",
+      "created_at": "2026-03-08T13:18:47.880681Z"
+    },
+    {
+      "id": "ddae2c8e-ed44-4228-bfbb-976bd46da753",
+      "author": "unknown",
+      "text": "Patched gossip ingest to reduce permanent backlog: (1) timestamp fallback to issue.updated_at/created_at when envelope ts is missing, (2) cross-root stable-signature dedupe to suppress replay duplicates with different envelope ids/producers/projects. Tests passing (62).",
+      "created_at": "2026-03-09T00:04:03.767140Z"
+    },
+    {
+      "id": "a3a0f2c5-1b11-45d1-80b8-9ead92ae91e7",
+      "author": "unknown",
+      "text": "Investigating repeated old notifications (e.g., Task A). Applying stricter startup cutoff handling for gossip events with missing timestamps to prevent replayed historical events from being enqueued.",
+      "created_at": "2026-03-09T00:52:21.435665Z"
+    },
+    {
+      "id": "36a5f68c-0143-422d-9558-ed0c74dca269",
+      "author": "unknown",
+      "text": "Applied strict startup cutoff fix: gossip events with missing timestamps are now skipped when startup_cutoff is active, preventing replayed stale notifications from entering the queue. Restarted clock with this patch.",
+      "created_at": "2026-03-09T00:53:14.992493Z"
+    },
+    {
+      "id": "b33f50ed-fa49-4112-9c05-c0bbdeb95c39",
+      "author": "unknown",
+      "text": "Implementing adaptive notification hold duration: 30s at empty queue, linearly down to 10s at depth>=10, minimum 10s.",
+      "created_at": "2026-03-09T01:10:20.703874Z"
+    },
+    {
+      "id": "a90864c5-f33d-4a46-9203-1711d05754e2",
+      "author": "unknown",
+      "text": "Reverting temporary hook/noise special-case filter per request. Continuing focused FPS investigation on React clock render path.",
+      "created_at": "2026-03-09T01:23:05.074137Z"
+    }
+  ],
+  "created_at": "2026-03-08T12:42:42.532164Z",
+  "updated_at": "2026-03-09T01:23:05.074137Z",
+  "closed_at": null,
+  "custom": {}
+}

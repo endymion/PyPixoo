@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "6f8c381a-ffd8-4133-826e-cc89e0ba667b",
+  "issue_id": "PIXO-613d6f54-d7ef-47bb-9d57-fe1dbe971699",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T07:02:37.044Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Demo issue to generate live Kanbus clock notifications.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Clock activity demo 020236"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "06b6accd-bb02-4472-a01f-dcb185369743",
+  "issue_id": "PIXO-d9f1cb3e-fe4e-4b2c-bf24-bd7c849c4ff3",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:39:54.826Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "check root gossip stream",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Gossip-only probe"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-d44546ab-8a70-47e5-ac8d-009150492f01",
+  "title": "kanbus_clock: use parent_snapshot for bottom row allocation",
+  "description": "bottom_count currently branches on parent_lines truthiness in created/transition/comment layout paths. Use parent_snapshot presence directly for deterministic row allocation and avoid accidental regressions if row generation changes.",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "b14c941f-bef3-4951-b7a7-72191ced4b6e",
+      "author": "ryan.porter",
+      "text": "Starting fix: switch bottom_count guards from parent_lines truthiness to parent_snapshot presence in issue_created/state_transition/comment_added layout paths.",
+      "created_at": "2026-03-07T06:01:37.511002Z"
+    },
+    {
+      "id": "68e5d438-adee-47f5-9f80-140f6efa9cbf",
+      "author": "ryan.porter",
+      "text": "Implemented: bottom_count now keys off parent_snapshot presence (not parent_lines) in issue_created/state_transition/comment_added paths. Validation: py_compile + pytest tests/test_kanbus_clock.py (55 passed).",
+      "created_at": "2026-03-07T06:01:59.300675Z"
+    }
+  ],
+  "created_at": "2026-03-07T06:01:33.175611Z",
+  "updated_at": "2026-03-07T06:01:59.332229Z",
+  "closed_at": "2026-03-07T06:01:59.332229Z",
+  "custom": {}
+}

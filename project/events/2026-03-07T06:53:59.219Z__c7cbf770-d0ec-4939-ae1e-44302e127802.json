@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "c7cbf770-d0ec-4939-ae1e-44302e127802",
+  "issue_id": "PIXO-2b17a115-9727-4e1d-b3ec-61b5f2776718",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:53:59.219Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Align created card header status color with transition card: status text should use the lighter attention color.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock: created slide status should use attention color"
+  }
+}

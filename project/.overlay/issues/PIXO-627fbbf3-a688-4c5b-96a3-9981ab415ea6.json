@@ -1,0 +1,29 @@
+{
+  "overlay_ts": "2026-03-08T12:35:20.615Z",
+  "overlay_event_id": "0eccb1f3-800a-4acf-adf0-b14558d254bc",
+  "issue": {
+    "id": "PIXO-627fbbf3-a688-4c5b-96a3-9981ab415ea6",
+    "title": "Hotfix verification 083515",
+    "description": "Verify React clock render path restored",
+    "type": "task",
+    "status": "in_progress",
+    "priority": 2,
+    "assignee": null,
+    "creator": null,
+    "parent": null,
+    "labels": [],
+    "dependencies": [],
+    "comments": [
+      {
+        "id": "1d77f045-bced-4943-a665-16f1cdaa5a8d",
+        "author": "ryan.porter",
+        "text": "hotfix render check",
+        "created_at": "2026-03-08T12:35:20.604313Z"
+      }
+    ],
+    "created_at": "2026-03-08T12:35:15.720853Z",
+    "updated_at": "2026-03-08T12:35:20.613732Z",
+    "closed_at": null,
+    "custom": {}
+  }
+}

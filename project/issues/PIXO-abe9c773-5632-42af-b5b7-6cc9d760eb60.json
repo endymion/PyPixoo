@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-abe9c773-5632-42af-b5b7-6cc9d760eb60",
+  "title": "Clock activity demo B 020308",
+  "description": "Second demo stream for live notification testing.",
+  "type": "bug",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "47643583-b0db-4f34-9afc-11c424a1bf65",
+      "author": "ryan.porter",
+      "text": "Burst B1: first comment",
+      "created_at": "2026-03-07T07:03:14.925465Z"
+    },
+    {
+      "id": "e21368ae-7b1a-45f8-b560-fe842fd95208",
+      "author": "ryan.porter",
+      "text": "Burst B2: in progress",
+      "created_at": "2026-03-07T07:03:14.943722Z"
+    },
+    {
+      "id": "d9793ab4-1d60-4d9c-a234-9788ce92814f",
+      "author": "ryan.porter",
+      "text": "Burst B3: closed",
+      "created_at": "2026-03-07T07:03:14.962158Z"
+    }
+  ],
+  "created_at": "2026-03-07T07:03:08.596670Z",
+  "updated_at": "2026-03-07T07:03:14.962158Z",
+  "closed_at": "2026-03-07T07:03:14.953375Z",
+  "custom": {}
+}

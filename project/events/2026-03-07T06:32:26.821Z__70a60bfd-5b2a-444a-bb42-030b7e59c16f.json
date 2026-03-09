@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "70a60bfd-5b2a-444a-bb42-030b7e59c16f",
+  "issue_id": "PIXO-39e0371a-dfb4-4c24-849f-425ba1b93ea5",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:32:26.821Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "verify clock active",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Animation check"
+  }
+}

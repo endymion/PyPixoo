@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "47296dd1-2ad9-4b30-bdde-b6ac2b837703",
+  "issue_id": "PIXO-623f580d-95cc-4c65-a394-ab0812f6baff",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T07:05:02.902Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "probe",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Gossip root scope probe"
+  }
+}

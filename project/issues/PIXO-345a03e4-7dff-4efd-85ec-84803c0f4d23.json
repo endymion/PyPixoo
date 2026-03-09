@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-345a03e4-7dff-4efd-85ec-84803c0f4d23",
+  "title": "Backlog probe 200442",
+  "description": "Probe queue drain",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "717ac44b-f394-4d28-9df3-b7bb3dd38d33",
+      "author": "unknown",
+      "text": "probe comment 1",
+      "created_at": "2026-03-09T00:04:48.032731Z"
+    }
+  ],
+  "created_at": "2026-03-09T00:04:42.370475Z",
+  "updated_at": "2026-03-09T00:04:48.154569Z",
+  "closed_at": "2026-03-09T00:04:48.154569Z",
+  "custom": {}
+}

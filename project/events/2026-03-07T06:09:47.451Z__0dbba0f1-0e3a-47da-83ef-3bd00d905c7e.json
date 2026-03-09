@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "0dbba0f1-0e3a-47da-83ef-3bd00d905c7e",
+  "issue_id": "PIXO-6fa23ea6-dc99-42e1-897a-e70ee5928895",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:09:47.451Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Generated to verify notification rendering after restart.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Clock visibility check"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-a977c501-f083-4578-b699-29a3169606b7",
+  "title": "Child task demo 020827",
+  "description": "Task with parent epic for clock notifications.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-e589b660-cf4d-4e75-9753-93034ec055a0",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "7bd13f2c-9897-4e1f-b09e-8ca0e1b7a641",
+      "author": "ryan.porter",
+      "text": "task event 1: comment while open",
+      "created_at": "2026-03-07T07:08:27.693371Z"
+    },
+    {
+      "id": "e3c092e8-ab59-4f5b-aa11-11c43f0255e5",
+      "author": "ryan.porter",
+      "text": "task event 2: now in progress",
+      "created_at": "2026-03-07T07:08:27.712487Z"
+    },
+    {
+      "id": "4db744a7-cf13-418d-976e-2a7863420ea9",
+      "author": "ryan.porter",
+      "text": "task event 3: closed",
+      "created_at": "2026-03-07T07:08:27.729921Z"
+    }
+  ],
+  "created_at": "2026-03-07T07:08:27.650343Z",
+  "updated_at": "2026-03-07T07:08:27.729921Z",
+  "closed_at": "2026-03-07T07:08:27.721163Z",
+  "custom": {}
+}

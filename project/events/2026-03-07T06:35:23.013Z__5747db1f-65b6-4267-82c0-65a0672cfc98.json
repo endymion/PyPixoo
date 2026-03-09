@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "5747db1f-65b6-4267-82c0-65a0672cfc98",
+  "issue_id": "PIXO-b5563c13-4c67-4a9d-9fe8-6e13a844aa2d",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:35:23.013Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Visual activity test for kanbus clock.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Live activity burst"
+  }
+}

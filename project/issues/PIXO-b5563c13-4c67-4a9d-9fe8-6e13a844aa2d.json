@@ -1,0 +1,43 @@
+{
+  "id": "PIXO-b5563c13-4c67-4a9d-9fe8-6e13a844aa2d",
+  "title": "Live activity burst",
+  "description": "Visual activity test for kanbus clock.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "61808396-7701-4d1f-9e78-d9f8a4bfa7f4",
+      "author": "ryan.porter",
+      "text": "Burst 1: created",
+      "created_at": "2026-03-07T06:35:23.021486Z"
+    },
+    {
+      "id": "c6c2ad87-dcef-4263-9140-e7a7c2547ae1",
+      "author": "ryan.porter",
+      "text": "Burst 2: in progress",
+      "created_at": "2026-03-07T06:35:23.038099Z"
+    },
+    {
+      "id": "ad32d6e2-f62a-43c8-8e19-d2f431fc8615",
+      "author": "ryan.porter",
+      "text": "Burst 3: done",
+      "created_at": "2026-03-07T06:35:23.052166Z"
+    },
+    {
+      "id": "02be3785-9fb1-4925-9624-4ab20121d64f",
+      "author": "ryan.porter",
+      "text": "Burst 4: closed",
+      "created_at": "2026-03-07T06:35:29.382406Z"
+    }
+  ],
+  "created_at": "2026-03-07T06:35:23.013026Z",
+  "updated_at": "2026-03-07T06:35:29.382406Z",
+  "closed_at": "2026-03-07T06:35:29.373562Z",
+  "custom": {}
+}

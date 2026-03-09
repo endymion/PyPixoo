@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-41fed0cd-a154-4a87-81c5-babe3e165e1c",
+  "title": "Clock restart demo",
+  "description": "Restart demo event stream",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "dbfd52b4-7267-480e-8d87-53ee692d4eaf",
+      "author": "ryan.porter",
+      "text": "Demo comment A",
+      "created_at": "2026-03-07T06:10:34.469715Z"
+    },
+    {
+      "id": "bbb541d2-610a-4a87-82f9-be14593a837b",
+      "author": "ryan.porter",
+      "text": "Demo comment B",
+      "created_at": "2026-03-07T06:10:34.906197Z"
+    },
+    {
+      "id": "586710b3-4132-4e73-8012-dc09b3d53947",
+      "author": "ryan.porter",
+      "text": "Demo comment C",
+      "created_at": "2026-03-07T06:10:34.925062Z"
+    }
+  ],
+  "created_at": "2026-03-07T06:10:34.205952Z",
+  "updated_at": "2026-03-07T06:10:34.933268Z",
+  "closed_at": "2026-03-07T06:10:34.933268Z",
+  "custom": {}
+}

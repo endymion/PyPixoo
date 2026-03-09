@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "788d39ac-187c-49c3-b5c8-f2c881a1f3d9",
+  "issue_id": "PIXO-1bed1755-3f47-4aaa-a680-66582d4763dd",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T21:43:00.509Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Description shows in body now",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Live test card"
+  }
+}

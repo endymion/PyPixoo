@@ -1435,9 +1435,33 @@ def test_build_parser_defaults_auto_info_seconds_30():
     assert not hasattr(args, "event_source")
     assert args.theme == "auto"
     assert args.react_clock is True
+    assert args.upside_down is None
     assert not hasattr(args, "storybook_iframe")
     assert not hasattr(args, "clock_story_id")
     assert not hasattr(args, "clock_browser_mode")
+
+
+def test_build_parser_rotation_flags():
+    module = _load_demo_module()
+    parser = module.build_parser()
+    args_up = parser.parse_args(["--upside-down"])
+    assert args_up.upside_down is True
+    args_right = parser.parse_args(["--right-side-up"])
+    assert args_right.upside_down is False
+
+
+def test_adaptive_notice_seconds_interpolates_and_clamps():
+    module = _load_demo_module()
+    assert module._adaptive_notice_seconds(queued_after_current=0, max_seconds=30.0) == 30.0
+    assert module._adaptive_notice_seconds(queued_after_current=10, max_seconds=30.0) == 10.0
+    assert module._adaptive_notice_seconds(queued_after_current=100, max_seconds=30.0) == 10.0
+    assert module._adaptive_notice_seconds(queued_after_current=5, max_seconds=30.0) == 20.0
+
+
+def test_adaptive_notice_seconds_respects_minimum_when_max_is_low():
+    module = _load_demo_module()
+    assert module._adaptive_notice_seconds(queued_after_current=0, max_seconds=5.0) == 10.0
+    assert module._adaptive_notice_seconds(queued_after_current=7, max_seconds=5.0) == 10.0
 
 
 def test_discover_kanbus_project_roots_recursive(tmp_path: Path):
@@ -1650,6 +1674,83 @@ def test_event_from_gossip_envelope_classifies_created_transition_and_comment():
     assert commented_event.payload["comment"] == "fresh comment from gossip"
 
 
+def test_event_from_gossip_envelope_uses_issue_timestamps_when_ts_missing():
+    module = _load_demo_module()
+    issue = {
+        "id": "PIXO-no-ts",
+        "type": "task",
+        "status": "open",
+        "title": "Issue title",
+        "description": "Issue description",
+        "comments": [],
+        "created_at": "2026-03-07T03:00:00.000Z",
+        "updated_at": "2026-03-07T03:00:00.000Z",
+    }
+    envelope = {
+        "id": "env-no-ts",
+        "event_id": "evt-no-ts",
+        "producer_id": "gossip-test",
+        "type": "issue.mutated",
+        "issue_id": "PIXO-no-ts",
+        "issue": issue,
+    }
+    event = module._event_from_gossip_envelope(envelope, prior_issue=None)
+    assert event is not None
+    assert event.event_type == "issue_created"
+    assert event.occurred_at is not None
+    assert event.occurred_at.isoformat().startswith("2026-03-07T03:00:00")
+
+
+def test_event_from_gossip_envelope_without_timestamps_is_ignored():
+    module = _load_demo_module()
+    issue = {
+        "id": "PIXO-no-time",
+        "type": "task",
+        "status": "open",
+        "title": "Issue title",
+        "description": "Issue description",
+        "comments": [],
+        "created_at": "",
+        "updated_at": "",
+    }
+    envelope = {
+        "id": "env-no-time",
+        "event_id": "evt-no-time",
+        "producer_id": "gossip-test",
+        "type": "issue.mutated",
+        "issue_id": "PIXO-no-time",
+        "issue": issue,
+    }
+    event = module._event_from_gossip_envelope(envelope, prior_issue=None)
+    assert event is None
+
+
+def test_stable_event_signature_ignores_cross_root_volatile_fields():
+    module = _load_demo_module()
+    base = {
+        "type": "issue.mutated",
+        "ts": "2026-03-08T20:20:00.000Z",
+        "issue_id": "PIXO-123",
+        "issue": {"id": "PIXO-123", "status": "open", "title": "T"},
+    }
+    env_a = {
+        **base,
+        "id": "a",
+        "event_id": "ea",
+        "producer_id": "p1",
+        "project": "A",
+    }
+    env_b = {
+        **base,
+        "id": "b",
+        "event_id": "eb",
+        "producer_id": "p2",
+        "project": "B",
+    }
+    assert module._stable_event_signature(env_a) == module._stable_event_signature(env_b)
+
+
+
 def test_runtime_clock_url_uses_direct_query_params():
     module = _load_demo_module()
     url = module._runtime_clock_url(
@@ -1696,6 +1797,24 @@ def test_react_clock_scene_frame_bucket_uses_refresh_fps():
     )
     assert scene._frame_bucket(0.19) == 0
     assert scene._frame_bucket(0.21) == 1
+
+
+def test_runtime_frame_renderer_exposes_render_callable():
+    module = _load_demo_module()
+    assert callable(getattr(module._RUNTIME_FRAME_RENDERER, "render", None))
+
+
+def test_react_clock_scene_start_fails_fast_when_renderer_missing_render(monkeypatch):
+    module = _load_demo_module()
+    monkeypatch.setattr(module, "_RUNTIME_FRAME_RENDERER", object())
+    scene = module.ReactClockScene(
+        runtime_base_url="http://127.0.0.1:1234/runtime.html",
+        show_second_hand=False,
+        theme="dark",
+        refresh_fps=5,
+    )
+    with pytest.raises(RuntimeError, match="missing render\\(\\)"):
+        asyncio.run(scene.start())
 
 
 def test_runtime_static_server_requires_built_assets(tmp_path: Path):

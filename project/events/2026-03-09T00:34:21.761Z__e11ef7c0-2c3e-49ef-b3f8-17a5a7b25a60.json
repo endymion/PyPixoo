@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "event_id": "e11ef7c0-2c3e-49ef-b3f8-17a5a7b25a60",
+  "issue_id": "PIXO-b94b43c9-03ef-43a7-9789-3940c648f316",
+  "event_type": "state_transition",
+  "occurred_at": "2026-03-09T00:34:21.761Z",
+  "actor_id": "unknown",
+  "payload": {
+    "from_status": "open",
+    "to_status": "in_progress"
+  }
+}

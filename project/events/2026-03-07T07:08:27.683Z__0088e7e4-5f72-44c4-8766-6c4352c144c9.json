@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "0088e7e4-5f72-44c4-8766-6c4352c144c9",
+  "issue_id": "PIXO-f37014d9-d257-41d6-aed2-6568084256a6",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T07:08:27.683Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Story with parent epic for clock notifications.",
+    "issue_type": "story",
+    "labels": [],
+    "parent": "PIXO-e589b660-cf4d-4e75-9753-93034ec055a0",
+    "priority": 2,
+    "status": "open",
+    "title": "Child story demo 020827"
+  }
+}

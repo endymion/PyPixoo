@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "dada6a12-3457-434f-b933-3eb01f57a3db",
+  "issue_id": "PIXO-41fed0cd-a154-4a87-81c5-babe3e165e1c",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:10:34.206Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Restart demo event stream",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Clock restart demo"
+  }
+}

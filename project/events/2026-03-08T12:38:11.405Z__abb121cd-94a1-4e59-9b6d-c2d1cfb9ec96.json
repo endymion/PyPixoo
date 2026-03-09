@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "abb121cd-94a1-4e59-9b6d-c2d1cfb9ec96",
+  "issue_id": "PIXO-621ae548-7fd7-4516-8385-362320d0b873",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-08T12:38:11.405Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Verify card rendering after render() hotfix",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Hotfix runtime verify 083811"
+  }
+}

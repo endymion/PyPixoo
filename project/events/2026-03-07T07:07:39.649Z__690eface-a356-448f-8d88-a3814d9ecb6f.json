@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "690eface-a356-448f-8d88-a3814d9ecb6f",
+  "issue_id": "PIXO-031e3183-bd99-4f5c-bfc7-154ab9d80a13",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T07:07:39.649Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Verify comment and transition notifications after open.",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Live sequence verification 020739"
+  }
+}

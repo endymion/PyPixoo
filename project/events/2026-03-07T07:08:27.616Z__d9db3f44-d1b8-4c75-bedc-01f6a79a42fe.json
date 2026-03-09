@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "d9db3f44-d1b8-4c75-bedc-01f6a79a42fe",
+  "issue_id": "PIXO-e589b660-cf4d-4e75-9753-93034ec055a0",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T07:08:27.616Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Parent epic for clock activity demo.",
+    "issue_type": "epic",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Parent epic demo 020827"
+  }
+}

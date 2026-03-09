@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-b2f0cbcd-e04e-464c-9a4d-fa00719b02a5",
+  "title": "Live notification recovery 020707",
+  "description": "Verify notifications are visible again.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "51ed99a4-05bb-49ff-b7ee-0943ea048cb2",
+      "author": "ryan.porter",
+      "text": "notif test 1",
+      "created_at": "2026-03-07T07:07:12.980808Z"
+    },
+    {
+      "id": "b761e123-df93-426b-9336-24bc7b75ff4e",
+      "author": "ryan.porter",
+      "text": "notif test 2",
+      "created_at": "2026-03-07T07:07:13.001422Z"
+    },
+    {
+      "id": "4ce68cc1-a8f6-4ce4-887f-513d1267a299",
+      "author": "ryan.porter",
+      "text": "notif test 3",
+      "created_at": "2026-03-07T07:07:13.025780Z"
+    }
+  ],
+  "created_at": "2026-03-07T07:07:07.169760Z",
+  "updated_at": "2026-03-07T07:07:13.025780Z",
+  "closed_at": "2026-03-07T07:07:13.013962Z",
+  "custom": {}
+}

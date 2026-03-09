@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-621ae548-7fd7-4516-8385-362320d0b873",
+  "title": "Hotfix runtime verify 083811",
+  "description": "Verify card rendering after render() hotfix",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "e03d9123-4830-43d5-ae34-1c54d6db7f0c",
+      "author": "ryan.porter",
+      "text": "render hotfix comment event",
+      "created_at": "2026-03-08T12:38:16.893252Z"
+    }
+  ],
+  "created_at": "2026-03-08T12:38:11.404899Z",
+  "updated_at": "2026-03-08T12:38:20.610752Z",
+  "closed_at": "2026-03-08T12:38:20.610752Z",
+  "custom": {}
+}

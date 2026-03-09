@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-b2b63369-c19e-4727-950c-4a4991e20a58",
+  "title": "Gossip autostart probe",
+  "description": "check root gossip stream autostart",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "f549665f-b512-414a-821a-305523900ef2",
+      "author": "ryan.porter",
+      "text": "autostart comment",
+      "created_at": "2026-03-07T06:40:08.703318Z"
+    }
+  ],
+  "created_at": "2026-03-07T06:40:08.693293Z",
+  "updated_at": "2026-03-07T06:40:08.721622Z",
+  "closed_at": "2026-03-07T06:40:08.721622Z",
+  "custom": {}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "3b58f5b1-369e-4eea-b7b1-0ed72bb314d8",
+  "issue_id": "PIXO-c35a694e-e30b-4691-aaf5-6d7cfa2db94d",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-08T12:42:42.532Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Run kanbus_clock under a supervisor that restarts every 7 minutes for realtime kbs testing.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Clock supervisor harness for periodic restart"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-6cbe1156-64cc-4daf-a6f4-335467c93271",
+  "title": "Polling mode check",
+  "description": "verify notifications visible",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "7cd473e6-fe7a-4555-995b-d431af5fd613",
+      "author": "ryan.porter",
+      "text": "poll check comment",
+      "created_at": "2026-03-07T06:38:09.590585Z"
+    }
+  ],
+  "created_at": "2026-03-07T06:38:09.580575Z",
+  "updated_at": "2026-03-07T06:38:09.607416Z",
+  "closed_at": "2026-03-07T06:38:09.607416Z",
+  "custom": {}
+}

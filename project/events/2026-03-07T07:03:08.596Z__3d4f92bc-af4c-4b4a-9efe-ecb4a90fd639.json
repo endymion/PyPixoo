@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "3d4f92bc-af4c-4b4a-9efe-ecb4a90fd639",
+  "issue_id": "PIXO-abe9c773-5632-42af-b5b7-6cc9d760eb60",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T07:03:08.596Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Second demo stream for live notification testing.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Clock activity demo B 020308"
+  }
+}

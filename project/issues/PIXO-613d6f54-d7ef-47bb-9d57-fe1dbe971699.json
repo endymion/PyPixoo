@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-613d6f54-d7ef-47bb-9d57-fe1dbe971699",
+  "title": "Clock activity demo 020236",
+  "description": "Demo issue to generate live Kanbus clock notifications.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "82447d46-c326-49dc-91df-11ab155a9a40",
+      "author": "ryan.porter",
+      "text": "Activity 1: first live notification",
+      "created_at": "2026-03-07T07:02:43.910810Z"
+    },
+    {
+      "id": "535fea12-c5cd-4214-8a2b-ec65566be978",
+      "author": "ryan.porter",
+      "text": "Activity 2: now in progress",
+      "created_at": "2026-03-07T07:02:44.031815Z"
+    },
+    {
+      "id": "6a73df14-2994-4b6a-a6d8-f7037ce4b4ef",
+      "author": "ryan.porter",
+      "text": "Activity 3: moved to closed",
+      "created_at": "2026-03-07T07:02:51.682948Z"
+    }
+  ],
+  "created_at": "2026-03-07T07:02:37.044610Z",
+  "updated_at": "2026-03-07T07:02:51.682948Z",
+  "closed_at": "2026-03-07T07:02:51.609505Z",
+  "custom": {}
+}

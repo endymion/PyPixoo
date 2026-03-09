@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-1bed1755-3f47-4aaa-a680-66582d4763dd",
+  "title": "Live test card",
+  "description": "Description shows in body now",
+  "type": "task",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-07T21:43:00.509185Z",
+  "updated_at": "2026-03-07T21:43:00.509185Z",
+  "closed_at": null,
+  "custom": {}
+}

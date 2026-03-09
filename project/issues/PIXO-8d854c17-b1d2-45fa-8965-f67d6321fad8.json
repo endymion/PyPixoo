@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-8d854c17-b1d2-45fa-8965-f67d6321fad8",
+  "title": "Adaptive notification hold based on queue depth",
+  "description": "Scale notification display time from 30s down to 10s based on queue depth, with 10s minimum.",
+  "type": "story",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "9f7c923e-dfad-4a21-965a-647e131ddb68",
+      "author": "unknown",
+      "text": "Implemented adaptive notification hold: hold_seconds now linearly scales from 30s at queued_after=0 to 10s at queued_after>=10, with 10s minimum. Tests passing (66). Clock restarted with patch.",
+      "created_at": "2026-03-09T01:11:28.316107Z"
+    }
+  ],
+  "created_at": "2026-03-09T01:10:20.755739Z",
+  "updated_at": "2026-03-09T01:11:28.316107Z",
+  "closed_at": null,
+  "custom": {}
+}

@@ -1,0 +1,37 @@
+{
+  "id": "PIXO-f37014d9-d257-41d6-aed2-6568084256a6",
+  "title": "Child story demo 020827",
+  "description": "Story with parent epic for clock notifications.",
+  "type": "story",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-e589b660-cf4d-4e75-9753-93034ec055a0",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "7c0cdddf-bbf0-4cdd-a67d-180dba4253e0",
+      "author": "ryan.porter",
+      "text": "story event 1: comment while open",
+      "created_at": "2026-03-07T07:08:27.738122Z"
+    },
+    {
+      "id": "8ef4ca39-61bd-4cc5-9a98-2749a135c240",
+      "author": "ryan.porter",
+      "text": "story event 2: now in progress",
+      "created_at": "2026-03-07T07:08:27.754762Z"
+    },
+    {
+      "id": "a801cbfe-f9a6-400d-a59e-941f0d3d35e8",
+      "author": "ryan.porter",
+      "text": "story event 3: closed",
+      "created_at": "2026-03-07T07:08:27.771467Z"
+    }
+  ],
+  "created_at": "2026-03-07T07:08:27.683569Z",
+  "updated_at": "2026-03-07T07:08:27.771467Z",
+  "closed_at": "2026-03-07T07:08:27.763046Z",
+  "custom": {}
+}

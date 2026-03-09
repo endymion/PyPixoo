@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "e76d778d-1cda-43f1-a9e7-601552ce174f",
+  "issue_id": "PIXO-6cbe1156-64cc-4daf-a6f4-335467c93271",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:38:09.580Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "verify notifications visible",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Polling mode check"
+  }
+}

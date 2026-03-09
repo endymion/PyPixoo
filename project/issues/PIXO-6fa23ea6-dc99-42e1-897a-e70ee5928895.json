@@ -1,0 +1,43 @@
+{
+  "id": "PIXO-6fa23ea6-dc99-42e1-897a-e70ee5928895",
+  "title": "Clock visibility check",
+  "description": "Generated to verify notification rendering after restart.",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "1f6b0d35-0d08-4ceb-b860-e895de02fe5d",
+      "author": "ryan.porter",
+      "text": "Notification 1: restart check",
+      "created_at": "2026-03-07T06:09:47.460514Z"
+    },
+    {
+      "id": "b72ba974-e302-4745-8de9-4e32a1240684",
+      "author": "ryan.porter",
+      "text": "Notification 2: in-progress check",
+      "created_at": "2026-03-07T06:09:47.477544Z"
+    },
+    {
+      "id": "f61b9218-386e-4a46-a963-77af5c3e43ea",
+      "author": "ryan.porter",
+      "text": "Notification 4: follow-up comment",
+      "created_at": "2026-03-07T06:10:02.570066Z"
+    },
+    {
+      "id": "cfbad431-d9cb-45be-9573-3189abe60211",
+      "author": "ryan.porter",
+      "text": "Notification 5: closed confirmation",
+      "created_at": "2026-03-07T06:10:02.587549Z"
+    }
+  ],
+  "created_at": "2026-03-07T06:09:47.450998Z",
+  "updated_at": "2026-03-07T06:10:02.587549Z",
+  "closed_at": "2026-03-07T06:10:02.579629Z",
+  "custom": {}
+}

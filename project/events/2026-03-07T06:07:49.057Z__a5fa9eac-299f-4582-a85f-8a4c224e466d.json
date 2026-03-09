@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "a5fa9eac-299f-4582-a85f-8a4c224e466d",
+  "issue_id": "PIXO-88ea331b-d415-4d25-b56e-a85f100c0cae",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:07:49.057Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Comment, transition, and created info cards should render the main content body row background as pure black in dark mode instead of tinted band color.",
+    "issue_type": "bug",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "kanbus_clock: make main content row background pure black in dark mode"
+  }
+}

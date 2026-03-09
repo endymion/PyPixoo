@@ -15,6 +15,7 @@ import atexit
 from collections import OrderedDict, deque
 import concurrent.futures
 from concurrent.futures import Future, ThreadPoolExecutor
+import hashlib
 import io
 import json
 import os
@@ -284,52 +285,6 @@ class _RuntimeFrameRenderer:
         with self._lock:
             self._shutdown_unlocked()
 
-
-class _ParallelFrameRenderer:
-    def __init__(self, worker_count: int) -> None:
-        self._worker_count = max(1, worker_count)
-        self._executor = ThreadPoolExecutor(
-            max_workers=self._worker_count,
-            thread_name_prefix="react-clock-render-pool",
-        )
-        self._futures: "OrderedDict[str, Future[Buffer]]" = OrderedDict()
-        self._condition = threading.Condition()
-
-    def submit(self, key: str, url: str) -> Future[Buffer]:
-        with self._condition:
-            future = self._futures.get(key)
-            if future is None or future.done():
-                future = self._executor.submit(_render_runtime_frame, url)
-                self._futures[key] = future
-                while len(self._futures) > self._worker_count * 3:
-                    self._futures.popitem(last=False)
-            return future
-
-    def result(self, key: str, timeout_s: float) -> Buffer | None:
-        with self._condition:
-            future = self._futures.get(key)
-        if future is None:
-            return None
-        try:
-            return future.result(timeout=timeout_s)
-        except concurrent.futures.TimeoutError:
-            return None
-        except Exception:
-            with self._condition:
-                self._futures.pop(key, None)
-            raise
-
-    def render_sync(self, url: str) -> Buffer:
-        return _render_runtime_frame(url)
-
-    def close(self) -> None:
-        with self._condition:
-            for key, future in list(self._futures.items()):
-                self._futures.pop(key, None)
-                if not future.done():
-                    future.cancel()
-        self._executor.shutdown(wait=False)
-
     def _ensure_runtime_loaded(self, base_url: str) -> None:
         if self._loaded_base_url == base_url:
             return
@@ -378,6 +333,52 @@ class _ParallelFrameRenderer:
             return self._page.screenshot()
 
 
+class _ParallelFrameRenderer:
+    def __init__(self, worker_count: int) -> None:
+        self._worker_count = max(1, worker_count)
+        self._executor = ThreadPoolExecutor(
+            max_workers=self._worker_count,
+            thread_name_prefix="react-clock-render-pool",
+        )
+        self._futures: "OrderedDict[str, Future[Buffer]]" = OrderedDict()
+        self._condition = threading.Condition()
+
+    def submit(self, key: str, url: str) -> Future[Buffer]:
+        with self._condition:
+            future = self._futures.get(key)
+            if future is None or future.done():
+                future = self._executor.submit(_render_runtime_frame, url)
+                self._futures[key] = future
+                while len(self._futures) > self._worker_count * 3:
+                    self._futures.popitem(last=False)
+            return future
+
+    def result(self, key: str, timeout_s: float) -> Buffer | None:
+        with self._condition:
+            future = self._futures.get(key)
+        if future is None:
+            return None
+        try:
+            return future.result(timeout=timeout_s)
+        except concurrent.futures.TimeoutError:
+            return None
+        except Exception:
+            with self._condition:
+                self._futures.pop(key, None)
+            raise
+
+    def render_sync(self, url: str) -> Buffer:
+        return _render_runtime_frame(url)
+
+    def close(self) -> None:
+        with self._condition:
+            for key, future in list(self._futures.items()):
+                self._futures.pop(key, None)
+                if not future.done():
+                    future.cancel()
+        self._executor.shutdown(wait=False)
+
+
 _RUNTIME_FRAME_RENDERER = _RuntimeFrameRenderer()
 atexit.register(_RUNTIME_FRAME_RENDERER.close)
 DEFAULT_FRAME_WORKERS = 2
@@ -419,9 +420,9 @@ class ReactClockScene:
         self._theme = theme
         self._refresh_fps = max(1, int(refresh_fps))
         self._cache: _CachedFrame | None = None
-        self._refresh_task: asyncio.Task | None = None
-        self._stop_refresh = asyncio.Event()
-        self._render_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="react-clock-render")
+        self._cache_lock = threading.Lock()
+        self._refresh_thread: threading.Thread | None = None
+        self._stop_refresh_thread = threading.Event()
         self._parallel_renderer = _ParallelFrameRenderer(worker_count=frame_workers)
 
     def _frame_bucket(self, epoch_s: float) -> int:
@@ -441,59 +442,75 @@ class ReactClockScene:
                 "theme": self._theme,
             },
         )
-        future = self._parallel_renderer.submit(key, url)
-        buf = self._parallel_renderer.result(key, timeout_s=0.05)
-        if buf is None:
-            try:
-                buf = self._parallel_renderer.render_sync(url)
-            except Exception as exc:
-                raise RuntimeError(
-                    f"{threading.current_thread().name}: {exc}"
-                ) from exc
-        self._cache = _CachedFrame(key=key, buffer=buf)
+        try:
+            buf = self._parallel_renderer.render_sync(url)
+        except Exception as exc:
+            raise RuntimeError(
+                f"{threading.current_thread().name}: {exc}"
+            ) from exc
+        with self._cache_lock:
+            self._cache = _CachedFrame(key=key, buffer=buf)
         return buf
 
     def _render_clock_cached(self) -> Buffer:
-        if self._cache is None:
+        with self._cache_lock:
+            cache = self._cache
+        if cache is None:
             return Buffer(width=64, height=64, data=tuple([0] * (64 * 64 * 3)))
-        return self._cache.buffer
+        return cache.buffer
 
-    async def _refresh_loop(self) -> None:
-        sleep_s = max(0.02, 0.5 / self._refresh_fps)
-        loop = asyncio.get_running_loop()
-        while not self._stop_refresh.is_set():
+    def _refresh_loop_thread(self) -> None:
+        interval_s = 1.0 / self._refresh_fps
+        next_tick = time.perf_counter()
+        while not self._stop_refresh_thread.is_set():
             now = time.time()
             local = time.localtime(now)
             second_float = min(59.999, max(0.0, local.tm_sec + (now - int(now))))
             key = f"{local.tm_hour}:{local.tm_min}:{second_float:.3f}:{self._frame_bucket(now)}"
-            if self._cache is None or self._cache.key != key:
+            with self._cache_lock:
+                cached_key = self._cache.key if self._cache is not None else None
+            if cached_key != key:
                 try:
-                    await loop.run_in_executor(self._render_executor, self._render_clock_sync, now)
+                    self._render_clock_sync(now)
                 except Exception as exc:
                     print(f"react-clock refresh skipped: {exc}")
-            await asyncio.sleep(sleep_s)
+
+            next_tick += interval_s
+            sleep_s = next_tick - time.perf_counter()
+            if sleep_s > 0:
+                self._stop_refresh_thread.wait(timeout=sleep_s)
+            else:
+                # If we're behind, drop delay and resync to now.
+                next_tick = time.perf_counter()
 
     async def start(self) -> None:
-        if self._refresh_task is not None and not self._refresh_task.done():
+        if self._refresh_thread is not None and self._refresh_thread.is_alive():
             return
-        self._stop_refresh.clear()
+        if not callable(getattr(_RUNTIME_FRAME_RENDERER, "render", None)):
+            raise RuntimeError("react runtime renderer misconfigured: missing render()")
+        self._stop_refresh_thread.clear()
         loop = asyncio.get_running_loop()
-        if self._cache is None:
+        with self._cache_lock:
+            cache_empty = self._cache is None
+        if cache_empty:
             try:
-                await loop.run_in_executor(self._render_executor, self._render_clock_sync, time.time())
+                await loop.run_in_executor(None, self._render_clock_sync, time.time())
             except Exception as exc:
                 print(f"react-clock warmup skipped: {exc}")
-        self._refresh_task = asyncio.create_task(self._refresh_loop())
+        self._refresh_thread = threading.Thread(
+            target=self._refresh_loop_thread,
+            name="react-clock-refresh",
+            daemon=True,
+        )
+        self._refresh_thread.start()
 
     async def stop(self) -> None:
-        self._stop_refresh.set()
-        if self._refresh_task is not None:
-            self._refresh_task.cancel()
-            await asyncio.gather(self._refresh_task, return_exceptions=True)
-            self._refresh_task = None
+        self._stop_refresh_thread.set()
+        if self._refresh_thread is not None:
+            self._refresh_thread.join(timeout=1.0)
+            self._refresh_thread = None
         loop = asyncio.get_running_loop()
-        await loop.run_in_executor(self._render_executor, _RUNTIME_FRAME_RENDERER.close)
-        self._render_executor.shutdown(wait=False, cancel_futures=True)
+        await loop.run_in_executor(None, _RUNTIME_FRAME_RENDERER.close)
         self._parallel_renderer.close()
 
     def layers(self, ctx: RenderContext) -> list[LayerNode]:
@@ -2171,6 +2188,10 @@ def _event_from_gossip_envelope(
         return None
 
     occurred_at = _parse_iso8601(str(envelope.get("ts") or ""))
+    if occurred_at is None:
+        occurred_at = _parse_iso8601(str(issue.get("updated_at") or ""))
+    if occurred_at is None:
+        occurred_at = _parse_iso8601(str(issue.get("created_at") or ""))
     event_id = str(envelope.get("event_id") or envelope.get("id") or "").strip()
     actor_id = str(envelope.get("producer_id") or "gossip").strip() or "gossip"
 
@@ -2179,7 +2200,6 @@ def _event_from_gossip_envelope(
     current_comment_count = _issue_comment_count(issue)
     prior_comment_count = _issue_comment_count(prior_issue or {})
     latest_comment = _issue_latest_comment_text(issue)
-
     created_at = str(issue.get("created_at") or "")
     updated_at = str(issue.get("updated_at") or "")
 
@@ -2231,6 +2251,35 @@ def _gossip_restart_delay_seconds(consecutive_failures: int) -> float:
     return min(30.0, 0.5 * (2 ** exponent))
 
 
+def _stable_event_signature(envelope: dict[str, Any]) -> str:
+    """Return a cross-root stable signature for deduping replayed gossip events."""
+
+    volatile_keys = {
+        "id",
+        "event_id",
+        "producer_id",
+        "project",
+        "project_key",
+        "source",
+        "topic",
+    }
+
+    def _normalize(value: Any) -> Any:
+        if isinstance(value, dict):
+            return {
+                str(k): _normalize(v)
+                for k, v in value.items()
+                if str(k) not in volatile_keys
+            }
+        if isinstance(value, list):
+            return [_normalize(v) for v in value]
+        return value
+
+    payload = _normalize(envelope)
+    raw = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()
+
+
 async def _watch_gossip_worker(
     *,
     root: Path,
@@ -2239,6 +2288,8 @@ async def _watch_gossip_worker(
     kbs_root: Optional[Path] = None,
     seen_ids: set[str],
     seen_order: deque[str],
+    seen_signatures: set[str],
+    signature_order: deque[str],
     prior_issue_by_id: dict[str, dict[str, Any]],
     startup_cutoff: Optional[datetime] = None,
     seen_max: int = 4096,
@@ -2299,12 +2350,20 @@ async def _watch_gossip_worker(
                 envelope_id = str(envelope.get("id") or "").strip()
                 if envelope_id and envelope_id in seen_ids:
                     continue
+                signature = _stable_event_signature(envelope)
+                if signature in seen_signatures:
+                    continue
                 if envelope_id:
                     seen_ids.add(envelope_id)
                     seen_order.append(envelope_id)
                     while len(seen_order) > seen_max:
                         old = seen_order.popleft()
                         seen_ids.discard(old)
+                seen_signatures.add(signature)
+                signature_order.append(signature)
+                while len(signature_order) > seen_max:
+                    old_sig = signature_order.popleft()
+                    seen_signatures.discard(old_sig)
 
                 issue = envelope.get("issue")
                 if isinstance(issue, dict):
@@ -2325,17 +2384,23 @@ async def _watch_gossip_worker(
 
                 if event is None:
                     continue
-                if (
-                    startup_cutoff is not None
-                    and event.occurred_at is not None
-                    and event.occurred_at < startup_cutoff
-                ):
-                    if _DEBUG_KBS:
-                        print(
-                            f"gossip[{root.name}]: skip historical event "
-                            f"{event.event_type} {event.issue_id} at {event.occurred_at.isoformat()}"
-                        )
-                    continue
+                if startup_cutoff is not None:
+                    # Enforce a strict startup gate: if we cannot place an event on a
+                    # reliable timeline, treat it as historical replay and skip it.
+                    if event.occurred_at is None:
+                        if _DEBUG_KBS:
+                            print(
+                                f"gossip[{root.name}]: skip untimestamped event "
+                                f"{event.event_type} {event.issue_id}"
+                            )
+                        continue
+                    if event.occurred_at < startup_cutoff:
+                        if _DEBUG_KBS:
+                            print(
+                                f"gossip[{root.name}]: skip historical event "
+                                f"{event.event_type} {event.issue_id} at {event.occurred_at.isoformat()}"
+                            )
+                        continue
                 try:
                     notice = await asyncio.to_thread(summarize_event, event, kbs_root)
                 except KbsShowAmbiguous:
@@ -2393,6 +2458,8 @@ async def _watch_gossip_loop(
 ) -> None:
     seen_ids: set[str] = set()
     seen_order: deque[str] = deque()
+    seen_signatures: set[str] = set()
+    signature_order: deque[str] = deque()
     prior_issue_by_id: dict[str, dict[str, Any]] = {}
     startup_cutoff = datetime.now(timezone.utc)
     print(f"gossip: startup cutoff {startup_cutoff.isoformat()} (ignoring older events)")
@@ -2405,6 +2472,8 @@ async def _watch_gossip_loop(
                 kbs_root=kbs_root or project_root,
                 seen_ids=seen_ids,
                 seen_order=seen_order,
+                seen_signatures=seen_signatures,
+                signature_order=signature_order,
                 prior_issue_by_id=prior_issue_by_id,
                 startup_cutoff=startup_cutoff,
             )
@@ -2433,6 +2502,24 @@ async def _enqueue_auto_notice(
     await queue.put(notice)
     if queue.qsize() >= high_watermark:
         print(f"watcher: auto notice backlog at {queue.qsize()} items")
+
+
+def _adaptive_notice_seconds(
+    *,
+    queued_after_current: int,
+    max_seconds: float,
+    min_seconds: float = 10.0,
+    depth_for_minimum: int = 10,
+) -> float:
+    """Interpolate hold duration based on queue depth after current item."""
+    hi = max(float(max_seconds), float(min_seconds))
+    lo = max(0.1, float(min_seconds))
+    depth_cap = max(1, int(depth_for_minimum))
+    depth = max(0, int(queued_after_current))
+    if depth >= depth_cap:
+        return lo
+    ratio = depth / depth_cap
+    return hi - ((hi - lo) * ratio)
 
 
 async def _wait_for_queue_capacity(
@@ -2614,10 +2701,16 @@ async def _auto_notice_consumer(
         except asyncio.TimeoutError:
             continue
         try:
+            queued_after_current = notices.qsize()
+            hold_seconds = _adaptive_notice_seconds(
+                queued_after_current=queued_after_current,
+                max_seconds=auto_info_seconds,
+            )
             if _DEBUG_KBS:
                 print(
                     f"consumer: dequeued notice level={notice.level} header={notice.header!r} "
-                    f"queue_depth={player.queue_depth}"
+                    f"queue_depth={player.queue_depth} queued_after={queued_after_current} "
+                    f"hold_seconds={hold_seconds:.1f}"
                 )
             fg, bg = _level_colors(notice.level)
             if _DEBUG_KBS:
@@ -2627,7 +2720,7 @@ async def _auto_notice_consumer(
                 clock_scene=clock_scene,
                 level=notice.level,
                 message=notice.message,
-                seconds=auto_info_seconds,
+                seconds=hold_seconds,
                 transition_ms=transition_ms,
                 fg=fg,
                 bg=bg,
@@ -2864,6 +2957,20 @@ def build_parser() -> argparse.ArgumentParser:
         help="Number of parallel workers rendering React frames (default 2)",
     )
     parser.add_argument("--react-clock", action=argparse.BooleanOptionalAction, default=True)
+    rotation_group = parser.add_mutually_exclusive_group()
+    rotation_group.add_argument(
+        "--upside-down",
+        dest="upside_down",
+        action="store_true",
+        help="Rotate display 180 degrees (Device/SetScreenRotationAngle mode 2)",
+    )
+    rotation_group.add_argument(
+        "--right-side-up",
+        dest="upside_down",
+        action="store_false",
+        help="Rotate display back to 0 degrees (Device/SetScreenRotationAngle mode 0)",
+    )
+    parser.set_defaults(upside_down=None)
     parser.add_argument(
         "--theme",
         choices=("auto", "dark", "light"),
@@ -2899,6 +3006,7 @@ async def run(
     react_clock: bool,
     react_second_hand: bool,
     react_frame_workers: int,
+    upside_down: Optional[bool],
     debug: bool,
     no_repl: bool,
 ) -> None:
@@ -2924,6 +3032,10 @@ async def run(
     if not pixoo.connect():
         raise SystemExit(f"Failed to connect to Pixoo at {ip}")
     try:
+        if upside_down is not None:
+            mode = 2 if upside_down else 0
+            pixoo.set_screen_rotation(mode)
+            print(f"pixoo: screen rotation set to mode {mode}")
         sink = PixooFrameSink(pixoo, reconnect=True)
         raster = AsyncRasterClient(sink)
         player = ScenePlayer(raster, fps=max(1, fps))
@@ -3028,6 +3140,7 @@ def main() -> None:
                 react_clock=bool(args.react_clock),
                 react_second_hand=bool(args.react_second_hand),
                 react_frame_workers=max(1, args.react_frame_workers),
+                upside_down=args.upside_down,
                 debug=bool(args.debug),
                 no_repl=bool(args.no_repl),
             )

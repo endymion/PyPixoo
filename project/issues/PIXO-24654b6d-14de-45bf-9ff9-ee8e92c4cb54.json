@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-24654b6d-14de-45bf-9ff9-ee8e92c4cb54",
+  "title": "FPS live check",
+  "description": "Validating kanbus clock smoothness",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "c5c16250-573d-4c81-b62b-5286b37d66ea",
+      "author": "ryan.porter",
+      "text": "fps live comment one",
+      "created_at": "2026-03-07T06:22:27.897857Z"
+    },
+    {
+      "id": "fe2edb76-8733-48c1-94f8-30c9aae3bdd3",
+      "author": "ryan.porter",
+      "text": "fps live comment two",
+      "created_at": "2026-03-07T06:22:27.916780Z"
+    }
+  ],
+  "created_at": "2026-03-07T06:22:27.887576Z",
+  "updated_at": "2026-03-07T06:22:27.925664Z",
+  "closed_at": "2026-03-07T06:22:27.925664Z",
+  "custom": {}
+}

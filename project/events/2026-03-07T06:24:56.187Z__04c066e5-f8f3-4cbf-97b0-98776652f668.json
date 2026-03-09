@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "04c066e5-f8f3-4cbf-97b0-98776652f668",
+  "issue_id": "PIXO-f8db93db-0f5c-4d17-84f5-4e9cca35fa51",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:24:56.187Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "verify one-root watcher path",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Single-root semantics check"
+  }
+}

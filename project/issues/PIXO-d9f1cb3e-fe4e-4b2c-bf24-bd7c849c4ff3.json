@@ -1,0 +1,25 @@
+{
+  "id": "PIXO-d9f1cb3e-fe4e-4b2c-bf24-bd7c849c4ff3",
+  "title": "Gossip-only probe",
+  "description": "check root gossip stream",
+  "type": "task",
+  "status": "closed",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "ab452b25-8abd-4e89-bbf9-c5ca8f90c0c6",
+      "author": "ryan.porter",
+      "text": "gossip-only comment",
+      "created_at": "2026-03-07T06:39:54.836358Z"
+    }
+  ],
+  "created_at": "2026-03-07T06:39:54.825988Z",
+  "updated_at": "2026-03-07T06:39:54.854049Z",
+  "closed_at": "2026-03-07T06:39:54.854049Z",
+  "custom": {}
+}

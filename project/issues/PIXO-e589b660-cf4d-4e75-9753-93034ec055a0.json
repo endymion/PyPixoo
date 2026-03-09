@@ -1,0 +1,18 @@
+{
+  "id": "PIXO-e589b660-cf4d-4e75-9753-93034ec055a0",
+  "title": "Parent epic demo 020827",
+  "description": "Parent epic for clock activity demo.",
+  "type": "epic",
+  "status": "open",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [],
+  "created_at": "2026-03-07T07:08:27.616762Z",
+  "updated_at": "2026-03-07T07:08:27.616762Z",
+  "closed_at": null,
+  "custom": {}
+}

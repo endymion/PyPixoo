@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-f8db93db-0f5c-4d17-84f5-4e9cca35fa51",
+  "title": "Single-root semantics check",
+  "description": "verify one-root watcher path",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": null,
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "b147f8e9-e888-42e0-b4ae-ef9793895330",
+      "author": "ryan.porter",
+      "text": "single-root comment",
+      "created_at": "2026-03-07T06:24:56.197871Z"
+    },
+    {
+      "id": "8ec91be1-950c-41bc-937c-97f3d6160fc4",
+      "author": "ryan.porter",
+      "text": "single-root comment two",
+      "created_at": "2026-03-07T06:24:56.215155Z"
+    }
+  ],
+  "created_at": "2026-03-07T06:24:56.184772Z",
+  "updated_at": "2026-03-07T06:24:56.215155Z",
+  "closed_at": null,
+  "custom": {}
+}

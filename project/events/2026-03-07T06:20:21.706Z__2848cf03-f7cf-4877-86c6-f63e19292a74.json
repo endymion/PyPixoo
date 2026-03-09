@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "2848cf03-f7cf-4877-86c6-f63e19292a74",
+  "issue_id": "PIXO-b350bca9-ba7b-40b4-9157-e3374e1fa0ed",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:20:21.706Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Checking smoother updates after gossip cache fix.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "FPS check demo"
+  }
+}

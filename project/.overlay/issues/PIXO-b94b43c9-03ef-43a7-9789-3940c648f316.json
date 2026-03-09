@@ -1,0 +1,36 @@
+{
+  "overlay_ts": "2026-03-09T00:35:46.302Z",
+  "overlay_event_id": "1c5fbdad-46a8-4240-a083-e2baeac89c3e",
+  "overrides": null,
+  "issue": {
+    "id": "PIXO-b94b43c9-03ef-43a7-9789-3940c648f316",
+    "title": "Kanbus clock CLI rotation flag",
+    "description": "Add simple CLI option to rotate display 180 degrees for kanbus_clock.",
+    "type": "task",
+    "status": "closed",
+    "priority": 2,
+    "assignee": null,
+    "creator": null,
+    "parent": null,
+    "labels": [],
+    "dependencies": [],
+    "comments": [
+      {
+        "id": "bc673161-a081-43ee-9b2f-5622e5a26176",
+        "author": "unknown",
+        "text": "Implementing simple CLI rotation for kanbus_clock (180-degree upside-down toggle) and wiring to Pixoo Device/SetScreenRotationAngle at startup.",
+        "created_at": "2026-03-09T00:34:21.781348Z"
+      },
+      {
+        "id": "5d3e24c5-20d4-463d-94b1-129581c3e3ec",
+        "author": "unknown",
+        "text": "Implemented: added --upside-down / --right-side-up flags in kanbus_clock, wired to Pixoo Device/SetScreenRotationAngle at startup (mode 2 for upside-down, mode 0 for right-side-up). Verified py_compile and pytest (63 passing).",
+        "created_at": "2026-03-09T00:35:46.272294Z"
+      }
+    ],
+    "created_at": "2026-03-09T00:34:17.152719Z",
+    "updated_at": "2026-03-09T00:35:46.300975Z",
+    "closed_at": "2026-03-09T00:35:46.300975Z",
+    "custom": {}
+  }
+}

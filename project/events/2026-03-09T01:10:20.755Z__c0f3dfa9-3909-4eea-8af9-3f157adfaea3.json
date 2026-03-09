@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "c0f3dfa9-3909-4eea-8af9-3f157adfaea3",
+  "issue_id": "PIXO-8d854c17-b1d2-45fa-8965-f67d6321fad8",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-09T01:10:20.755Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "Scale notification display time from 30s down to 10s based on queue depth, with 10s minimum.",
+    "issue_type": "story",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "Adaptive notification hold based on queue depth"
+  }
+}

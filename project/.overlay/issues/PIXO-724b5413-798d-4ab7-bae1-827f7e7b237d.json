@@ -1,0 +1,23 @@
+{
+  "overlay_ts": "2026-03-09T00:18:29.101Z",
+  "overlay_event_id": "d2efb848-3553-4fd6-898a-25e146941820",
+  "overrides": null,
+  "issue": {
+    "id": "PIXO-724b5413-798d-4ab7-bae1-827f7e7b237d",
+    "title": "Drain check 201828",
+    "description": "queue depth spot check",
+    "type": "task",
+    "status": "open",
+    "priority": 2,
+    "assignee": null,
+    "creator": null,
+    "parent": null,
+    "labels": [],
+    "dependencies": [],
+    "comments": [],
+    "created_at": "2026-03-09T00:18:29.100789Z",
+    "updated_at": "2026-03-09T00:18:29.100789Z",
+    "closed_at": null,
+    "custom": {}
+  }
+}

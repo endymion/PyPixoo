@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "412c3d63-8dba-440b-8d1f-7891a09ccff1",
+  "issue_id": "PIXO-24654b6d-14de-45bf-9ff9-ee8e92c4cb54",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-07T06:22:27.887Z",
+  "actor_id": "ryan.porter",
+  "payload": {
+    "assignee": null,
+    "description": "Validating kanbus clock smoothness",
+    "issue_type": "task",
+    "labels": [],
+    "parent": null,
+    "priority": 2,
+    "status": "open",
+    "title": "FPS live check"
+  }
+}
