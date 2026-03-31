@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "4aaaa69e-e280-4a3e-a3aa-21ac7ce1a709",
+  "issue_id": "PIXO-0c37fe2a-7a48-4a64-b9fd-9facdad85045",
+  "event_type": "issue_created",
+  "occurred_at": "2026-03-09T05:12:02.529Z",
+  "actor_id": "unknown",
+  "payload": {
+    "assignee": null,
+    "description": "Set React clock face background to true black in dark mode only; do not change light mode. Validate on-device by restarting kanbus_clock.",
+    "issue_type": "task",
+    "labels": [],
+    "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+    "priority": 2,
+    "status": "open",
+    "title": "Kanbus clock dark-mode face background pure black"
+  }
+}

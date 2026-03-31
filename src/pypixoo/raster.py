@@ -66,10 +66,12 @@ class PixooFrameSink:
         pixoo: Pixoo,
         reconnect: bool = True,
         reconnect_delay_s: float = 1.0,
+        on_reconnect: Optional[Callable[[], None]] = None,
     ):
         self._pixoo = pixoo
         self._reconnect_enabled = reconnect
         self._reconnect_delay_s = max(0.1, reconnect_delay_s)
+        self._on_reconnect = on_reconnect
 
     def push(self, frame: Buffer) -> None:
         """Push frame to device, retrying once after reconnect on transport loss."""
@@ -98,6 +100,11 @@ class PixooFrameSink:
                 pass
             try:
                 if self._pixoo.connect():
+                    if self._on_reconnect is not None:
+                        try:
+                            self._on_reconnect()
+                        except Exception:
+                            pass
                     return
             except Exception:
                 pass

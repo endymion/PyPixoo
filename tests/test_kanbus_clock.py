@@ -1435,7 +1435,7 @@ def test_build_parser_defaults_auto_info_seconds_30():
     assert not hasattr(args, "event_source")
     assert args.theme == "auto"
     assert args.react_clock is True
-    assert args.upside_down is None
+    assert args.upside_down is False
     assert not hasattr(args, "storybook_iframe")
     assert not hasattr(args, "clock_story_id")
     assert not hasattr(args, "clock_browser_mode")
@@ -1450,18 +1450,51 @@ def test_build_parser_rotation_flags():
     assert args_right.upside_down is False
 
 
+def test_desired_rotation_mode_mapping():
+    module = _load_demo_module()
+    assert module._desired_rotation_mode(True) == 2
+    assert module._desired_rotation_mode(False) == 0
+
+
+def test_rotation_guard_loop_reapplies_rotation(monkeypatch):
+    module = _load_demo_module()
+    calls: list[tuple[int, str, bool]] = []
+
+    def _fake_apply_rotation(pixoo, *, desired_mode: int, reason: str, log_success: bool = True):
+        calls.append((desired_mode, reason, log_success))
+
+    monkeypatch.setattr(module, "_apply_rotation", _fake_apply_rotation)
+
+    async def _run():
+        stop_event = asyncio.Event()
+        task = asyncio.create_task(
+            module._rotation_guard_loop(
+                pixoo=object(),
+                desired_mode=2,
+                stop_event=stop_event,
+                check_seconds=0.1,
+            )
+        )
+        await asyncio.sleep(0.12)
+        stop_event.set()
+        await asyncio.wait_for(task, timeout=1.0)
+
+    asyncio.run(_run())
+    assert any(mode == 2 and reason == "guard" for mode, reason, _ in calls)
+
+
 def test_adaptive_notice_seconds_interpolates_and_clamps():
     module = _load_demo_module()
     assert module._adaptive_notice_seconds(queued_after_current=0, max_seconds=30.0) == 30.0
-    assert module._adaptive_notice_seconds(queued_after_current=10, max_seconds=30.0) == 10.0
-    assert module._adaptive_notice_seconds(queued_after_current=100, max_seconds=30.0) == 10.0
-    assert module._adaptive_notice_seconds(queued_after_current=5, max_seconds=30.0) == 20.0
+    assert module._adaptive_notice_seconds(queued_after_current=20, max_seconds=30.0) == 5.0
+    assert module._adaptive_notice_seconds(queued_after_current=100, max_seconds=30.0) == 5.0
+    assert module._adaptive_notice_seconds(queued_after_current=10, max_seconds=30.0) == 17.5
 
 
 def test_adaptive_notice_seconds_respects_minimum_when_max_is_low():
     module = _load_demo_module()
-    assert module._adaptive_notice_seconds(queued_after_current=0, max_seconds=5.0) == 10.0
-    assert module._adaptive_notice_seconds(queued_after_current=7, max_seconds=5.0) == 10.0
+    assert module._adaptive_notice_seconds(queued_after_current=0, max_seconds=5.0) == 5.0
+    assert module._adaptive_notice_seconds(queued_after_current=7, max_seconds=5.0) == 5.0
 
 
 def test_discover_kanbus_project_roots_recursive(tmp_path: Path):

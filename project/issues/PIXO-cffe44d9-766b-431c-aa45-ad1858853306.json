@@ -1,0 +1,31 @@
+{
+  "id": "PIXO-cffe44d9-766b-431c-aa45-ad1858853306",
+  "title": "Kanbus clock: rotation persistence across reconnect/reboot",
+  "description": "Make rotation policy persistent (default right-side-up), reapply on reconnect, and add a periodic rotation guard in kanbus_clock.",
+  "type": "task",
+  "status": "in_progress",
+  "priority": 2,
+  "assignee": null,
+  "creator": null,
+  "parent": "PIXO-6d6c8e05-67c0-4095-b0c2-776433d0ea95",
+  "labels": [],
+  "dependencies": [],
+  "comments": [
+    {
+      "id": "6f85b2e0-79cf-4ad7-a49d-6cbcf2d4eaf3",
+      "author": "ryan.porter",
+      "text": "Tests complete: py_compile on demos/kanbus_clock.py + src/pypixoo/raster.py and pytest tests/test_raster.py tests/test_kanbus_clock.py (73 passed). Added coverage for parser default, reconnect callback, desired mode mapping, and rotation guard loop.",
+      "created_at": "2026-03-10T01:35:26.735398Z"
+    },
+    {
+      "id": "196e19f8-5587-4075-aabe-7cd95bfc485b",
+      "author": "ryan.porter",
+      "text": "Device validation: restarted kanbus_clock with no rotation flags (new default path). Runtime logs show desired mode 0 and successful startup apply: 'pixoo: desired screen rotation mode 0' + 'screen rotation set to mode 0 (startup)'. Process running for live verification.",
+      "created_at": "2026-03-10T01:36:02.371194Z"
+    }
+  ],
+  "created_at": "2026-03-10T01:33:25.600916Z",
+  "updated_at": "2026-03-10T01:36:02.371194Z",
+  "closed_at": null,
+  "custom": {}
+}

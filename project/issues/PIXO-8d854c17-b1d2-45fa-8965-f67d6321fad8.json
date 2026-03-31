@@ -16,10 +16,22 @@
       "author": "unknown",
       "text": "Implemented adaptive notification hold: hold_seconds now linearly scales from 30s at queued_after=0 to 10s at queued_after>=10, with 10s minimum. Tests passing (66). Clock restarted with patch.",
       "created_at": "2026-03-09T01:11:28.316107Z"
+    },
+    {
+      "id": "4a70488d-308f-42ba-bbba-f0f451b22cb8",
+      "author": "unknown",
+      "text": "Applying new hold-duration curve: 30s at depth 0, linearly down to 5s at depth 20, clamped to 5s minimum beyond depth 20.",
+      "created_at": "2026-03-09T05:20:32.011135Z"
+    },
+    {
+      "id": "43b5871d-abaf-4ed5-a10d-bca8adccb50d",
+      "author": "unknown",
+      "text": "Implemented adaptive hold update: min_seconds=5.0 and depth_for_minimum=20. New curve: 30s at depth 0, 17.5s at depth 10, 5s at depth >=20. Updated unit tests and verified with pytest (-k adaptive_notice_seconds).",
+      "created_at": "2026-03-09T05:20:57.573906Z"
     }
   ],
   "created_at": "2026-03-09T01:10:20.755739Z",
-  "updated_at": "2026-03-09T01:11:28.316107Z",
+  "updated_at": "2026-03-09T05:20:57.573906Z",
   "closed_at": null,
   "custom": {}
 }

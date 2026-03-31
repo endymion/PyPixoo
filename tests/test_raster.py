@@ -59,13 +59,20 @@ def test_pixoo_frame_sink_reconnects_on_connection_loss():
     pixoo = MagicMock()
     pixoo.push_buffer.side_effect = [requests.exceptions.ConnectionError("boom"), None]
     pixoo.connect.side_effect = [False, True]
+    on_reconnect = MagicMock()
 
-    sink = PixooFrameSink(pixoo, reconnect=True, reconnect_delay_s=0.001)
+    sink = PixooFrameSink(
+        pixoo,
+        reconnect=True,
+        reconnect_delay_s=0.001,
+        on_reconnect=on_reconnect,
+    )
     with patch("pypixoo.raster.time.sleep", return_value=None):
         sink.push(_frame((1, 1, 1)))
 
     assert pixoo.connect.call_count >= 1
     assert pixoo.push_buffer.call_count == 2
+    on_reconnect.assert_called_once()
 
 
 def test_async_raster_stream_parity():
